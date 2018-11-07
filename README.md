@@ -1,4 +1,6 @@
-# semviz
+# Semviz
+
+[![Build Status](https://travis-ci.org/vmoglan/semviz.svg?branch=master)](https://travis-ci.org/vmoglan/semviz)
 
 ## Main objective
 Create a viewer for semantically annotated three-dimensional point clouds.
