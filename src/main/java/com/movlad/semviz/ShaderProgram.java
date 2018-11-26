@@ -1,11 +1,23 @@
 package com.movlad.semviz;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.nio.charset.Charset;
 
 import com.jogamp.opengl.GL4;
 import com.jogamp.opengl.GLException;
+
+class ShaderSource {
+	public String[] vertexShaderSource = { "" };
+	public String[] fragmentShaderSource = { "" };
+}
+
+enum ShaderType { NONE, VERTEX_SHADER, FRAGMENT_SHADER }
 
 /**
  * Shader program that runs on the GPU. Compiled from the sources for a vertex shader
@@ -28,6 +40,14 @@ public class ShaderProgram {
 			throws GLException {
 		this.gl = gl;
 		this.id = createProgram(vertexShaderSource, fragmentShaderSource);
+	}
+	
+	public ShaderProgram(GL4 gl, String path) throws IOException {
+		this.gl = gl;
+		
+		ShaderSource source = parse(path);
+		
+		this.id = createProgram(source.vertexShaderSource, source.fragmentShaderSource);
 	}
 	
 	public int getId() { return id; }
@@ -123,6 +143,45 @@ public class ShaderProgram {
 		}
 		
 		return id;
+	}
+	
+	/**
+	 * Parses a {@code .glsl} file and returns the shader source codes.
+	 * 
+	 * @param path is the path of the {@code .glsl} file
+	 * @return the source code for the shaders
+	 * @throws IOException if the shader file is not found/failed to create streams/reader
+	 */
+	private ShaderSource parse(String path) throws IOException {
+		ShaderSource source = new ShaderSource();
+		File file = new File(path);
+		FileInputStream fileInputStream = new FileInputStream(file);
+		BufferedReader reader = new BufferedReader(new InputStreamReader(fileInputStream));
+		String line;
+		ShaderType type = ShaderType.NONE;
+		
+		while ((line = reader.readLine()) != null) {
+			if (line.contains("VERTEX_SHADER")) {
+				type = ShaderType.VERTEX_SHADER;
+			} else if (line.contains("FRAGMENT_SHADER")) {
+				type = ShaderType.FRAGMENT_SHADER;
+			} else {
+				switch (type) {
+				case VERTEX_SHADER:
+					source.vertexShaderSource[0] += line + "\r\n";
+					break;
+				case FRAGMENT_SHADER:
+					source.fragmentShaderSource[0] += line + "\r\n";
+					break;
+				default:
+					throw new GLException("Invalid shader file format.");
+				}
+			}
+		}
+		
+		reader.close();
+		
+		return source;
 	}
 	
 }

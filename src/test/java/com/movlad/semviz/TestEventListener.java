@@ -1,5 +1,6 @@
 package com.movlad.semviz;
 
+import java.io.IOException;
 import java.nio.FloatBuffer;
 
 import com.jogamp.opengl.GL;
@@ -20,31 +21,12 @@ public class TestEventListener implements GLEventListener {
 		
 		// Shaders
 		
-		String[] vertexShaderSource =  new String[] { 
-			"#version 400 core\r\n" +
-			"in vec3 position;\r\n" +
-			"in vec3 in_color;\r\n" +
-			"out vec3 out_color;\r\n" +
-			"\r\n" +
-			"void main()\r\n" +
-			"{\r\n" +
-			"	gl_Position = vec4(position, 1.0f);\r\n" +
-			"   out_color = in_color;\r\n" +
-			"}\r\n"
-		};
-		
-		String[] fragShaderSource = new String[] { 
-			"#version 400 core\r\n" +
-			"in vec3 out_color;\r\n" +
-			"out vec4 frag_color;\r\n" +
-			"\r\n" +
-			"void main()\r\n" +
-			"{\r\n" +
-			"	frag_color = vec4(out_color, 1.0f);\r\n" +
-			"}\r\n"
-		};
-		
-		program = new ShaderProgram(gl, vertexShaderSource, fragShaderSource);
+		try {
+			program = new ShaderProgram(gl, ClassLoader.getSystemClassLoader()
+					.getResource("shaders/shader.glsl").getFile());
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
 		
 		// Buffers
 		
