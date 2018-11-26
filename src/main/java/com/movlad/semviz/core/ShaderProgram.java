@@ -1,4 +1,4 @@
-package com.movlad.semviz;
+package com.movlad.semviz.core;
 
 import java.io.BufferedReader;
 import java.io.File;

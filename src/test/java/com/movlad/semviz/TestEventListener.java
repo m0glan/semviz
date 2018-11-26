@@ -8,6 +8,11 @@ import com.jogamp.opengl.GL4;
 import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.GLEventListener;
 import com.jogamp.opengl.GLException;
+import com.movlad.semviz.core.BufferLayout;
+import com.movlad.semviz.core.ShaderProgram;
+import com.movlad.semviz.core.VertexArrayObject;
+import com.movlad.semviz.core.VertexBufferObject;
+import com.movlad.semviz.core.io.VertexDataReader;
 
 public class TestEventListener implements GLEventListener {
 
@@ -30,13 +35,16 @@ public class TestEventListener implements GLEventListener {
 		
 		// Buffers
 		
-		float[] vertexArr = {
-			-0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f,
-			0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f,
-			0.0f, 0.5f, 0.0f, 0.0f, 0.0f, 1.0f
-		};
+		VertexDataReader vertexDataReader = new VertexDataReader(ClassLoader.getSystemClassLoader()
+				.getResource("data/cube.txt").getFile());
 		
-		FloatBuffer vertices = FloatBuffer.wrap(vertexArr);
+		try {
+			vertexDataReader.read();
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+		
+		FloatBuffer vertices = vertexDataReader.getDataBuffer();
 				
 		try {
 			vao = new VertexArrayObject(gl);
@@ -44,7 +52,6 @@ public class TestEventListener implements GLEventListener {
 			
 			BufferLayout layout = new BufferLayout();
 			
-			layout.pushFloats(3, false);
 			layout.pushFloats(3, false);
 			
 			vao.addBuffer(vbo, layout);
@@ -69,7 +76,7 @@ public class TestEventListener implements GLEventListener {
 		program.use();
 		vao.bind();
 		
-		gl.glDrawArrays(GL4.GL_TRIANGLES, 0, 3);
+		gl.glDrawArrays(GL4.GL_TRIANGLES, 0, 36);
 	}
 
 	@Override
