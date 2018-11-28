@@ -13,7 +13,6 @@ import com.movlad.semviz.core.BufferLayout;
 import com.movlad.semviz.core.BufferedGeometry;
 import com.movlad.semviz.core.Camera;
 import com.movlad.semviz.core.MeshRenderer;
-import com.movlad.semviz.core.PerspectiveCamera;
 import com.movlad.semviz.core.Renderer;
 import com.movlad.semviz.core.Scene;
 import com.movlad.semviz.core.io.VertexDataReader;
@@ -61,7 +60,7 @@ class SceneRenderTest {
 		
 		animator.start();
 		
-		while (window.isVisible());
+		// while (window.isVisible());
 	}
 	
 	private static void initContext() {
