@@ -1,6 +1,5 @@
-package com.movlad.semviz;
+package com.movlad.semviz.core;
 
-/*
 import java.io.IOException;
 
 import org.joml.Vector3f;
@@ -18,13 +17,9 @@ import com.movlad.semviz.core.PerspectiveCamera;
 import com.movlad.semviz.core.Renderer;
 import com.movlad.semviz.core.Scene;
 import com.movlad.semviz.core.io.VertexDataReader;
-*/
 
 class SceneRenderTest {
 	
-	/*
-	 * TODO: FIX TEST
-	 * 
 	private static GLWindow window = null;
 	private static GLProfile profile;
 	private static GLCapabilities caps;
@@ -66,7 +61,7 @@ class SceneRenderTest {
 		
 		animator.start();
 		
-		// while (window.isVisible());
+		while (window.isVisible());
 	}
 	
 	private static void initContext() {
@@ -102,12 +97,12 @@ class SceneRenderTest {
 			scene.add(geometry);
 		}
 		
-		camera = new PerspectiveCamera(45, 800/600, 0.1f, 1000.0f);
+		camera = new OrthogonalCamera(-20, 20, -20, 20, 0.1f, 1000.0f);
 		
 		camera.translate(new Vector3f(0.0f, 0.0f, -10.0f));
 		camera.setTarget(new Vector3f(-10.0f, 0.0f, 0.0f));
 		
 		renderer = new MeshRenderer(scene, camera);
 	}
-	*/
+	
 }

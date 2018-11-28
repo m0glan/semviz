@@ -30,7 +30,7 @@ public class MeshRenderer extends Renderer {
 		gl.glEnable(GL4.GL_DEPTH_TEST);
 		
 		try {
-			program = new ShaderProgram(gl, ClassLoader.getSystemClassLoader()
+			program = new ShaderProgram(gl, this.getClass().getClassLoader()
 					.getResource("shaders/shader.glsl").getFile());
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -51,14 +51,12 @@ public class MeshRenderer extends Renderer {
 			VertexArrayObject vertexArrayObject = new VertexArrayObject(gl);
 			
 			vertexArrayObjects.add(vertexArrayObject);
-			
 			vertexArrayObject.bind();
 			
 			Buffer dataBuffer = FloatBuffer.wrap(scene.get(i).getData());
 			
 			VertexBufferObject vertexBufferObject = new VertexBufferObject(gl, dataBuffer, dataBuffer.capacity() 
 					* Float.BYTES, GL4.GL_STATIC_DRAW);
-			
 			BufferLayout layout = scene.get(i).getLayout();
 			
 			vertexArrayObject.addBuffer(vertexBufferObject, layout);

@@ -21,7 +21,7 @@ public class PerspectiveCamera extends Camera {
 
 	@Override
 	protected void updateProjectionMatrix() {
-		this.projectionMatrix = this.projectionMatrix.perspective(fov, aspect, near, far);
+		projectionMatrix = projectionMatrix.perspective(fov, aspect, near, far);
 	}
 	
 }
