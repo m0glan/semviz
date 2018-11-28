@@ -66,12 +66,13 @@ public class VertexArrayObject {
 		vbo.bind();
 		
 		for (int i = 0; i < layout.size(); i++) {
-			BufferLayoutElement e = layout.get(i);
+			BufferAttribute attribute = layout.get(i);
 			
 			gl.glEnableVertexAttribArray(i);
-			gl.glVertexAttribPointer(i, e.getCount(), e.getType(), e.isNormalized(), layout.getStride(), offset);
-			offset += e.getSize();
+			gl.glVertexAttribPointer(i, attribute.getCount(), GL4.GL_FLOAT, attribute.isNormalized(), layout.getStride(), offset);
+			offset += attribute.getSize();
 		}
 	}
 	
 }
+

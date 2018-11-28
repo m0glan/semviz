@@ -2,39 +2,27 @@ package com.movlad.semviz.core;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-
-import com.jogamp.opengl.GL4;
+import java.util.List;
 
 /**
  * Keeps structural and size-related information concerning the layout of a {@code VertexBufferObject},
  * such as position, color, texture coordinates etc. .
  */
-public class BufferLayout implements Iterable<BufferLayoutElement> {
+public class BufferLayout implements Iterable<BufferAttribute> {
 
-	private ArrayList<BufferLayoutElement> elements = new ArrayList<>();
+	private List<BufferAttribute> attributes = new ArrayList<>();
 	private int stride = 0; 
+	
+	public List<BufferAttribute> getAttributes() { return attributes; }
 
 	/**
 	 * @return sum of the sizes of all the layout elements
 	 */
 	public int getStride() { return stride; }
 	
-	public BufferLayoutElement get(int i) { return elements.get(i); }
+	public BufferAttribute get(int i) { return attributes.get(0); }
 	
-	public int size() { return elements.size(); }
-	
-	/**
-	 * Adds a layout component which is a sequence of unsigned integers.
-	 * 
-	 * @param count is the length of the sequence
-	 * @param normalized is true if the sequence elements are normalized
-	 */
-	public void pushUInts(int count, boolean normalized) {
-		BufferLayoutElement e = new BufferLayoutElement(GL4.GL_UNSIGNED_INT, count, normalized);
-		
-		elements.add(e);
-		stride += e.getSize();
-	}
+	public int size() { return attributes.size(); }
 	
 	/**
 	 * Adds a layout component which is a sequence of floats.
@@ -42,29 +30,16 @@ public class BufferLayout implements Iterable<BufferLayoutElement> {
 	 * @param count is the length of the sequence
 	 * @param normalized is true if the sequence elements are normalized
 	 */
-	public void pushFloats(int count, boolean normalized) {
-		BufferLayoutElement e = new BufferLayoutElement(GL4.GL_FLOAT, count, normalized);
+	public void push(String name, int count, boolean normalized) {
+		BufferAttribute attribute = new BufferAttribute(name, count, normalized);
 		
-		elements.add(e);
-		stride += e.getSize();
-	}
-	
-	/**
-	 * Adds a layout component which is a sequence of unsigned bytes.
-	 * 
-	 * @param count is the length of the sequence
-	 * @param normalized is true if the sequence elements are normalized
-	 */
-	public void pushUBytes(int count, boolean normalized) {
-		BufferLayoutElement e = new BufferLayoutElement(GL4.GL_UNSIGNED_BYTE, count, normalized);
-		
-		elements.add(e);
-		stride += e.getSize();
+		attributes.add(attribute);
+		stride += attribute.getSize();
 	}
 	
 	@Override
-	public Iterator<BufferLayoutElement> iterator() {
-		return elements.iterator();
+	public Iterator<BufferAttribute> iterator() {
+		return attributes.iterator();
 	}
 	
 }

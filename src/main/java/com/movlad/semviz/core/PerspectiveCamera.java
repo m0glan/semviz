@@ -1,5 +1,8 @@
 package com.movlad.semviz.core;
 
+/**
+ * Camera offering a perspective (real-life) view of the scene.
+ */
 public class PerspectiveCamera extends Camera {
 
 	private float fov;
