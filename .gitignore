@@ -1,2 +1,2 @@
 /target/
-/src/test/java/com/movlad/semviz/core/SceneRenderTest.java
+/src/test/java/com/movlad/semviz/graphics/engine/SceneRenderTest.java
