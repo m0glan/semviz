@@ -63,23 +63,23 @@ public class OrbitControls implements MouseListener {
 
 			// getting the current position of the camera in the polar coordinate system
 
-		    Vector3f polarCoords = MathUtils.toPolarCoords(camera.getPosition());
+		    Vector3f sphericalCoords = MathUtils.toSphericalCoords(camera.getPosition());
 
 		    float speedY = (float)Math.toRadians(differenceY / 4.0f);
 		    float speedX = (float)Math.toRadians(differenceX / 4.0f);
 
 		    // adding speedY to the theta angle and speedX to the phi angle
 
-		    polarCoords.add(new Vector3f(0, speedY, speedX));
+		    sphericalCoords.add(new Vector3f(0, speedY, speedX));
 
 		    // making sure the angles are not outside the [0, 2 * PI] interval
 
-		    polarCoords.y = MathUtils.normalizeAngle(polarCoords.y);
-		    polarCoords.z = MathUtils.normalizeAngle(polarCoords.z);
+		    sphericalCoords.y = MathUtils.wrapTo2Pi(sphericalCoords.y);
+		    sphericalCoords.z = MathUtils.wrapTo2Pi(sphericalCoords.z);
 
 		    // updating the position of the camera
 
-		    camera.setPosition(MathUtils.toCartesianCoords(polarCoords));
+		    camera.setPosition(MathUtils.toCartesianCoords(sphericalCoords));
 		}
 	}
 

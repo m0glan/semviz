@@ -5,12 +5,12 @@ import org.joml.Vector3f;
 public class MathUtils {
 
 	/**
-	 * Converts a position in the Cartesian coordinate system to a position in the Polar coordinate system.
+	 * Converts a position in the Cartesian coordinate system to a position in the spherical coordinate system.
 	 * 
 	 * @param cartesianCoords is the position to be converted
-	 * @return the polar coordinates
+	 * @return the spherical coordinates
 	 */
-	public static Vector3f toPolarCoords(Vector3f cartesianCoords) {
+	public static Vector3f toSphericalCoords(Vector3f cartesianCoords) {
 		float r = cartesianCoords.length();
 		float theta = (float) Math.acos(cartesianCoords.z / r);
 		float phi = (float) Math.atan2(cartesianCoords.y, cartesianCoords.x);
@@ -19,15 +19,15 @@ public class MathUtils {
 	}
 	
 	/**
-	 * Converts a position in the Polar coordinate system to a position in the Polar coordinate system.
+	 * Converts a position in the spherical coordinate system to a position in the Cartesian coordinate system.
 	 * 
-	 * @param polarCoords is the position to be converted
+	 * @param sphericalCoords is the position to be converted
 	 * @return the Cartesian coordinates
 	 */
-	public static Vector3f toCartesianCoords(Vector3f polarCoords) {
-		float x = (float) (polarCoords.x * Math.sin(polarCoords.y) * Math.cos(polarCoords.z));
-		float y = (float) (polarCoords.x * Math.sin(polarCoords.y) * Math.sin(polarCoords.z));
-		float z = (float) (polarCoords.x * Math.cos(polarCoords.y));
+	public static Vector3f toCartesianCoords(Vector3f sphericalCoords) {
+		float x = (float) (sphericalCoords.x * Math.sin(sphericalCoords.y) * Math.cos(sphericalCoords.z));
+		float y = (float) (sphericalCoords.x * Math.sin(sphericalCoords.y) * Math.sin(sphericalCoords.z));
+		float z = (float) (sphericalCoords.x * Math.cos(sphericalCoords.y));
 		
 		return new Vector3f(x, y, z);
 	}
@@ -36,8 +36,8 @@ public class MathUtils {
 	 * @param ang is the angle to be normalized in radians
 	 * @return an angle between 0 and {@code 2 * PI}
 	 */
-	public static float normalizeAngle(float ang) {
-		float nang = ang;
+	public static float wrapTo2Pi(float ang) {
+		float wrap = ang;
 		
 		if (ang > (2 * Math.PI)) {
 			ang -= 2 * Math.PI;
@@ -45,7 +45,7 @@ public class MathUtils {
 			ang += 2 * Math.PI;
 		}
 		
-		return nang;
+		return wrap;
 	}
 	
 }
