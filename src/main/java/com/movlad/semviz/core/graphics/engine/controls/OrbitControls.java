@@ -7,6 +7,9 @@ import com.jogamp.newt.event.MouseListener;
 import com.movlad.semviz.core.graphics.MathUtils;
 import com.movlad.semviz.core.graphics.engine.Camera;
 
+/**
+ * Controls making the camera move around the world's origin.
+ */
 public class OrbitControls implements MouseListener {
 	
 	private Camera camera;
@@ -58,16 +61,25 @@ public class OrbitControls implements MouseListener {
 			oldX = e.getX();
 			oldY = e.getY();
 
-			Vector3f polarCoords = MathUtils.toPolarCoords(camera.getPosition());
-			
-			float speedY = (float)Math.toRadians(differenceY / 4.0f);
-			float speedX = (float)Math.toRadians(differenceX / 4.0f);
-			
-			polarCoords.add(new Vector3f(0, speedY, speedX));
-			polarCoords.y = MathUtils.normalizeAngle(polarCoords.y);
-			polarCoords.z = MathUtils.normalizeAngle(polarCoords.z);
-			
-			camera.setPosition(MathUtils.toCartesianCoords(polarCoords));
+			// getting the current position of the camera in the polar coordinate system
+
+		    Vector3f polarCoords = MathUtils.toPolarCoords(camera.getPosition());
+
+		    float speedY = (float)Math.toRadians(differenceY / 4.0f);
+		    float speedX = (float)Math.toRadians(differenceX / 4.0f);
+
+		    // adding speedY to the theta angle and speedX to the phi angle
+
+		    polarCoords.add(new Vector3f(0, speedY, speedX));
+
+		    // making sure the angles are not outside the [0, 2 * PI] interval
+
+		    polarCoords.y = MathUtils.normalizeAngle(polarCoords.y);
+		    polarCoords.z = MathUtils.normalizeAngle(polarCoords.z);
+
+		    // updating the position of the camera
+
+		    camera.setPosition(MathUtils.toCartesianCoords(polarCoords));
 		}
 	}
 
