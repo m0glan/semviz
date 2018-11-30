@@ -1,4 +1,4 @@
-package com.movlad.semviz.engine;
+package com.movlad.semviz.core.graphics.engine;
 
 import java.util.ArrayList;
 import java.util.Iterator;

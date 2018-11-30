@@ -1,4 +1,4 @@
-package com.movlad.semviz.core;
+package com.movlad.semviz.core.graphics;
 
 /**
  * Class representing one attribute of a buffer layout, such

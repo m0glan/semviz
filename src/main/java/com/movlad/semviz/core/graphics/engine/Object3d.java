@@ -1,4 +1,4 @@
-package com.movlad.semviz.engine;
+package com.movlad.semviz.core.graphics.engine;
 
 import java.util.UUID;
 
@@ -30,7 +30,7 @@ public class Object3d {
 
 		position = new Vector3f(0.0f, 0.0f, -5.0f);
 
-		worldUp = new Vector3f(0.0f, 1.0f, 0.0f);
+		worldUp = new Vector3f(0.0f, 0.0f, 1.0f);
 		target = new Vector3f();
 		direction = new Vector3f();
 		up = new Vector3f();
@@ -48,6 +48,25 @@ public class Object3d {
 
 	public void setPosition(Vector3f position) {
 		this.position = position;
+		
+		updateVectors();
+	}
+	
+	public void setX(float x) {
+		position.x = x;
+		
+		updateVectors();
+	}
+	
+	public void setY(float y) {
+		position.y = y;
+		
+		updateVectors();
+	}
+	
+	public void setZ(float z) {
+		position.z = z;
+		
 		updateVectors();
 	}
 

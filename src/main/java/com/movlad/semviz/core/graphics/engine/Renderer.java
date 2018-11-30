@@ -1,9 +1,9 @@
-package com.movlad.semviz.engine;
+package com.movlad.semviz.core.graphics.engine;
 
 import com.jogamp.opengl.GL4;
 import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.GLEventListener;
-import com.movlad.semviz.core.ShaderProgram;
+import com.movlad.semviz.core.graphics.ShaderProgram;
 
 /**
  * Renders a scene with a camera on a canvas.

@@ -1,4 +1,4 @@
-package com.movlad.semviz.core;
+package com.movlad.semviz.core.graphics;
 
 import java.nio.Buffer;
 import java.nio.IntBuffer;
