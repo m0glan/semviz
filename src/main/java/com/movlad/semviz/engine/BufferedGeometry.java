@@ -1,4 +1,6 @@
-package com.movlad.semviz.core;
+package com.movlad.semviz.engine;
+
+import com.movlad.semviz.core.BufferLayout;
 
 /**
  * Basic geometry grouping vertex data and buffer layout.

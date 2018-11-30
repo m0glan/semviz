@@ -10,12 +10,15 @@ import com.jogamp.opengl.GLCapabilities;
 import com.jogamp.opengl.GLProfile;
 import com.jogamp.opengl.util.FPSAnimator;
 import com.movlad.semviz.core.BufferLayout;
-import com.movlad.semviz.core.BufferedGeometry;
-import com.movlad.semviz.core.Camera;
-import com.movlad.semviz.core.MeshRenderer;
-import com.movlad.semviz.core.Renderer;
-import com.movlad.semviz.core.Scene;
 import com.movlad.semviz.core.io.VertexDataReader;
+import com.movlad.semviz.engine.BufferedGeometry;
+import com.movlad.semviz.engine.Camera;
+import com.movlad.semviz.engine.MeshRenderer;
+// import com.movlad.semviz.engine.OrthographicCamera;
+import com.movlad.semviz.engine.PerspectiveCamera;
+import com.movlad.semviz.engine.Renderer;
+import com.movlad.semviz.engine.Scene;
+import com.movlad.semviz.engine.controls.OrbitControls;
 
 class SceneRenderTest {
 	
@@ -42,6 +45,7 @@ class SceneRenderTest {
 	private static Scene scene;
 	private static Camera camera;
 	private static Renderer renderer;
+	private static OrbitControls orbit;
 
 	@Test
 	void test() {
@@ -53,6 +57,7 @@ class SceneRenderTest {
 		window.setSize(640, 320);
 		window.setResizable(false);
 		window.addGLEventListener(renderer);
+		window.addMouseListener(orbit);
 		
 		window.setVisible(true);
 		
@@ -60,7 +65,7 @@ class SceneRenderTest {
 		
 		animator.start();
 		
-		// while (window.isVisible());
+		while (window.isVisible());
 	}
 	
 	private static void initContext() {
@@ -93,15 +98,23 @@ class SceneRenderTest {
 			BufferedGeometry geometry = new BufferedGeometry(vertexData, layout);
 			
 			geometry.setPosition(geometryPositions[i]);
+			
+			if (i != 0 && i != 2) geometry.setVisible(false);
+			
 			scene.add(geometry);
 		}
 		
-		camera = new OrthogonalCamera(-20, 20, -20, 20, 0.1f, 1000.0f);
+		// camera = new OrthographicCamera(-10, 10, -10, 10, 0.1f, 1000.0f);
+		
+		camera = new PerspectiveCamera((float) Math.toRadians(45.0f), (float)800/600, 0.1f, 1000.0f);
 		
 		camera.translate(new Vector3f(0.0f, 0.0f, -10.0f));
-		camera.setTarget(new Vector3f(-10.0f, 0.0f, 0.0f));
+		camera.setMaxZoomLevel(-50);
+		camera.setMaxZoomLevel(50);
 		
 		renderer = new MeshRenderer(scene, camera);
+		
+		orbit = new OrbitControls(camera);
 	}
 	
 }

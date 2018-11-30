@@ -14,7 +14,7 @@ class BufferAttribute {
 	 * Constructor.
 	 * 
 	 * @param name is the name of the attribute as present in the shader
-	 * @param data is the data that the attribute contains
+	 * @param count is the number of components of the attribute
 	 * @param normalized is true if the value is between 0 and 1
 	 */
 	public BufferAttribute(String name, int count, boolean normalized) {

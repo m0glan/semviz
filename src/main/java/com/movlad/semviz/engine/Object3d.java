@@ -1,4 +1,4 @@
-package com.movlad.semviz.core;
+package com.movlad.semviz.engine;
 
 import java.util.UUID;
 

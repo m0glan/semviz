@@ -1,1 +1,4 @@
-com.movlad.semviz
+com.movlad.semviz.core
+com.movlad.semviz.core.io
+com.movlad.semviz.engine
+com.movlad.semviz.engine.controls

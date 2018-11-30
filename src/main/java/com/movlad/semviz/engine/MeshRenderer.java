@@ -1,4 +1,4 @@
-package com.movlad.semviz.core;
+package com.movlad.semviz.engine;
 
 import java.io.IOException;
 import java.nio.Buffer;
@@ -11,6 +11,10 @@ import org.lwjgl.BufferUtils;
 
 import com.jogamp.opengl.GL4;
 import com.jogamp.opengl.GLAutoDrawable;
+import com.movlad.semviz.core.BufferLayout;
+import com.movlad.semviz.core.ShaderProgram;
+import com.movlad.semviz.core.VertexArrayObject;
+import com.movlad.semviz.core.VertexBufferObject;
 
 /**
  * Renderer used for rendering basic geometries (triangles).

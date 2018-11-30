@@ -1,4 +1,6 @@
-package com.movlad.semviz.core;
+package com.movlad.semviz.engine;
+
+import org.joml.Matrix4f;
 
 /**
  * Camera offering a perspective (real-life) view of the scene.
@@ -20,7 +22,21 @@ public class PerspectiveCamera extends Camera {
 	}
 
 	@Override
+	protected boolean performZoom(float zoom) {
+		float newFov = fov - zoom;
+		
+		if (Math.toRadians(newFov) > 0 && Math.toRadians(newFov) < Math.PI) {
+			fov = newFov;
+			
+			return true;
+		}
+		
+		return false;
+	}
+	
+	@Override
 	protected void updateProjectionMatrix() {
+		projectionMatrix = new Matrix4f();
 		projectionMatrix = projectionMatrix.perspective(fov, aspect, near, far);
 	}
 	
