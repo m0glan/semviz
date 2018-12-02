@@ -1,19 +1,24 @@
 package com.movlad.semviz.core.graphics.engine;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.UUID;
 
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
+import com.jogamp.opengl.GL4;
+
 /**
  * Generic representation of a 3d object.
  */
-public class Object3d {
+public class Object3d implements Iterable<Object3d> {
 
 	private String id;
 
-	// world matrix and factors
-
+	private float scale;
+	
 	private Vector3f position;
 
 	// object vectors
@@ -22,29 +27,41 @@ public class Object3d {
 	private Vector3f target;
 	private Vector3f direction;
 	private Vector3f up;
+	
+	Matrix4f matrixWorld;
 
-	private boolean visible;
+	private boolean isVisible;
+	
+	List<Object3d> children;
 
 	public Object3d() {
 		id = UUID.randomUUID().toString();
 
+		scale = 1.0f;
+		
 		position = new Vector3f(0.0f, 0.0f, -5.0f);
 
 		worldUp = new Vector3f(0.0f, 0.0f, 1.0f);
 		target = new Vector3f();
 		direction = new Vector3f();
 		up = new Vector3f();
+		
+		isVisible = true;
+		
+		children = new ArrayList<>();
+	}
 
+	public String getId() { return id; }
+
+	public float getScale() { return scale; }
+	
+	public void setScale(float scale) { 
+		this.scale = scale; 
+		
 		updateVectors();
 	}
-
-	public String getId() {
-		return id;
-	}
-
-	public Vector3f getPosition() {
-		return position;
-	}
+	
+	public Vector3f getPosition() { return position; }
 
 	public void setPosition(Vector3f position) {
 		this.position = position;
@@ -70,26 +87,27 @@ public class Object3d {
 		updateVectors();
 	}
 
-	public Vector3f getWorldUp() {
-		return worldUp;
-	}
+	public Vector3f getWorldUp() { return worldUp; }
 
 	public void setWorldUp(Vector3f worldUp) {
 		this.worldUp = worldUp;
+		
 		updateVectors();
 	}
 
-	public Vector3f getUp() {
-		return up;
+	public Vector3f getUp() { return up; }
+
+	public Vector3f getDirection() { return direction; }
+	
+	public Vector3f getRight() { 
+		Vector3f right = new Vector3f();
+		
+		up.cross(direction, right);
+		
+		return right;
 	}
 
-	public Vector3f getDirection() {
-		return direction;
-	}
-
-	public Vector3f getTarget() {
-		return target;
-	}
+	public Vector3f getTarget() { return target; }
 
 	/**
 	 * Changes the target the object is facing and updates its vectors.
@@ -106,26 +124,7 @@ public class Object3d {
 		position.add(t);
 		updateVectors();
 	};
-
-	/**
-	 * @return the matrix world based on the object vectors
-	 */
-	public Matrix4f getMatrixWorld() {
-		Matrix4f matrixWorld = new Matrix4f();
-
-		matrixWorld.lookAt(position, target, up);
-
-		return matrixWorld;
-	}
-
-	public boolean isVisible() {
-		return visible;
-	}
-
-	public void setVisible(boolean visible) {
-		this.visible = visible;
-	}
-
+	
 	/**
 	 * Recalculates object vectors upon a change of target or a translation.
 	 */
@@ -140,6 +139,40 @@ public class Object3d {
 
 		direction.cross(right, up);
 		up.normalize();
+		
+		matrixWorld = new Matrix4f();
+		
+		matrixWorld.lookAt(position, target, up);
 	}
+
+	/**
+	 * @return the matrix world based on the object vectors
+	 */
+	public Matrix4f getMatrixWorld() {
+		Matrix4f matrixWorld = new Matrix4f();
+
+		this.matrixWorld.scale(scale, scale, scale, matrixWorld);
+
+		return matrixWorld;
+	}
+	
+	public int getDrawingMode() { return GL4.GL_TRIANGLES; }
+
+	public boolean isVisible() { return isVisible; }
+
+	public void setVisible(boolean isVisible) { this.isVisible = isVisible; }
+	
+	public void add(Object3d object) { children.add(object); }
+	
+	public void remove(Object3d object) { children.remove(object); }
+	
+	public void remove(int i) { children.remove(i); }
+	
+	public Object3d get(int i) { return children.get(i); }
+	
+	public int numChildren() { return children.size(); }
+
+	@Override
+	public Iterator<Object3d> iterator() { return children.iterator(); }
 
 }

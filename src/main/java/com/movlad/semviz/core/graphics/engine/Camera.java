@@ -38,7 +38,6 @@ public abstract class Camera extends Object3d {
 				updateProjectionMatrix();
 			}
 		}
-		
 	}
 	
 	/**

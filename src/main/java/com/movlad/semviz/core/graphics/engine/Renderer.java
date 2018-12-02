@@ -6,13 +6,11 @@ import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.joml.Matrix4f;
 import org.lwjgl.BufferUtils;
 
 import com.jogamp.opengl.GL4;
 import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.GLEventListener;
-import com.movlad.semviz.core.graphics.BufferLayout;
 import com.movlad.semviz.core.graphics.ShaderProgram;
 import com.movlad.semviz.core.graphics.VertexArrayObject;
 import com.movlad.semviz.core.graphics.VertexBufferObject;
@@ -20,7 +18,7 @@ import com.movlad.semviz.core.graphics.VertexBufferObject;
 /**
  * Renders a scene with a camera on a canvas.
  */
-public abstract class Renderer implements GLEventListener {
+public class Renderer implements GLEventListener {
 	
 	protected Scene scene;
 	protected Camera camera;
@@ -28,7 +26,7 @@ public abstract class Renderer implements GLEventListener {
 	protected GL4 gl;
 	protected ShaderProgram program;
 	
-	private List<VertexArrayObject> vertexArrayObjects = new ArrayList<>();
+	private List<Renderable> renderables = new ArrayList<>();
 	
 	public Renderer(Scene scene, Camera camera) {
 		this.scene = scene;
@@ -49,30 +47,6 @@ public abstract class Renderer implements GLEventListener {
 		}
 		
 		program.use();
-		
-		initVertexArrays(gl);
-	}
-	
-	/**
-	 * Initializes the vertex arrays for the drawable geometries.
-	 * 
-	 * @param gl is the context
-	 */
-	private void initVertexArrays(GL4 gl) {
-		for (int i = 0; i < scene.size(); i++) {
-			VertexArrayObject vertexArrayObject = new VertexArrayObject(gl);
-			
-			vertexArrayObjects.add(vertexArrayObject);
-			vertexArrayObject.bind();
-			
-			Buffer dataBuffer = FloatBuffer.wrap(scene.get(i).getData());
-			
-			VertexBufferObject vertexBufferObject = new VertexBufferObject(gl, dataBuffer, dataBuffer.capacity() 
-					* Float.BYTES, GL4.GL_STATIC_DRAW);
-			BufferLayout layout = scene.get(i).getLayout();
-			
-			vertexArrayObject.addBuffer(vertexBufferObject, layout);
-		}
 	}
 	
 	@Override
@@ -82,60 +56,102 @@ public abstract class Renderer implements GLEventListener {
 		gl.glClear(GL4.GL_DEPTH_BUFFER_BIT | GL4.GL_COLOR_BUFFER_BIT);
 		
 		program.use();
-		
-		for (int i = 0; i < scene.size(); i++) {
-			if (scene.get(i).isVisible()) {
-				vertexArrayObjects.get(i).bind();
-				
-				int modelUniformLocation = gl.glGetUniformLocation(program.getId(), "model");
-				int viewUniformLocation = gl.glGetUniformLocation(program.getId(), "view");
-				int projectionUniformLocation = gl.glGetUniformLocation(program.getId(), "projection");
-				
-				FloatBuffer modelBuffer = BufferUtils.createFloatBuffer(16);
-				FloatBuffer viewBuffer = BufferUtils.createFloatBuffer(16);
-				FloatBuffer projectionBuffer = BufferUtils.createFloatBuffer(16);
-				
-				Matrix4f model = new Matrix4f();
-				
-				model.translate(scene.get(i).getPosition());
-				
-				model.get(modelBuffer);
-				camera.getMatrixWorld().get(viewBuffer);
-				camera.getProjectionMatrix().get(projectionBuffer);
-				
-				gl.glUniformMatrix4fv(modelUniformLocation, 1, false, modelBuffer);
-				gl.glUniformMatrix4fv(viewUniformLocation, 1, false, viewBuffer);
-				gl.glUniformMatrix4fv(projectionUniformLocation, 1, false, projectionBuffer);
-				
-				draw(scene.get(i));
-			}
-		}
-		
+		resetVertexArrays();
+		initVertexArrays(scene);
+		render();
 	}
-	
-	/**
-	 * Renderer specific drawing method.
-	 * 
-	 * @param drawable is the geometry to be drawn
-	 */
-	protected abstract void draw(BufferedGeometry drawable);
 	
 	@Override
 	public void dispose(GLAutoDrawable drawable) {
-		GL4 gl = (GL4) drawable.getGL();
-		
-		gl.glBindVertexArray(0);
-		
-		for (VertexArrayObject vertexArrayObject : vertexArrayObjects) {
-			vertexArrayObject.delete();
-		}
-		
+		resetVertexArrays();
 		program.delete();
 	}
 	
 	@Override
 	public final void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
 		// TODO
+	}
+	
+	/**
+	 * Draws renderables on the screen.
+	 */
+	private void render() {
+		for (Renderable renderable : renderables) {
+			if (renderable.getObject().isVisible()) {
+				if (renderable.getObject() instanceof Geometry) {
+					Geometry geometry = (Geometry) renderable.getObject();
+					
+					renderable.getVertexArrayObject().bind();
+					
+					setMatrixUniforms(renderable);
+					
+					gl.glDrawArrays(geometry.getDrawingMode(), 0, geometry.getVertexCount());
+				}
+			}
+		}
+	}
+	
+	/**
+	 * Sets the matrix uniforms for the currently drawn renderable.
+	 * 
+	 * @param renderable is the currently draw renderable
+	 */
+	private void setMatrixUniforms(Renderable renderable) {
+		int modelUniformLocation = gl.glGetUniformLocation(program.getId(), "model");
+		int viewUniformLocation = gl.glGetUniformLocation(program.getId(), "view");
+		int projectionUniformLocation = gl.glGetUniformLocation(program.getId(), "projection");
+		
+		FloatBuffer modelBuffer = BufferUtils.createFloatBuffer(16);
+		FloatBuffer viewBuffer = BufferUtils.createFloatBuffer(16);
+		FloatBuffer projectionBuffer = BufferUtils.createFloatBuffer(16);
+		
+		renderable.getObject().getMatrixWorld().get(modelBuffer);
+		camera.getMatrixWorld().get(viewBuffer);
+		camera.getProjectionMatrix().get(projectionBuffer);
+		
+		gl.glUniformMatrix4fv(modelUniformLocation, 1, false, modelBuffer);
+		gl.glUniformMatrix4fv(viewUniformLocation, 1, false, viewBuffer);
+		gl.glUniformMatrix4fv(projectionUniformLocation, 1, false, projectionBuffer);
+	}
+	
+	/**
+	 * Initializes the vertex arrays for the drawable geometries.
+	 * 
+	 * @param gl is the context
+	 */
+	private void initVertexArrays(Object3d object) {
+		for (Object3d child : object) {
+			if (child instanceof Geometry) {
+				Geometry geometry = (Geometry) child;
+				
+				VertexArrayObject vertexArrayObject = new VertexArrayObject(gl);
+				
+				vertexArrayObject.bind();
+				
+				Buffer dataBuffer = FloatBuffer.wrap(geometry.getData());
+				VertexBufferObject vertexBufferObject = new VertexBufferObject(gl, dataBuffer, dataBuffer.capacity() 
+						* Float.BYTES, GL4.GL_STATIC_DRAW);
+				
+				vertexArrayObject.addBuffer(vertexBufferObject, geometry.getLayout());
+				
+				renderables.add(new Renderable(child, vertexArrayObject));
+			}
+			
+			initVertexArrays(child);
+		}
+	}
+	
+	/**
+	 * Binds vertex array to 0, deletes vertex arrays and reinitializes the {@code renderables} array list
+	 */
+	private void resetVertexArrays() {
+		gl.glBindVertexArray(0);
+		
+		for (Renderable renderable : renderables) {
+			renderable.getVertexArrayObject().delete();
+		}
+		
+		renderables.clear();
 	}
 
 }
