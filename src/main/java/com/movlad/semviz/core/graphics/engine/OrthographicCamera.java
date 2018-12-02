@@ -35,29 +35,53 @@ public class OrthographicCamera extends Camera {
 		updateProjectionMatrix();
 	}
 	
+	public float getLeft() { return left; }
+	
+	public void setLeft(float left) {
+		this.left = left;
+		
+		updateProjectionMatrix();
+	}
+	
+	public float getRight() { return right; }
+	
+	public void setRight(float right) {
+		this.right = right;
+		
+		updateProjectionMatrix();
+	}
+	
+	public float getBottom() { return bottom; }
+	
+	public void setBottom(float bottom) {
+		this.bottom = bottom;
+		
+		updateProjectionMatrix();
+	}
+	
+	public float getTop() { return top; }
+	
+	public void setTop(float top) {
+		this.top = top;
+		
+		updateProjectionMatrix();
+	}
+	
 	@Override
-	protected boolean performZoom(float zoom) {
-		float newLeft = left + zoom * 1.4f;
-		float newRight = right - zoom * 1.4f;
-		float newBottom = bottom + zoom * 0.9f;
-		float newTop = top - zoom * 0.9f;
+	protected final boolean canZoom(float newZoom) {
+		float zoomedLeft = (left * newZoom) / ZOOM_FACTOR;
+		float zoomedRight = (right * newZoom) / ZOOM_FACTOR;
+		float zoomedBottom = (bottom * newZoom) / ZOOM_FACTOR;
+		float zoomedTop = (top * newZoom) / ZOOM_FACTOR;
 		
-		if (newLeft < newRight && newBottom < newTop) {
-			left = newLeft;
-			right = newRight;
-			bottom = newBottom;
-			top = newTop;
-			
-			return true;
-		}
-		
-		return false;
+		return zoomedLeft < zoomedRight && zoomedBottom < zoomedTop;
 	}
 	
 	@Override
 	protected void updateProjectionMatrix() {
 		projectionMatrix = new Matrix4f();
-		projectionMatrix = projectionMatrix.ortho(left, right, bottom, top, near, far);
+		projectionMatrix = projectionMatrix.ortho((left * getZoom()) / ZOOM_FACTOR, (right * getZoom()) / ZOOM_FACTOR, 
+				(bottom * getZoom()) / ZOOM_FACTOR, (top * getZoom()) / ZOOM_FACTOR, near, far);
 	}
 
 }

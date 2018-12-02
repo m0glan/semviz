@@ -20,24 +20,24 @@ public class PerspectiveCamera extends Camera {
 
 		updateProjectionMatrix();
 	}
-
+	
+	public void setAspect(float aspect) { 
+		this.aspect = aspect; 
+		
+		updateProjectionMatrix(); 
+	}
+	
 	@Override
-	protected boolean performZoom(float zoom) {
-		float newFov = fov - zoom;
+	public boolean canZoom(float newZoom) {
+		float zoomedFov = fov - (newZoom / ZOOM_FACTOR);
 		
-		if (Math.toRadians(newFov) > 0 && Math.toRadians(newFov) < Math.PI) {
-			fov = newFov;
-			
-			return true;
-		}
-		
-		return false;
+		return zoomedFov > 0 && zoomedFov < Math.PI;
 	}
 	
 	@Override
 	protected void updateProjectionMatrix() {
 		projectionMatrix = new Matrix4f();
-		projectionMatrix = projectionMatrix.perspective(fov, aspect, near, far);
+		projectionMatrix = projectionMatrix.perspective(fov + (getZoom() / ZOOM_FACTOR), aspect, near, far);
 	}
 	
 }

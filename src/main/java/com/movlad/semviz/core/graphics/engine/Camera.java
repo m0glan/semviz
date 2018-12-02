@@ -7,15 +7,19 @@ import org.joml.Matrix4f;
  */
 public abstract class Camera extends Object3d {
 
+	protected static final float ZOOM_FACTOR = 5.0f;
+	
 	protected Matrix4f projectionMatrix;
-	int zoomLevel;
-	int minZoomLevel;
-	int maxZoomLevel;
+	private float zoom;
+	private float minZoom;
+	private float maxZoom;
 	
 	public Camera() { 
-		this.zoomLevel = 0;
+		this.zoom = 1.0f;
 		this.setVisible(false); 
 	}
+	
+	protected float getZoom() { return zoom; }
 	
 	/**
 	 * Zooms the camera by the given amount.
@@ -23,17 +27,11 @@ public abstract class Camera extends Object3d {
 	 * @param zoom is the amount to zoom by
 	 */
 	public final void zoom(float zoom) {
-		int newZoomLevel = zoomLevel;
+		float newZoom = this.zoom - zoom;
 		
-		if (zoom < 0) {
-			newZoomLevel--;
-		} else {
-			newZoomLevel++;
-		}
-		
-		if (newZoomLevel >= minZoomLevel && newZoomLevel <= maxZoomLevel) {
-			if (performZoom(zoom)) {
-				zoomLevel = newZoomLevel;
+		if (newZoom >= minZoom && newZoom <= maxZoom) {
+			if (canZoom(newZoom)) {
+				this.zoom = newZoom;
 				
 				updateProjectionMatrix();
 			}
@@ -41,27 +39,18 @@ public abstract class Camera extends Object3d {
 	}
 	
 	/**
-	 * Actual zoom implementation, varying from camera type to camera type.
+	 * @param newZoom is the potential new value of zoom
 	 * 
-	 * @param zoom is the amount by which to zoom
-	 * @return true if a zoom has been performed
+	 * @return true if the camera can zoom
 	 */
-	protected abstract boolean performZoom(float zoom);
+	protected abstract boolean canZoom(float newZoom);
 	
-	public void setMinZoomLevel(int minZoomLevel) {
-		if (minZoomLevel > 0) {
-			this.minZoomLevel = 0;
-		} else {
-			this.minZoomLevel = minZoomLevel;
-		}
+	public void setMinZoom(float minZoom) {
+		this.minZoom = minZoom;
 	}
 	
-	public void setMaxZoomLevel(int maxZoomLevel) {
-		if (maxZoomLevel < 0) {
-			this.maxZoomLevel = 0;
-		} else {
-			this.maxZoomLevel = maxZoomLevel;
-		}
+	public void setMaxZoom(float maxZoom) {
+		this.maxZoom = maxZoom;
 	}
 	
 	/**

@@ -95,11 +95,11 @@ public class Object3d implements Iterable<Object3d> {
 		updateVectors();
 	}
 
-	public Vector3f getUp() { return up; }
+	public Vector3f getVectorUp() { return up; }
 
 	public Vector3f getDirection() { return direction; }
 	
-	public Vector3f getRight() { 
+	public Vector3f getVectorRight() { 
 		Vector3f right = new Vector3f();
 		
 		up.cross(direction, right);

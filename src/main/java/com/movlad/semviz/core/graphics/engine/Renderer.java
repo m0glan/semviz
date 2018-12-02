@@ -69,7 +69,16 @@ public class Renderer implements GLEventListener {
 	
 	@Override
 	public final void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
-		// TODO
+		// updating camera's projection matrix based on changes in windows size
+		
+		if (camera instanceof PerspectiveCamera) {
+			((PerspectiveCamera) camera).setAspect(width / height);		
+		} else if (camera instanceof OrthographicCamera) {
+			((OrthographicCamera) camera).setLeft(-width);
+			((OrthographicCamera) camera).setRight(width);
+			((OrthographicCamera) camera).setBottom(-height);
+			((OrthographicCamera) camera).setTop(height);
+		}
 	}
 	
 	/**
@@ -117,7 +126,7 @@ public class Renderer implements GLEventListener {
 	/**
 	 * Initializes the vertex arrays for the drawable geometries.
 	 * 
-	 * @param gl is the context
+	 * @param object is the object whose children will be initialized with vertex array objects
 	 */
 	private void initVertexArrays(Object3d object) {
 		for (Object3d child : object) {
