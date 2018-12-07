@@ -1,2 +1,18 @@
+# Eclipse
+.classpath
+.project
+.settings/
+
+# Intellij
+.idea/
+*.iml
+*.iws
+
+# Mac
+.DS_Store
+
+# Maven
 /target/
+
+# TravisCI
 /src/test/java/com/movlad/semviz/core/graphics/engine/SceneRenderTest.java

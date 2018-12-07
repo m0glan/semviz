@@ -15,18 +15,18 @@
           <target>1.8</target>
         </configuration>
       </plugin>
-      
+
       <plugin>
-	  	<groupId>org.apache.maven.plugins</groupId>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
         <version>2.22.0</version>
         <configuration>
-         <groups>acceptance | !feature-a</groups>
-         <excludedGroups>integration, regression</excludedGroups>
+          <groups>acceptance | !feature-a</groups>
+          <excludedGroups>integration, regression</excludedGroups>
         </configuration>
-	   </plugin>
-	   
-	   <plugin>
+      </plugin>
+
+      <plugin>
         <artifactId>maven-assembly-plugin</artifactId>
         <version>3.1.0</version>
         <configuration>
@@ -36,62 +36,64 @@
         </configuration>
         <executions>
           <execution>
-            <id>make-assembly</id> <!-- this is used for inheritance merges -->
-            <phase>package</phase> <!-- bind to the packaging phase -->
+            <id>make-assembly</id>
+            <!-- this is used for inheritance merges -->
+            <phase>package</phase>
+            <!-- bind to the packaging phase -->
             <goals>
               <goal>single</goal>
             </goals>
           </execution>
         </executions>
-	   </plugin>
+      </plugin>
     </plugins>
   </build>
-  
-  <dependencies>
-  	<!-- https://mvnrepository.com/artifact/org.jogamp.jogl/jogl-all-main -->
-	<dependency>
-	    <groupId>org.jogamp.jogl</groupId>
-	    <artifactId>jogl-all-main</artifactId>
-	    <version>2.3.2</version>
-	</dependency>
-	
-	<dependency>
-     	<groupId>org.jogamp.gluegen</groupId>
-     	<artifactId>gluegen-rt-main</artifactId>
-     	<version>2.3.2</version>
-    </dependency>
-    
-	<dependency>
-	  <groupId>org.apache.commons</groupId>
-	  <artifactId>commons-lang3</artifactId>
-	  <version>3.8.1</version>
-	</dependency>
-	
-	<!-- https://mvnrepository.com/artifact/org.joml/joml -->
-	<dependency>
-	    <groupId>org.joml</groupId>
-	    <artifactId>joml</artifactId>
-	    <version>1.9.12</version>
-	</dependency>
 
-	<dependency>
-	    <groupId>org.lwjgl</groupId>
-	    <artifactId>lwjgl</artifactId>
-	    <version>3.1.0</version>
-	</dependency>
-	
-	<dependency>
-       <groupId>org.junit.jupiter</groupId>
-       <artifactId>junit-jupiter-engine</artifactId>
-       <version>5.2.0</version>
-       <scope>test</scope>
-   </dependency>
-   
-   <dependency>
-       <groupId>org.junit.vintage</groupId>
-       <artifactId>junit-vintage-engine</artifactId>
-       <version>5.2.0</version>
-       <scope>test</scope>
-   </dependency>
+  <dependencies>
+    <!-- https://mvnrepository.com/artifact/org.jogamp.jogl/jogl-all-main -->
+    <dependency>
+      <groupId>org.jogamp.jogl</groupId>
+      <artifactId>jogl-all-main</artifactId>
+      <version>2.3.2</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.jogamp.gluegen</groupId>
+      <artifactId>gluegen-rt-main</artifactId>
+      <version>2.3.2</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
+      <version>3.8.1</version>
+    </dependency>
+
+    <!-- https://mvnrepository.com/artifact/org.joml/joml -->
+    <dependency>
+      <groupId>org.joml</groupId>
+      <artifactId>joml</artifactId>
+      <version>1.9.12</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.lwjgl</groupId>
+      <artifactId>lwjgl</artifactId>
+      <version>3.1.0</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-engine</artifactId>
+      <version>5.2.0</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.junit.vintage</groupId>
+      <artifactId>junit-vintage-engine</artifactId>
+      <version>5.2.0</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 </project>
