@@ -4,13 +4,13 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 
-import com.movlad.semviz.core.math.geometry.Point3dCN;
+import com.movlad.semviz.core.math.geometry.Point;
 import com.movlad.semviz.core.math.geometry.PointCloud;
 
 /**
  * Generates a float buffer from a point cloud text file.
  */
-public class PointCloudLoaderText {
+public class CloudLoader {
 
 	private String path;
 	private boolean normalsIncluded;
@@ -23,7 +23,7 @@ public class PointCloudLoaderText {
 	 * @param path is the path of the cloud {@code .txt} file
 	 * @param normalsIncluded is true if the file also contains the normal vectors in each point
 	 */
-	public PointCloudLoaderText(String path, boolean normalsIncluded) {
+	public CloudLoader(String path, boolean normalsIncluded) {
 		this.path = path;
 		this.normalsIncluded = normalsIncluded;
 	}
@@ -58,7 +58,7 @@ public class PointCloudLoaderText {
 			String[] attributes = line.split("\\t");
 			
 			if (attributes.length == numFields) {
-				Point3dCN point = new Point3dCN();
+				Point point = new Point();
 				
 				point.x = Float.parseFloat(attributes[0]);
 				point.y = Float.parseFloat(attributes[1]);
@@ -71,7 +71,7 @@ public class PointCloudLoaderText {
 				if (numFields == 9) {
 					point.normalX = Float.parseFloat(attributes[6]);
 					point.normalY = Float.parseFloat(attributes[7]);
-					point.normalZ = Float.parseFloat(attributes[7]);
+					point.normalZ = Float.parseFloat(attributes[8]);
 				}
 				
 				pointCloud.add(point);

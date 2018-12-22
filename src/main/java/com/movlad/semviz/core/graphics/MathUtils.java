@@ -48,4 +48,8 @@ public class MathUtils {
 		return wrap;
 	}
 	
+	public static float map(float x, float sourceMin, float sourceMax, float destMin, float destMax) {
+		return destMin + ((destMax - destMin)/(sourceMax - sourceMin)) * (x - sourceMin);
+	}
+	
 }

@@ -31,8 +31,8 @@ public class BufferLayout implements Iterable<BufferAttribute> {
 	 * @param count is the length of the sequence
 	 * @param normalized is true if the sequence elements are normalized
 	 */
-	public void push(String name, int count, boolean normalized) {
-		BufferAttribute attribute = new BufferAttribute(name, count, normalized);
+	public void push(String name, int type, int count, boolean normalized) {
+		BufferAttribute attribute = new BufferAttribute(name, type, count, normalized);
 		
 		attributes.add(attribute);
 		stride += attribute.getSize();

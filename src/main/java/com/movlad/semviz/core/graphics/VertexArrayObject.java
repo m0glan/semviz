@@ -69,7 +69,7 @@ public class VertexArrayObject {
 			BufferAttribute attribute = layout.get(i);
 			
 			gl.glEnableVertexAttribArray(i);
-			gl.glVertexAttribPointer(i, attribute.getCount(), GL4.GL_FLOAT, attribute.isNormalized(), layout.getStride(), offset);
+			gl.glVertexAttribPointer(i, attribute.getCount(), attribute.getType(), attribute.isNormalized(), layout.getStride(), offset);
 			offset += attribute.getSize();
 		}
 	}

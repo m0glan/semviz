@@ -4,11 +4,11 @@ import java.io.IOException;
 
 import org.junit.jupiter.api.Test;
 
-class PointCloudLoaderTextTest {
+class CloudLoaderTest {
 
 	@Test
 	void test() {
-		PointCloudLoaderText loader = new PointCloudLoaderText(ClassLoader.getSystemClassLoader()
+		CloudLoader loader = new CloudLoader(ClassLoader.getSystemClassLoader()
 				.getResource("clouds/cloud-2.txt").getFile(), true);
 		
 		try {
