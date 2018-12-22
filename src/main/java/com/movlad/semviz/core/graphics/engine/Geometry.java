@@ -1,7 +1,6 @@
 package com.movlad.semviz.core.graphics.engine;
 
 import com.movlad.semviz.core.graphics.BufferLayout;
-import com.movlad.semviz.core.graphics.VertexArrayObject;
 
 /**
  * Basic geometry grouping vertex data and buffer layout.
@@ -10,7 +9,6 @@ public class Geometry extends Object3d {
 
 	protected BufferLayout layout;
 	protected float[] data;
-	protected VertexArrayObject vertexArrayObject;
 	
 	protected Geometry() { this.setVisible(true); }
 	
