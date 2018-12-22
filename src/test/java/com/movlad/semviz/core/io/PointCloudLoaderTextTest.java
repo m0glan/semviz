@@ -9,7 +9,7 @@ class PointCloudLoaderTextTest {
 	@Test
 	void test() {
 		PointCloudLoaderText loader = new PointCloudLoaderText(ClassLoader.getSystemClassLoader()
-				.getResource("clouds/cloud-1.txt").getFile(), true);
+				.getResource("clouds/cloud-2.txt").getFile(), true);
 		
 		try {
 			loader.load();

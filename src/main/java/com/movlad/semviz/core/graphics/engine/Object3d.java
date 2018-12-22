@@ -39,12 +39,14 @@ public class Object3d implements Iterable<Object3d> {
 
 		scale = 1.0f;
 		
-		position = new Vector3f(0.0f, 0.0f, -5.0f);
+		position = new Vector3f(0.0f, 0.0f, 0.0f);
 
 		worldUp = new Vector3f(0.0f, 0.0f, 1.0f);
-		target = new Vector3f();
+		target = new Vector3f(1.0f, 0.0f, 0.0f);
 		direction = new Vector3f();
 		up = new Vector3f();
+		
+		setTarget(new Vector3f(1.0f, 0.0f, 0.0f));
 		
 		isVisible = true;
 		
