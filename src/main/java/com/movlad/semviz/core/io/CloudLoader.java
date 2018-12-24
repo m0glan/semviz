@@ -41,7 +41,8 @@ public class CloudLoader {
 	
 	/**
 	 * Loads the contents of the file.
-	 * @throws IOException
+	 * 
+	 * @throws IOException if the cloud file is not found
 	 */
 	public void load() throws IOException {
 		int numFields;

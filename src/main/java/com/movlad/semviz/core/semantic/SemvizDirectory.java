@@ -5,11 +5,19 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.NotDirectoryException;
 
+/**
+ * Helps validate a directory as being correctly structured as a Semviz data source.
+ */
 class SemvizDirectory {
 
 	private String ontologyPath;
 	private String cloudsPath;
 	
+	/**
+	 * @param path is the path to the directory
+	 * @throws IOException if the file is not found
+	 * @throws NotSemvizDirectoryException if path does not point to a Semviz source
+	 */
 	public SemvizDirectory(String path) throws IOException, NotSemvizDirectoryException {
 		File semvizDir = new File(path);
 		
@@ -38,6 +46,11 @@ class SemvizDirectory {
 	
 	public String getCloudsPath() { return cloudsPath; }
 	
+	/**
+	 * @param files is an array of files in the directory
+	 * @return the path of the ontology file in the directory
+	 * @throws NotSemvizDirectoryException if the directory is not correctly structured as a Semviz source
+	 */
 	private String findOntologyPath(File[] files) throws NotSemvizDirectoryException {
 		String ontologyPath = null;
 		
@@ -54,6 +67,11 @@ class SemvizDirectory {
 		return ontologyPath;
 	}
 	
+	/**
+	 * @param files is an array of files in the directory
+	 * @return the path containing the cloud {@code .txt} files
+	 * @throws NotSemvizDirectoryException if the directory is not correctly structured as a Semviz source
+	 */
 	private String findCloudsPath(File[] files) throws NotSemvizDirectoryException {
 		String cloudsPath = null;
 		

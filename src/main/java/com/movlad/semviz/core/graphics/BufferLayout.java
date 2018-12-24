@@ -28,6 +28,7 @@ public class BufferLayout implements Iterable<BufferAttribute> {
 	 * Adds a layout component which is a sequence of floats.
 	 * 
 	 * @param name is the name of the attribute (<i>e.g.</i> position)
+	 * @param type is the type of the attribute (<i>e.g.</i> {@code GL_FLOAT})
 	 * @param count is the length of the sequence
 	 * @param normalized is true if the sequence elements are normalized
 	 */
