@@ -18,6 +18,7 @@ import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JTextPane;
 import javax.swing.LayoutStyle.ComponentPlacement;
+import java.awt.FlowLayout;
 
 public class MainWindow extends JFrame {
 
@@ -57,6 +58,8 @@ public class MainWindow extends JFrame {
 		JTextPane textPane_Command = new JTextPane();
 		
 		JPanel panel_Control = new JPanel();
+		FlowLayout flowLayout = (FlowLayout) panel_Control.getLayout();
+		flowLayout.setAlignment(FlowLayout.LEFT);
 		
 		JPanel panel_Canvas = new JPanel();
 		panel_Canvas.setBackground(Color.BLACK);
@@ -64,18 +67,18 @@ public class MainWindow extends JFrame {
 		groupLayout.setHorizontalGroup(
 			groupLayout.createParallelGroup(Alignment.LEADING)
 				.addComponent(textPane_Command, GroupLayout.DEFAULT_SIZE, 941, Short.MAX_VALUE)
-				.addGroup(groupLayout.createSequentialGroup()
-					.addComponent(panel_Control, GroupLayout.PREFERRED_SIZE, 185, GroupLayout.PREFERRED_SIZE)
+				.addGroup(Alignment.TRAILING, groupLayout.createSequentialGroup()
+					.addComponent(panel_Control, GroupLayout.PREFERRED_SIZE, 259, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(panel_Canvas, GroupLayout.DEFAULT_SIZE, 737, Short.MAX_VALUE)
+					.addComponent(panel_Canvas, GroupLayout.DEFAULT_SIZE, 663, Short.MAX_VALUE)
 					.addContainerGap())
 		);
 		groupLayout.setVerticalGroup(
 			groupLayout.createParallelGroup(Alignment.LEADING)
 				.addGroup(Alignment.TRAILING, groupLayout.createSequentialGroup()
-					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+					.addGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
 						.addComponent(panel_Canvas, GroupLayout.DEFAULT_SIZE, 518, Short.MAX_VALUE)
-						.addComponent(panel_Control, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 518, Short.MAX_VALUE))
+						.addComponent(panel_Control, GroupLayout.DEFAULT_SIZE, 518, Short.MAX_VALUE))
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(textPane_Command, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 		);
