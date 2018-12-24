@@ -101,5 +101,13 @@
 	    <artifactId>quickhull3d</artifactId>
 	    <version>1.0.0</version>
 	</dependency>
+	
+	<!-- https://mvnrepository.com/artifact/org.apache.jena/apache-jena-libs -->
+	<dependency>
+	    <groupId>org.apache.jena</groupId>
+	    <artifactId>apache-jena-libs</artifactId>
+	    <version>3.7.0</version>
+	    <type>pom</type>
+	</dependency>
   </dependencies>
 </project>
