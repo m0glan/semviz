@@ -8,6 +8,7 @@ package com.movlad.semviz.view;
 import com.movlad.semviz.application.GraphicsController;
 import com.movlad.semviz.application.SemvizManagerController;
 import com.movlad.semviz.core.SemvizException;
+import java.awt.BorderLayout;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.util.HashMap;
@@ -48,7 +49,7 @@ public class MainWindow extends javax.swing.JFrame implements Observer {
         gc.init(panel_GLCanvas.getWidth(), panel_GLCanvas.getHeight(), 0.1f, 1000.0f);
         gc.addObserver(this);
         
-        panel_GLCanvas.add(gc.getCanvas());
+        panel_GLCanvas.add(gc.getCanvas(), BorderLayout.CENTER);
         
         updateCloudInfoTable();
         updateCloudURIList();
@@ -95,7 +96,7 @@ public class MainWindow extends javax.swing.JFrame implements Observer {
         panel_GLCanvas.setLayout(panel_GLCanvasLayout);
         panel_GLCanvasLayout.setHorizontalGroup(
             panel_GLCanvasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 504, Short.MAX_VALUE)
+            .addGap(0, 664, Short.MAX_VALUE)
         );
         panel_GLCanvasLayout.setVerticalGroup(
             panel_GLCanvasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -158,7 +159,7 @@ public class MainWindow extends javax.swing.JFrame implements Observer {
                 .addComponent(label_CloudInfoTable)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 46, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(655, Short.MAX_VALUE))
+                .addContainerGap(308, Short.MAX_VALUE))
         );
 
         menu_File.setText("File");

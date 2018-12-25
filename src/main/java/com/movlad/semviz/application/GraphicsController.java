@@ -6,11 +6,9 @@
 package com.movlad.semviz.application;
 
 import com.jogamp.newt.awt.NewtCanvasAWT;
-import com.jogamp.newt.event.awt.AWTMouseAdapter;
 import com.jogamp.newt.opengl.GLWindow;
 import com.jogamp.opengl.GLCapabilities;
 import com.jogamp.opengl.GLProfile;
-import com.jogamp.opengl.awt.GLCanvas;
 import com.jogamp.opengl.util.FPSAnimator;
 import com.movlad.semviz.core.graphics.engine.AxisHelper;
 import com.movlad.semviz.core.graphics.engine.Camera;
@@ -19,7 +17,6 @@ import com.movlad.semviz.core.graphics.engine.OrthographicCamera;
 import com.movlad.semviz.core.graphics.engine.Renderer;
 import com.movlad.semviz.core.graphics.engine.Scene;
 import com.movlad.semviz.core.graphics.engine.controls.OrbitControls;
-import java.awt.event.MouseListener;
 import java.util.Observable;
 import org.joml.Vector3f;
 
@@ -55,6 +52,8 @@ public class GraphicsController extends Observable {
         glCaps = new GLCapabilities(glProfile);
         glWindow = GLWindow.create(glCaps);
         
+        glCanvas = new NewtCanvasAWT(glWindow);
+        glWindow.setPosition(0, 0);
         glWindow.setSize(width, height);
         
         // Camera, Scene, Renderer, Controls...
@@ -73,6 +72,8 @@ public class GraphicsController extends Observable {
 		
         orbit = new OrbitControls(camera);
         
+        // Adding event listeners
+        
         glWindow.addGLEventListener(renderer);
         glWindow.setVisible(true);
         glWindow.addMouseListener(orbit);
@@ -80,8 +81,6 @@ public class GraphicsController extends Observable {
 	FPSAnimator animator = new FPSAnimator(glWindow, 60);
 		
         animator.start();
-        
-        glCanvas = new NewtCanvasAWT(glWindow);
     }
     
     public NewtCanvasAWT getCanvas() {
