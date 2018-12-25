@@ -7,27 +7,25 @@ package com.movlad.semviz.application;
 
 import com.movlad.semviz.core.SemvizException;
 import com.movlad.semviz.core.math.geometry.PointCloud;
-import com.movlad.semviz.core.semantic.CloudSelection;
+import com.movlad.semviz.core.semantic.SemvizQueryExecution;
 import com.movlad.semviz.core.semantic.SemvizManager;
 import java.io.IOException;
 import java.util.Observable;
+import org.apache.jena.query.QueryException;
 
 public class SemvizManagerController extends Observable {
     
     private static SemvizManagerController instance = null;
     
     private SemvizManager svmgr;
-    private CloudSelection cloudSelection;
-    private PointCloud loadedCloud;
+    private SemvizQueryExecution semvizQueryExec;
     
     private SemvizManagerController() { 
         svmgr = SemvizManager.get(); 
-        cloudSelection = null;
+        semvizQueryExec = null;
     }
     
-    public CloudSelection getCloudSelection() { return cloudSelection; }
-    
-    public PointCloud getLoadedCloud() { return loadedCloud; }
+    public SemvizQueryExecution getCloudSelection() { return semvizQueryExec; }
     
     public static SemvizManagerController get() {
         if (instance == null) {
@@ -38,24 +36,31 @@ public class SemvizManagerController extends Observable {
     }
     
     public void load(String path) throws IOException, SemvizException {
-        svmgr.load(path);
+        semvizQueryExec = null;
         
-        setChanged();
-        notifyObservers();
+        try {
+            svmgr.load(path);
+        } catch (SemvizException | IOException e) {
+            throw e;
+        } finally {
+            setChanged();
+            notifyObservers();
+        }
     }
     
     public void query(String queryString) throws SemvizException {
-        cloudSelection = svmgr.query(queryString);
-        
-        setChanged();
-        notifyObservers();
+        try {
+            semvizQueryExec = svmgr.query(queryString);
+        } catch (SemvizException | QueryException e) {
+            throw e;
+        } finally {
+            setChanged();
+            notifyObservers();  
+        }
     }
     
-    public void retrieve(String cloudURI) throws SemvizException, IOException {
-        loadedCloud = svmgr.retrieve(cloudURI, true);
-        
-        setChanged();
-        notifyObservers();
+    public PointCloud retrieve(String cloudLocalName) throws SemvizException, IOException {
+        return svmgr.retrieve(SemvizManager.NS + cloudLocalName, true);
     }
     
 }

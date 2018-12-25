@@ -1,9 +1,10 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.movlad</groupId>
   <artifactId>semviz</artifactId>
-  <version>0.1.0</version>
   <name>Semviz</name>
+  <version>0.1.0</version>
   <description>A viewer for semantically annotated three-dimensional point clouds.</description>
   <build>
     <plugins>
@@ -15,9 +16,7 @@
           <target>1.8</target>
         </configuration>
       </plugin>
-
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
         <version>2.22.0</version>
         <configuration>
@@ -25,9 +24,7 @@
           <excludedGroups>integration, regression</excludedGroups>
         </configuration>
       </plugin>
-
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
         <configuration>
           <archive>
@@ -38,16 +35,13 @@
           </archive>
         </configuration>
       </plugin>
-
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>exec-maven-plugin</artifactId>
         <version>1.6.0</version>
-
         <configuration>
           <executable>java</executable>
           <arguments>
-            <!-- the next line sets java library path to where the natives are unpacked -->
             <argument>-Djava.library.path=${project.build.directory}/natives</argument>
             <argument>-classpath</argument>
             <classpath />
@@ -55,12 +49,9 @@
           </arguments>
         </configuration>
       </plugin>
-
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-shade-plugin</artifactId>
         <version>2.1</version>
-
         <executions>
           <execution>
             <phase>package</phase>
@@ -69,8 +60,8 @@
             </goals>
             <configuration>
               <transformers>
-                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
-                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                <transformer />
+                <transformer>
                   <mainClass>com.movlad.semviz.view.MainWindow</mainClass>
                 </transformer>
               </transformers>
@@ -80,66 +71,54 @@
       </plugin>
     </plugins>
   </build>
-
   <dependencies>
-    <!-- https://mvnrepository.com/artifact/org.jogamp.jogl/jogl-all-main -->
-    <dependency>
-      <groupId>org.jogamp.jogl</groupId>
-      <artifactId>jogl-all-main</artifactId>
-      <version>2.3.2</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.jogamp.gluegen</groupId>
-      <artifactId>gluegen-rt-main</artifactId>
-      <version>2.3.2</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.apache.commons</groupId>
-      <artifactId>commons-lang3</artifactId>
-      <version>3.8.1</version>
-    </dependency>
-
-    <!-- https://mvnrepository.com/artifact/org.joml/joml -->
-    <dependency>
-      <groupId>org.joml</groupId>
-      <artifactId>joml</artifactId>
-      <version>1.9.12</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.lwjgl</groupId>
-      <artifactId>lwjgl</artifactId>
-      <version>3.1.0</version>
-    </dependency>
-
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter-engine</artifactId>
       <version>5.2.0</version>
       <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <artifactId>apiguardian-api</artifactId>
+          <groupId>org.apiguardian</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>junit-platform-engine</artifactId>
+          <groupId>org.junit.platform</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>junit-jupiter-api</artifactId>
+          <groupId>org.junit.jupiter</groupId>
+        </exclusion>
+      </exclusions>
     </dependency>
-
     <dependency>
       <groupId>org.junit.vintage</groupId>
       <artifactId>junit-vintage-engine</artifactId>
       <version>5.2.0</version>
       <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <artifactId>junit</artifactId>
+          <groupId>junit</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>apiguardian-api</artifactId>
+          <groupId>org.apiguardian</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>junit-platform-engine</artifactId>
+          <groupId>org.junit.platform</groupId>
+        </exclusion>
+      </exclusions>
     </dependency>
-
-    <dependency>
-      <groupId>com.github.quickhull3d</groupId>
-      <artifactId>quickhull3d</artifactId>
-      <version>1.0.0</version>
-    </dependency>
-
-    <!-- https://mvnrepository.com/artifact/org.apache.jena/apache-jena-libs -->
     <dependency>
       <groupId>org.apache.jena</groupId>
       <artifactId>apache-jena-libs</artifactId>
       <version>3.7.0</version>
       <type>pom</type>
+      <scope>compile</scope>
     </dependency>
   </dependencies>
 </project>
+

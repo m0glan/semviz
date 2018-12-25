@@ -12,73 +12,73 @@ import com.movlad.semviz.core.graphics.engine.Camera;
  */
 public class OrbitControls implements MouseListener {
 	
-	private Camera camera;
-	private float oldX, oldY;
-	
-	public OrbitControls(Camera camera) {
-		this.camera = camera;
-	}
+    private Camera camera;
+    private float oldX, oldY;
 
-	@Override
-	public void mouseClicked(MouseEvent e) { }
+    public OrbitControls(Camera camera) {
+        this.camera = camera;
+    }
 
-	@Override
-	public void mouseEntered(MouseEvent e) { }
+    @Override
+    public void mouseClicked(MouseEvent e) { }
 
-	@Override
-	public void mouseExited(MouseEvent e) { }
+    @Override
+    public void mouseEntered(MouseEvent e) { }
 
-	@Override
-	public void mousePressed(MouseEvent e) { }
+    @Override
+    public void mouseExited(MouseEvent e) { }
 
-	@Override
-	public void mouseReleased(MouseEvent e) {
-		oldX = 0;
-		oldY = 0;
-	}
+    @Override
+    public void mousePressed(MouseEvent e) { }
 
-	@Override
-	public void mouseMoved(MouseEvent e) { }
+    @Override
+    public void mouseReleased(MouseEvent e) {
+        oldX = 0;
+        oldY = 0;
+    }
 
-	@Override
-	public void mouseDragged(MouseEvent e) {
-		if (oldX < 0.0005 && oldY < 0.0005) {
-			oldX = e.getX();
-			oldY = e.getY();
-		} else {
-			float differenceX = e.getX() - oldX;
-			float differenceY = e.getY() - oldY;
-			
-			oldX = e.getX();
-			oldY = e.getY();
+    @Override
+    public void mouseMoved(MouseEvent e) { }
 
-			// getting the current position of the camera in the polar coordinate system
+    @Override
+    public void mouseDragged(MouseEvent e) {
+        if (oldX < 0.0005 && oldY < 0.0005) {
+            oldX = e.getX();
+            oldY = e.getY();
+        } else {
+            float differenceX = e.getX() - oldX;
+            float differenceY = e.getY() - oldY;
 
-		    Vector3f sphericalCoords = MathUtils.toSphericalCoords(camera.getPosition());
+            oldX = e.getX();
+            oldY = e.getY();
 
-		    float speedY = (float)Math.toRadians(differenceY / 4.0f);
-		    float speedX = (float)Math.toRadians(differenceX / 4.0f);
+            // getting the current position of the camera in the polar coordinate system
 
-		    // adding speedY to the theta angle and speedX to the phi angle
+            Vector3f sphericalCoords = MathUtils.toSphericalCoords(camera.getPosition());
 
-		    sphericalCoords.add(new Vector3f(0, speedY, speedX));
+            float speedY = (float)Math.toRadians(differenceY / 4.0f);
+            float speedX = (float)Math.toRadians(differenceX / 4.0f);
 
-		    // making sure the angles are not outside the [0, 2 * PI] interval
+            // adding speedY to the theta angle and speedX to the phi angle
 
-		    sphericalCoords.y = MathUtils.wrapTo2Pi(sphericalCoords.y);
-		    sphericalCoords.z = MathUtils.wrapTo2Pi(sphericalCoords.z);
+            sphericalCoords.add(new Vector3f(0, speedY, speedX));
 
-		    // updating the position of the camera
+            // making sure the angles are not outside the [0, 2 * PI] interval
 
-		    camera.setPosition(MathUtils.toCartesianCoords(sphericalCoords));
-		}
-	}
+            sphericalCoords.y = MathUtils.wrapTo2Pi(sphericalCoords.y);
+            sphericalCoords.z = MathUtils.wrapTo2Pi(sphericalCoords.z);
 
-	@Override
-	public void mouseWheelMoved(MouseEvent e) {
-		float zoom = e.getRotation()[1] / 12;
-		
-		camera.zoom(zoom);
-	}
+            // updating the position of the camera
+
+            camera.setPosition(MathUtils.toCartesianCoords(sphericalCoords));
+        }
+    }
+
+    @Override
+    public void mouseWheelMoved(MouseEvent e) {
+        float zoom = e.getRotation()[1] / 12;
+
+        camera.zoom(zoom);
+    }
 
 }

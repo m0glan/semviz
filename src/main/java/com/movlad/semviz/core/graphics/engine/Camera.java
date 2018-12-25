@@ -15,8 +15,8 @@ public abstract class Camera extends Object3d {
 	private float maxZoom;
 	
 	public Camera() { 
-		this.zoom = 1.0f;
-		this.setVisible(false); 
+            this.zoom = 1.0f;
+            this.setVisible(false); 
 	}
 	
 	protected float getZoom() { return zoom; }
@@ -27,15 +27,15 @@ public abstract class Camera extends Object3d {
 	 * @param zoom is the amount to zoom by
 	 */
 	public final void zoom(float zoom) {
-		float newZoom = this.zoom - zoom;
-		
-		if (newZoom >= minZoom && newZoom <= maxZoom) {
-			if (canZoom(newZoom)) {
-				this.zoom = newZoom;
-				
-				updateProjectionMatrix();
-			}
-		}
+            float newZoom = this.zoom - zoom;
+
+            if (newZoom >= minZoom && newZoom <= maxZoom) {
+                if (canZoom(newZoom)) {
+                        this.zoom = newZoom;
+
+                        updateProjectionMatrix();
+                }
+            }
 	}
 	
 	/**
@@ -46,11 +46,11 @@ public abstract class Camera extends Object3d {
 	protected abstract boolean canZoom(float newZoom);
 	
 	public void setMinZoom(float minZoom) {
-		this.minZoom = minZoom;
+            this.minZoom = minZoom;
 	}
 	
 	public void setMaxZoom(float maxZoom) {
-		this.maxZoom = maxZoom;
+            this.maxZoom = maxZoom;
 	}
 	
 	/**

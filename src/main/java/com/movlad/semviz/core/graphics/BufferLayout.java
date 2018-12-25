@@ -10,38 +10,38 @@ import java.util.List;
  */
 public class BufferLayout implements Iterable<BufferAttribute> {
 
-	private List<BufferAttribute> attributes = new ArrayList<>();
-	private int stride = 0; 
-	
-	public List<BufferAttribute> getAttributes() { return attributes; }
+    private List<BufferAttribute> attributes = new ArrayList<>();
+    private int stride = 0; 
 
-	/**
-	 * @return sum of the sizes of all the layout elements
-	 */
-	public int getStride() { return stride; }
-	
-	public BufferAttribute get(int i) { return attributes.get(0); }
-	
-	public int size() { return attributes.size(); }
-	
-	/**
-	 * Adds a layout component which is a sequence of floats.
-	 * 
-	 * @param name is the name of the attribute (<i>e.g.</i> position)
-	 * @param type is the type of the attribute (<i>e.g.</i> {@code GL_FLOAT})
-	 * @param count is the length of the sequence
-	 * @param normalized is true if the sequence elements are normalized
-	 */
-	public void push(String name, int type, int count, boolean normalized) {
-		BufferAttribute attribute = new BufferAttribute(name, type, count, normalized);
-		
-		attributes.add(attribute);
-		stride += attribute.getSize();
-	}
-	
-	@Override
-	public Iterator<BufferAttribute> iterator() {
-		return attributes.iterator();
-	}
+    public List<BufferAttribute> getAttributes() { return attributes; }
+
+    /**
+     * @return sum of the sizes of all the layout elements
+     */
+    public int getStride() { return stride; }
+
+    public BufferAttribute get(int i) { return attributes.get(0); }
+
+    public int size() { return attributes.size(); }
+
+    /**
+     * Adds a layout component which is a sequence of floats.
+     * 
+     * @param name is the name of the attribute (<i>e.g.</i> position)
+     * @param type is the type of the attribute (<i>e.g.</i> {@code GL_FLOAT})
+     * @param count is the length of the sequence
+     * @param normalized is true if the sequence elements are normalized
+     */
+    public void push(String name, int type, int count, boolean normalized) {
+        BufferAttribute attribute = new BufferAttribute(name, type, count, normalized);
+
+        attributes.add(attribute);
+        stride += attribute.getSize();
+    }
+
+    @Override
+    public Iterator<BufferAttribute> iterator() {
+        return attributes.iterator();
+    }
 	
 }
