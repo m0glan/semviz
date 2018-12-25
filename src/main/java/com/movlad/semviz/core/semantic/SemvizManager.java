@@ -21,7 +21,7 @@ public class SemvizManager {
 
 	private static SemvizManager instance = null;
 	
-	private static final String PREFIX = "PREFIX knowdip: <http://lab.ponciano.info/knowdip#>";
+	public static final String PREFIX = "PREFIX knowdip: <http://lab.ponciano.info/knowdip#>";
 	
 	private SemvizDirectory sourceDir;
 	private OntModel model;
