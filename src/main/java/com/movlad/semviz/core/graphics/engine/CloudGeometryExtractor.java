@@ -118,17 +118,20 @@ public class CloudGeometryExtractor {
 
             int[][] faces = hull.getFaces();
             float[] data = new float[faces.length * 3 * 6];
+            int offset = 0;
 
             for (int i = 0; i < faces.length; i++) {
                 for (int j = 0; j < faces[i].length; j++) {
                     Point p = cloud.get(faces[i][j]);
 
-                    data[i * 3 + j * 6] = (float) (p.x - centroid.x);
-                    data[i * 3 + j * 6 + 1] = (float) (p.y - centroid.y);
-                    data[i * 3 + j * 6 + 2] = (float) (p.z - centroid.z);
-                    data[i * 3 + j * 6 + 3] = MathUtils.map(p.r, 0.0f, 255.0f, 0.0f, 1.0f);
-                    data[i * 3 + j * 6 + 4] = MathUtils.map(p.g, 0.0f, 255.0f, 0.0f, 1.0f);
-                    data[i * 3 + j * 6 + 5] = MathUtils.map(p.b, 0.0f, 255.0f, 0.0f, 1.0f);
+                    data[offset] = (float) (p.x - centroid.x);
+                    data[offset + 1] = (float) (p.y - centroid.y);
+                    data[offset + 2] = (float) (p.z - centroid.z);
+                    data[offset + 3] = MathUtils.map(p.r, 0.0f, 255.0f, 0.0f, 1.0f);
+                    data[offset + 4] = MathUtils.map(p.g, 0.0f, 255.0f, 0.0f, 1.0f);
+                    data[offset + 5] = MathUtils.map(p.b, 0.0f, 255.0f, 0.0f, 1.0f);
+                    
+                    offset += 6;
                 }
             }
 
