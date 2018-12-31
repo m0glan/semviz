@@ -77,6 +77,7 @@ public class MainWindow extends javax.swing.JFrame implements Observer {
         
         comboBox_ViewSelection.addItem("High Resolution");
         comboBox_ViewSelection.addItem("High Resolution (Normals)");
+        comboBox_ViewSelection.addItem("Convex Hull");
     }
 
     /**

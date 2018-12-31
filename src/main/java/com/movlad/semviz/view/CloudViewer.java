@@ -122,6 +122,9 @@ public class CloudViewer {
                     case 1:
                         geometry = geometryExtractor.extractNormalRGBGeometry();
                         break;
+                    case 2:
+                        geometry = geometryExtractor.extractConvexHullGeometry();
+                        break;
                     default:
                         geometry = null;
                         break;

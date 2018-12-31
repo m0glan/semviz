@@ -1,5 +1,6 @@
 package com.movlad.semviz.core.graphics.engine;
 
+import com.github.quickhull3d.QuickHull3D;
 import com.jogamp.opengl.GL4;
 import com.movlad.semviz.core.graphics.BufferLayout;
 import com.movlad.semviz.core.graphics.MathUtils;
@@ -17,6 +18,7 @@ public class CloudGeometryExtractor {
 
     private Geometry baseGeometry = null;
     private Geometry normalViewGeometry = null;
+    private Geometry convexHullViewGeometry = null;
 
     /**
      * @param cloud is the cloud for which to extract different geometries
@@ -108,7 +110,44 @@ public class CloudGeometryExtractor {
      * @return the convex hull geometry of the point cloud
      */
     public Geometry extractConvexHullGeometry() { 
-        throw new UnsupportedOperationException();
+        if (convexHullViewGeometry == null) {
+            QuickHull3D hull = new QuickHull3D();
+            Point[] points = cloud.getPoints();
+        
+            hull.build(points);
+
+            int[][] faces = hull.getFaces();
+            float[] data = new float[faces.length * 3 * 6];
+
+            for (int i = 0; i < faces.length; i++) {
+                for (int j = 0; j < faces[i].length; j++) {
+                    Point p = cloud.get(faces[i][j]);
+
+                    data[i * 3 + j * 6] = (float) (p.x - centroid.x);
+                    data[i * 3 + j * 6 + 1] = (float) (p.y - centroid.y);
+                    data[i * 3 + j * 6 + 2] = (float) (p.z - centroid.z);
+                    data[i * 3 + j * 6 + 3] = MathUtils.map(p.r, 0.0f, 255.0f, 0.0f, 1.0f);
+                    data[i * 3 + j * 6 + 4] = MathUtils.map(p.g, 0.0f, 255.0f, 0.0f, 1.0f);
+                    data[i * 3 + j * 6 + 5] = MathUtils.map(p.b, 0.0f, 255.0f, 0.0f, 1.0f);
+                }
+            }
+
+            BufferLayout layout = new BufferLayout();
+
+            layout.push("position", GL4.GL_FLOAT, 3, true);
+            layout.push("color", GL4.GL_UNSIGNED_BYTE, 3, false);
+            
+            convexHullViewGeometry = new Geometry(data, layout) {
+                
+                @Override
+                public int getDrawingMode() {
+                        return GL4.GL_TRIANGLES;
+                }
+                
+            };
+        }
+        
+        return convexHullViewGeometry;
     }
 
     private void calculateCentroid() {

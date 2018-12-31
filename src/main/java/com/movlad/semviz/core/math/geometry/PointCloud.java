@@ -22,14 +22,14 @@ public class PointCloud implements Iterable<Point> {
 	public int size() { return points.size(); }
 	
 	public Point[] getPoints() {
-		Point[] arr = new Point[size()];
-		
-		return points.toArray(arr);
+            Point[] arr = new Point[size()];
+
+            return points.toArray(arr);
 	}
 	
 	@Override
 	public Iterator<Point> iterator() {
-		return points.iterator();
+            return points.iterator();
 	}
 	
 }
