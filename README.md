@@ -15,3 +15,5 @@ The display of a 3D object must be done in three ways:
 - Low resolution display in cubic form (octree)
 - Polygon display (convex hull)
 - High resolution (base point cloud)
+
+**NOTE:** For now, this project is developed to work with Knowdip, an internal project of the i3Mainz photogrammetry lab.
