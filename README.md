@@ -24,7 +24,7 @@ A **Semviz directory** is a folder that contains a number of point cloud files (
 
 > **NOTE:** For now, this program is developed to work with [Knowdip](https://www.researchgate.net/publication/317428247_Summary_of_KnowDIP_project), an internal project of the i3Mainz photogrammetry lab, so you cannot use Semviz as of now; I will ask for permission to provide a valid sample directory for demonstration purposes.
 
-Once you have a valid Semviz directory, from the application's window you can open it by navigating to `File > Open` or hitting `Ctrl+O`. This process validates the structure of the directory and loads the ontology, so an error will be displayed if something went wrong loading.
+Once you have a valid Semviz directory, from the application's window you can open it by navigating to `File > Open` or hitting `Ctrl + O`. This process validates the structure of the directory and loads the ontology, so an error will be displayed if something went wrong loading.
 
 ### Queries
 With the Semviz directory loaded (the red dot in the upper left side of the application turned green), the console bar at the bottom of the window should now be enabled. This bar is where the SPARQL queries for retrieving clouds are typed in; the SPARQL query **must** contain a `?cloud` variable and use the `knowdip` namespace, as in the example below:
