@@ -30,7 +30,7 @@ Once you have a valid Semviz directory, from the application's window you can op
 With the Semviz directory loaded (the red dot in the upper left side of the application turned green), the console bar at the bottom of the window should now be enabled. This bar is where the SPARQL queries for retrieving clouds are typed in; the SPARQL query **must** contain a `?cloud` variable and use the `knowdip` namespace, as in the example below:
 
 ```
-select ?cloud ?size { ?cloud knowdip:hasSize ?size . }
+select ?cloud ?size { ?cloud knowdip:hasSize ?size }
 ```
 The query above gets all clouds as well as their size information. The solutions given by the `?cloud` variable are listed within the _Cloud List_ view; below that, the _Queried Info_ table shows all the other variables under the key-value format.
 
