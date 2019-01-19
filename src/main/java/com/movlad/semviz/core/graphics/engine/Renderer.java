@@ -40,10 +40,10 @@ public class Renderer implements GLEventListener {
         gl.glEnable(GL4.GL_DEPTH_TEST);
 
         try {
-                program = new ShaderProgram(gl, this.getClass().getClassLoader()
-                                .getResourceAsStream("shaders/shader.glsl"));
+            program = new ShaderProgram(gl, this.getClass().getClassLoader()
+                .getResourceAsStream("shaders/shader.glsl"));
         } catch (IOException e) {
-                e.printStackTrace();
+            e.printStackTrace();
         }
 
         program.use();
@@ -54,6 +54,7 @@ public class Renderer implements GLEventListener {
         GL4 gl = (GL4) drawable.getGL();
 
         gl.glClear(GL4.GL_DEPTH_BUFFER_BIT | GL4.GL_COLOR_BUFFER_BIT);
+        gl.glClearColor(0.027f, 0.184f, 0.372f, 1.0f);
 
         program.use();
         resetVertexArrays();
