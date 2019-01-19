@@ -5,8 +5,9 @@ import org.joml.Vector3f;
 public class TransformationUtils {
 
     /**
-     * Converts a position in the Cartesian coordinate system to a position in the spherical coordinate system.
-     * 
+     * Converts a position in the Cartesian coordinate system to a position in
+     * the spherical coordinate system.
+     *
      * @param cartesianCoords is the position to be converted
      * @return the spherical coordinates
      */
@@ -19,8 +20,9 @@ public class TransformationUtils {
     }
 
     /**
-     * Converts a position in the spherical coordinate system to a position in the Cartesian coordinate system.
-     * 
+     * Converts a position in the spherical coordinate system to a position in
+     * the Cartesian coordinate system.
+     *
      * @param sphericalCoords is the position to be converted
      * @return the Cartesian coordinates
      */
@@ -39,17 +41,17 @@ public class TransformationUtils {
     public static float wrapTo2Pi(float ang) {
         float wrap = ang;
 
-        if (ang > (2 * Math.PI)) {
-                ang -= 2 * Math.PI;
-        } else if (ang < 0) {
-                ang += 2 * Math.PI;
+        if (wrap > (2 * Math.PI)) {
+            wrap -= 2 * Math.PI;
+        } else if (wrap < 0) {
+            wrap += 2 * Math.PI;
         }
 
         return wrap;
     }
 
     public static float map(float x, float sourceMin, float sourceMax, float destMin, float destMax) {
-        return destMin + ((destMax - destMin)/(sourceMax - sourceMin)) * (x - sourceMin);
+        return destMin + ((destMax - destMin) / (sourceMax - sourceMin)) * (x - sourceMin);
     }
-	
+
 }

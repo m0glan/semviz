@@ -1,34 +1,33 @@
 package com.movlad.semviz.core.graphics.engine;
 
-import java.io.IOException;
-import java.nio.Buffer;
-import java.nio.FloatBuffer;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.lwjgl.BufferUtils;
-
 import com.jogamp.opengl.GL4;
 import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.GLEventListener;
 import com.movlad.semviz.core.graphics.ShaderProgram;
 import com.movlad.semviz.core.graphics.VertexArrayObject;
 import com.movlad.semviz.core.graphics.VertexBufferObject;
+import java.io.IOException;
+import java.nio.Buffer;
+import java.nio.FloatBuffer;
+import java.util.ArrayList;
+import java.util.List;
+import org.lwjgl.BufferUtils;
 
 /**
  * Renders a scene with a camera on a canvas.
  */
 public class Renderer implements GLEventListener {
-	
+
     protected Scene scene;
     protected Camera camera;
 
     protected GL4 gl;
     protected ShaderProgram program;
 
-    private List<Renderable> renderables = new ArrayList<>();
+    private final List<Renderable> renderables;
 
     public Renderer(Scene scene, Camera camera) {
+        this.renderables = new ArrayList<>();
         this.scene = scene;
         this.camera = camera;
     }
@@ -41,9 +40,9 @@ public class Renderer implements GLEventListener {
 
         try {
             program = new ShaderProgram(gl, this.getClass().getClassLoader()
-                .getResourceAsStream("shaders/shader.glsl"));
+                    .getResourceAsStream("shaders/shader.glsl"));
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println(e.getMessage());
         }
 
         program.use();
@@ -51,8 +50,6 @@ public class Renderer implements GLEventListener {
 
     @Override
     public final void display(GLAutoDrawable drawable) {
-        GL4 gl = (GL4) drawable.getGL();
-
         gl.glClear(GL4.GL_DEPTH_BUFFER_BIT | GL4.GL_COLOR_BUFFER_BIT);
         gl.glClearColor(0.027f, 0.184f, 0.372f, 1.0f);
 
@@ -73,22 +70,23 @@ public class Renderer implements GLEventListener {
         // updating camera's projection matrix based on changes in windows size
 
         if (camera instanceof PerspectiveCamera) {
-            ((PerspectiveCamera) camera).setAspect(width / height);		
+            ((PerspectiveCamera) camera).setAspect(width / height);
         } else if (camera instanceof OrthographicCamera) {
             ((OrthographicCamera) camera).setLeft(-width);
             ((OrthographicCamera) camera).setRight(width);
             ((OrthographicCamera) camera).setBottom(-height);
             ((OrthographicCamera) camera).setTop(height);
         }
+
+        camera.updateProjectionMatrix();
     }
 
     /**
      * Draws renderables on the screen.
      */
     private void render() {
-        for (Renderable renderable : renderables) {
-            if (renderable.getObject().isVisible()) {
-                if (renderable.getObject() instanceof Geometry) {
+        renderables.stream().filter((renderable) -> (renderable.getObject().isVisible())).filter((renderable) -> (renderable.getObject() instanceof Geometry))
+                .forEachOrdered((renderable) -> {
                     Geometry geometry = (Geometry) renderable.getObject();
 
                     renderable.getVertexArrayObject().bind();
@@ -96,14 +94,12 @@ public class Renderer implements GLEventListener {
                     setMatrixUniforms(renderable);
 
                     gl.glDrawArrays(geometry.getDrawingMode(), 0, geometry.getVertexCount());
-                }
-            }
-        }
+                });
     }
 
     /**
      * Sets the matrix uniforms for the currently drawn renderable.
-     * 
+     *
      * @param renderable is the currently draw renderable
      */
     private void setMatrixUniforms(Renderable renderable) {
@@ -126,8 +122,9 @@ public class Renderer implements GLEventListener {
 
     /**
      * Initializes the vertex arrays for the drawable geometries.
-     * 
-     * @param object is the object whose children will be initialized with vertex array objects
+     *
+     * @param object is the object whose children will be initialized with
+     * vertex array objects
      */
     private void initVertexArrays(Object3d object) {
         for (Object3d child : object) {
@@ -139,8 +136,8 @@ public class Renderer implements GLEventListener {
                 vertexArrayObject.bind();
 
                 Buffer dataBuffer = FloatBuffer.wrap(geometry.getData());
-                VertexBufferObject vertexBufferObject = new VertexBufferObject(gl, dataBuffer, dataBuffer.capacity() 
-                                * Float.BYTES, GL4.GL_STATIC_DRAW);
+                VertexBufferObject vertexBufferObject = new VertexBufferObject(gl, dataBuffer, dataBuffer.capacity()
+                        * Float.BYTES, GL4.GL_STATIC_DRAW);
 
                 vertexArrayObject.addBuffer(vertexBufferObject, geometry.getLayout());
 
@@ -152,14 +149,15 @@ public class Renderer implements GLEventListener {
     }
 
     /**
-     * Binds vertex array to 0, deletes vertex arrays and reinitializes the {@code renderables} array list
+     * Binds vertex array to 0, deletes vertex arrays and reinitializes the
+     * {@code renderables} array list
      */
     private void resetVertexArrays() {
         gl.glBindVertexArray(0);
 
-        for (Renderable renderable : renderables) {
-                renderable.getVertexArrayObject().delete();
-        }
+        renderables.forEach((renderable) -> {
+            renderable.getVertexArrayObject().delete();
+        });
 
         renderables.clear();
     }

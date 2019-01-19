@@ -1,26 +1,28 @@
 package com.movlad.semviz.core.graphics;
 
+import com.jogamp.opengl.GL4;
 import java.nio.Buffer;
 import java.nio.IntBuffer;
 
-import com.jogamp.opengl.GL4;
-
 /**
- * Also called index buffer object, it allows re-using points in a {@code VertexBufferObject} multiple times to draw shapes
- * composed of two or more triangles having common points. 
+ * Also called index buffer object, it allows re-using points in a
+ * {@code VertexBufferObject} multiple times to draw shapes composed of two or
+ * more triangles having common points.
  */
 public class ElementBufferObject {
 
-    private int id;
-    private GL4 gl;
+    private final int id;
+    private final GL4 gl;
 
     /**
      * Constructor.
-     * 
+     *
      * @param gl is the GL context
-     * @param data is the buffer containing the sequences of points for drawing elements
-     * @param count is the number of indices 
-     * @param usage indicates OpenGL on how to draw the elements (<i>e.g.</i> {@code GL_STATIC_DRAW})
+     * @param data is the buffer containing the sequences of points for drawing
+     * elements
+     * @param count is the number of indices
+     * @param usage indicates OpenGL on how to draw the elements (<i>e.g.</i>
+     * {@code GL_STATIC_DRAW})
      */
     public ElementBufferObject(GL4 gl, Buffer data, int count, int usage) {
         this.gl = gl;
@@ -35,7 +37,9 @@ public class ElementBufferObject {
         this.gl.glBufferData(id, count * Integer.BYTES, data, usage);
     }
 
-    public int getId() { return id; }
+    public int getId() {
+        return id;
+    }
 
     /**
      * Binds this element buffer object.
@@ -61,5 +65,5 @@ public class ElementBufferObject {
 
         gl.glDeleteBuffers(1, intBuffer);
     }
-	
+
 }

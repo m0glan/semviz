@@ -5,6 +5,7 @@
  */
 package com.movlad.semviz.view;
 
+import com.movlad.semviz.application.CloudViewer;
 import com.movlad.semviz.application.SemvizManagerController;
 import com.movlad.semviz.core.SemvizException;
 import com.movlad.semviz.core.math.geometry.PointCloud;
@@ -21,8 +22,6 @@ import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Vector;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
@@ -36,14 +35,14 @@ import org.apache.jena.query.QuerySolution;
  * @author Vlad
  */
 public class MainWindow extends javax.swing.JFrame implements Observer {
-    
+
     private SemvizManagerController svmgrController;
-    
+
     private CloudViewer viewer;
-    
+
     private List<String> commands = new ArrayList<>();
     private int commandIndex = -1;
-    
+
     /**
      * Creates new form MainWindow
      */
@@ -55,26 +54,26 @@ public class MainWindow extends javax.swing.JFrame implements Observer {
         updateCloudInfoTable();
         updateCloudURIList();
         updateStatusIndicators();
-        
+
         textField_Command.setEnabled(false);
     }
-    
+
     private void initCloudViewer() {
         viewer = new CloudViewer(panel_GLCanvas.getWidth(), panel_GLCanvas.getHeight());
-        
+
         panel_GLCanvas.add(viewer.getCanvas(), BorderLayout.CENTER);
     }
-    
+
     private void initControllers() {
         svmgrController = SemvizManagerController.get();
-        
+
         svmgrController.addObserver(this);
     }
-    
+
     private void initViewSelectionComboBox() {
         comboBox_ViewSelection.setEnabled(false);
         comboBox_ViewSelection.removeAllItems();
-        
+
         comboBox_ViewSelection.addItem("High Resolution");
         comboBox_ViewSelection.addItem("High Resolution (Normals)");
         comboBox_ViewSelection.addItem("Convex Hull");
@@ -358,28 +357,28 @@ public class MainWindow extends javax.swing.JFrame implements Observer {
 
     private void menuItem_OpenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItem_OpenActionPerformed
         final JFileChooser fc = new JFileChooser();
-        
+
         fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        
+
         int returnVal = fc.showOpenDialog(this);
-        
+
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             String path = fc.getSelectedFile().getAbsolutePath();
-            
+
             try {
                 svmgrController.load(path);
-                
-                JOptionPane.showMessageDialog(this, "Semviz data directory successfully loaded.", 
+
+                JOptionPane.showMessageDialog(this, "Semviz data directory successfully loaded.",
                         "Info", JOptionPane.INFORMATION_MESSAGE);
-                
+
                 textField_Command.setEnabled(true);
             } catch (SemvizException e) {
                 JOptionPane.showMessageDialog(this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-                
+
                 textField_Command.setEnabled(false);
             } catch (IOException ioe) {
                 JOptionPane.showMessageDialog(this, "File could not be loaded.", "Error", JOptionPane.ERROR_MESSAGE);
-                
+
                 textField_Command.setEnabled(false);
             }
         }
@@ -389,40 +388,43 @@ public class MainWindow extends javax.swing.JFrame implements Observer {
         switch (evt.getKeyCode()) {
             case KeyEvent.VK_ENTER:
                 String queryString = textField_Command.getText();
-                
+
                 commands.add(queryString);
                 commandIndex = commands.size();
-                
+
                 try {
                     svmgrController.query(queryString);
                 } catch (SemvizException e) {
                     JOptionPane.showMessageDialog(this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                 } catch (QueryException qe) {
                     JOptionPane.showMessageDialog(this, "Invalid query syntax.", "Error", JOptionPane.ERROR_MESSAGE);
-                }   textField_Command.setText("");
-                
+                }
+                textField_Command.setText("");
+
                 break;
             case KeyEvent.VK_UP:
                 if ((commandIndex - 1) >= 0) {
                     commandIndex--;
                     textField_Command.setText(commands.get(commandIndex));
-                    
-                }   break;
+
+                }
+                break;
             case KeyEvent.VK_DOWN:
                 if ((commandIndex + 1) <= commands.size()) {
                     commandIndex++;
-                    
+
                     String text;
-                    
+
                     if (commandIndex >= commands.size()) {
                         text = "";
                     } else {
                         text = commands.get(commandIndex);
                     }
-                    
+
                     textField_Command.setText(text);
-                    
-                }   break;
+
+                }
+                break;
             default:
                 break;
         }
@@ -434,19 +436,19 @@ public class MainWindow extends javax.swing.JFrame implements Observer {
 
     private void list_CloudURIValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_list_CloudURIValueChanged
         updateCloudInfoTable();
-        
+
         PointCloud cloud = null;
-        
+
         if (!list_CloudURI.isSelectionEmpty()) {
             try {
                 cloud = svmgrController.retrieve(list_CloudURI.getSelectedValue());
             } catch (SemvizException | IOException ex) {
                 JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             }
-        } 
-        
+        }
+
         viewer.setCloud(cloud);
-        
+
         if (cloud != null) {
             comboBox_ViewSelection.setEnabled(true);
             comboBox_ViewSelection.setSelectedIndex(0);
@@ -460,23 +462,16 @@ public class MainWindow extends javax.swing.JFrame implements Observer {
     }//GEN-LAST:event_none
 
     private void comboBox_ViewSelectionItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_comboBox_ViewSelectionItemStateChanged
-        if (evt.getStateChange() == ItemEvent.SELECTED && 
-                comboBox_ViewSelection.isEnabled() && comboBox_ViewSelection.getSelectedIndex() >= 0) {
+        if (evt.getStateChange() == ItemEvent.SELECTED
+                && comboBox_ViewSelection.isEnabled() && comboBox_ViewSelection.getSelectedIndex() >= 0) {
             viewer.setView(comboBox_ViewSelection.getSelectedIndex());
         }
     }//GEN-LAST:event_comboBox_ViewSelectionItemStateChanged
 
     private void menuItem_QuitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItem_QuitActionPerformed
-        try {
-            viewer.finalize();
-        } catch (Throwable ex) {
-            Logger.getLogger(MainWindow.class.getName()).log(Level.SEVERE, null, ex);
-        } finally {
-            System.exit(0);
-        }
+        System.exit(0);
     }//GEN-LAST:event_menuItem_QuitActionPerformed
 
-    
     /**
      * @param args the command line arguments
      */
@@ -484,10 +479,10 @@ public class MainWindow extends javax.swing.JFrame implements Observer {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
          */
         setFont(new FontUIResource(new Font("Arial", Font.PLAIN, 14)));
-        
+
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (Exception e) {
@@ -502,7 +497,7 @@ public class MainWindow extends javax.swing.JFrame implements Observer {
             }
         });
     }
-    
+
     private static void setFont(FontUIResource myFont) {
         UIManager.put("CheckBoxMenuItem.acceleratorFont", myFont);
         UIManager.put("Button.font", myFont);
@@ -580,45 +575,45 @@ public class MainWindow extends javax.swing.JFrame implements Observer {
         updateCloudURIList();
         updateStatusIndicators();
     }
-    
+
     /**
      * Updates the list with new information from the last executed query.
      */
     private void updateCloudURIList() {
         list_CloudURI.removeAll();
-        
+
         Vector<String> uris = new Vector<>();
-        
+
         if (svmgrController.getCloudSelection() != null) {
             for (QuerySolution querySolution : svmgrController.getCloudSelection()) {
                 uris.add(querySolution.get("?cloud").asResource().getLocalName());
-            }   
+            }
         }
-        
+
         list_CloudURI.setListData(uris);
     }
-    
+
     /**
      * Upon cloud URI selection, the table is updated with vars
      */
     private void updateCloudInfoTable() {
         DefaultTableModel tableModel = new DefaultTableModel();
-        
+
         tableModel.addColumn("Variable");
         tableModel.addColumn("Value");
-        
+
         panel_VarInfo.setEnabled(false);
-        
+
         if (!list_CloudURI.isSelectionEmpty()) {
             String cloudURI = list_CloudURI.getSelectedValue();
-            
+
             for (QuerySolution querySolution : svmgrController.getCloudSelection()) {
                 if (cloudURI.equals(querySolution.getResource("?cloud").getLocalName())) {
                     Iterator<String> varNameIt = querySolution.varNames();
-                
+
                     while (varNameIt.hasNext()) {
                         String varName = varNameIt.next();
-                        
+
                         if (!varName.equals("cloud")) {
                             String varValue;
 
@@ -632,20 +627,21 @@ public class MainWindow extends javax.swing.JFrame implements Observer {
 
                             data[0] = varName;
                             data[1] = varValue;
-                        
+
                             tableModel.addRow(data);
                         }
                     }
                 }
             }
-            
-            if  (tableModel.getRowCount() > 0)
+
+            if (tableModel.getRowCount() > 0) {
                 panel_VarInfo.setEnabled(true);
+            }
         }
-        
+
         table_CloudInfo.setModel(tableModel);
     }
-    
+
     private void updateStatusIndicators() {
         if (!SemvizManager.get().isInitialized()) {
             label_StatusLED.setForeground(Color.RED);
@@ -655,5 +651,5 @@ public class MainWindow extends javax.swing.JFrame implements Observer {
             label_StatusText.setText(SemvizManager.get().getOntologyVersionIRI());
         }
     }
-    
+
 }

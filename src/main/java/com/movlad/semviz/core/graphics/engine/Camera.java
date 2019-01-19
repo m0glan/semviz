@@ -7,57 +7,54 @@ import org.joml.Matrix4f;
  */
 public abstract class Camera extends Object3d {
 
-	protected static final float ZOOM_FACTOR = 5.0f;
-	
-	protected Matrix4f projectionMatrix;
-	private float zoom;
-	private float minZoom;
-	private float maxZoom;
-	
-	public Camera() { 
-            this.zoom = 1.0f;
-            this.setVisible(false); 
-	}
-	
-	protected float getZoom() { return zoom; }
-	
-	/**
-	 * Zooms the camera by the given amount.
-	 * 
-	 * @param zoom is the amount to zoom by
-	 */
-	public final void zoom(float zoom) {
-            float newZoom = this.zoom - zoom;
+    public static final float DEFAULT_ZOOM = 1.0f;
 
-            if (newZoom >= minZoom && newZoom <= maxZoom) {
-                if (canZoom(newZoom)) {
-                        this.zoom = newZoom;
+    protected Matrix4f projectionMatrix;
 
-                        updateProjectionMatrix();
-                }
-            }
-	}
-	
-	/**
-	 * @param newZoom is the potential new value of zoom
-	 * 
-	 * @return true if the camera can zoom
-	 */
-	protected abstract boolean canZoom(float newZoom);
-	
-	public void setMinZoom(float minZoom) {
-            this.minZoom = minZoom;
-	}
-	
-	public void setMaxZoom(float maxZoom) {
-            this.maxZoom = maxZoom;
-	}
-	
-	/**
-	 * @return projection matrix (<i>e.g.</i> perspective, orthogonal etc.)
-	 */
-	public Matrix4f getProjectionMatrix() { return projectionMatrix; }
-	
-	protected abstract void updateProjectionMatrix();
-	
+    private float near;
+    private float far;
+    protected float zoom;
+
+    public Camera() {
+        zoom = DEFAULT_ZOOM;
+
+        setVisible(false);
+    }
+
+    public final float getNear() {
+        return near;
+    }
+
+    public final void setNear(float near) {
+        this.near = near;
+    }
+
+    public final float getFar() {
+        return far;
+    }
+
+    public final void setFar(float far) {
+        this.far = far;
+    }
+
+    public final float getZoom() {
+        return zoom;
+    }
+
+    /**
+     * Zooms the camera by the given amount.
+     *
+     * @param zoom is the amount to zoom by
+     */
+    public abstract void zoom(float zoom);
+
+    /**
+     * @return projection matrix (<i>e.g.</i> perspective, orthogonal etc.)
+     */
+    public final Matrix4f getProjectionMatrix() {
+        return projectionMatrix;
+    }
+
+    public abstract void updateProjectionMatrix();
+
 }

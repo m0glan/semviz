@@ -1,42 +1,44 @@
 package com.movlad.semviz.core.graphics;
 
+import com.jogamp.opengl.GL4;
+import com.jogamp.opengl.GLException;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.nio.charset.Charset;
 
-import com.jogamp.opengl.GL4;
-import com.jogamp.opengl.GLException;
-import java.io.InputStream;
-
 class ShaderSource {
-	public String[] vertexShaderSource = { "" };
-	public String[] fragmentShaderSource = { "" };
+
+    public String[] vertexShaderSource = {""};
+    public String[] fragmentShaderSource = {""};
 }
 
-enum ShaderType { NONE, VERTEX_SHADER, FRAGMENT_SHADER }
+enum ShaderType {
+    NONE, VERTEX_SHADER, FRAGMENT_SHADER
+}
 
 /**
- * Shader program that runs on the GPU. Compiled from the sources for a vertex shader
- * and a fragment shader.
+ * Shader program that runs on the GPU. Compiled from the sources for a vertex
+ * shader and a fragment shader.
  */
 public class ShaderProgram {
 
-    private int id;
-    private GL4 gl;
+    private final int id;
+    private final GL4 gl;
 
     /**
-     * Constructor. 
-     * 
+     * Constructor.
+     *
      * @param gl is the context
      * @param vertexShaderSource is the GLSL source for the vertex shader
      * @param fragmentShaderSource is the GLSL source for the fragment shader
      * @throws GLException upon compilation, linkage or validation errors.
      */
-    public ShaderProgram(GL4 gl, String[] vertexShaderSource, String[] fragmentShaderSource) 
-                    throws GLException {
+    public ShaderProgram(GL4 gl, String[] vertexShaderSource, String[] fragmentShaderSource)
+            throws GLException {
         this.gl = gl;
         this.id = createProgram(vertexShaderSource, fragmentShaderSource);
     }
@@ -49,7 +51,9 @@ public class ShaderProgram {
         this.id = createProgram(source.vertexShaderSource, source.fragmentShaderSource);
     }
 
-    public int getId() { return id; }
+    public int getId() {
+        return id;
+    }
 
     /**
      * Sets this shader as the currently used program.
@@ -67,89 +71,92 @@ public class ShaderProgram {
 
     /**
      * Compiles a shader component of the program.
-     * 
-     * @param type is the type of shader, {@code GL_VERTEX_SHADER} or {@code GL_FRAGMENT_SHADER}
+     *
+     * @param type is the type of shader, {@code GL_VERTEX_SHADER} or
+     * {@code GL_FRAGMENT_SHADER}
      * @param source is the GLSL source code for the shader
      * @return the id of the created shader if no exception was raised
      * @throws GLException if the shader fails to compile
      */
     private int compileShader(int type, String[] source) throws GLException {
-        int id = gl.glCreateShader(type);
+        int idTemp = gl.glCreateShader(type);
 
-        gl.glShaderSource(id, 1, source, null);
-        gl.glCompileShader(id);
+        gl.glShaderSource(idTemp, 1, source, null);
+        gl.glCompileShader(idTemp);
 
         IntBuffer success = IntBuffer.allocate(1);
 
-        gl.glGetShaderiv(id, GL4.GL_COMPILE_STATUS, success);
+        gl.glGetShaderiv(idTemp, GL4.GL_COMPILE_STATUS, success);
 
         if (success.get(0) == GL4.GL_FALSE) {
             IntBuffer infoLogLength = IntBuffer.allocate(1);
 
-            gl.glGetShaderiv(id, GL4.GL_INFO_LOG_LENGTH, infoLogLength);
+            gl.glGetShaderiv(idTemp, GL4.GL_INFO_LOG_LENGTH, infoLogLength);
 
             ByteBuffer infoLog = ByteBuffer.allocate(infoLogLength.get(0));
 
-            gl.glGetShaderInfoLog(id, infoLogLength.get(0), infoLogLength, infoLog);
+            gl.glGetShaderInfoLog(idTemp, infoLogLength.get(0), infoLogLength, infoLog);
 
             String errorMessage = new String(infoLog.array(), Charset.forName("UTF-8"));
 
             throw new GLException(errorMessage);
         }
 
-        return id;
+        return idTemp;
     }
 
     /**
      * Links the vertex and fragment shaders to the program.
-     * 
+     *
      * @param vertexShaderSource is the GLSL source for the vertex shader
      * @param fragmentShaderSource is the GLSL source for the fragment shader
      * @return the id of the created program
-     * @throws GLException upon shader failed shader compilation, linkage or program validation
+     * @throws GLException upon shader failed shader compilation, linkage or
+     * program validation
      */
-    private int createProgram(String[] vertexShaderSource, String[] fragmentShaderSource) 
-                    throws GLException {
+    private int createProgram(String[] vertexShaderSource, String[] fragmentShaderSource)
+            throws GLException {
         int vertexShader = compileShader(GL4.GL_VERTEX_SHADER, vertexShaderSource);
         int fragmentShader = compileShader(GL4.GL_FRAGMENT_SHADER, fragmentShaderSource);
-        int id = gl.glCreateProgram();
+        int idTemp = gl.glCreateProgram();
 
-        gl.glAttachShader(id, vertexShader);
-        gl.glAttachShader(id, fragmentShader);
-        gl.glLinkProgram(id);
-        gl.glValidateProgram(id);
+        gl.glAttachShader(idTemp, vertexShader);
+        gl.glAttachShader(idTemp, fragmentShader);
+        gl.glLinkProgram(idTemp);
+        gl.glValidateProgram(idTemp);
         gl.glDeleteShader(vertexShader);
         gl.glDeleteShader(fragmentShader);
 
         IntBuffer linkSuccess = IntBuffer.allocate(1);
         IntBuffer valid = IntBuffer.allocate(1);
 
-        gl.glGetProgramiv(id, GL4.GL_LINK_STATUS, linkSuccess);
-        gl.glGetProgramiv(id, GL4.GL_VALIDATE_STATUS, valid);
+        gl.glGetProgramiv(idTemp, GL4.GL_LINK_STATUS, linkSuccess);
+        gl.glGetProgramiv(idTemp, GL4.GL_VALIDATE_STATUS, valid);
 
         if (linkSuccess.get(0) == GL4.GL_FALSE || valid.get(0) == GL4.GL_FALSE) {
             IntBuffer infoLogLength = IntBuffer.allocate(1);
 
-            gl.glGetProgramiv(id, GL4.GL_INFO_LOG_LENGTH, infoLogLength);
+            gl.glGetProgramiv(idTemp, GL4.GL_INFO_LOG_LENGTH, infoLogLength);
 
             ByteBuffer infoLog = ByteBuffer.allocate(infoLogLength.get(0));
 
-            gl.glGetProgramInfoLog(id, infoLogLength.get(0), infoLogLength, infoLog);
+            gl.glGetProgramInfoLog(idTemp, infoLogLength.get(0), infoLogLength, infoLog);
 
             String errorMessage = new String(infoLog.array(), Charset.forName("UTF-8"));
 
             throw new GLException(errorMessage);
         }
 
-        return id;
+        return idTemp;
     }
 
     /**
      * Parses a {@code .glsl} file and returns the shader source codes.
-     * 
+     *
      * @param is is the input stream containing the shader code
      * @return the source code for the shaders
-     * @throws IOException if the shader file is not found/failed to create streams/reader
+     * @throws IOException if the shader file is not found/failed to create
+     * streams/reader
      */
     private ShaderSource parse(InputStream is) throws IOException {
         ShaderSource source = new ShaderSource();
@@ -164,13 +171,13 @@ public class ShaderProgram {
                 type = ShaderType.FRAGMENT_SHADER;
             } else {
                 switch (type) {
-                case VERTEX_SHADER:
+                    case VERTEX_SHADER:
                         source.vertexShaderSource[0] += line + "\r\n";
                         break;
-                case FRAGMENT_SHADER:
+                    case FRAGMENT_SHADER:
                         source.fragmentShaderSource[0] += line + "\r\n";
                         break;
-                default:
+                    default:
                         throw new GLException("Invalid shader file format.");
                 }
             }
@@ -180,5 +187,5 @@ public class ShaderProgram {
 
         return source;
     }
-	
+
 }

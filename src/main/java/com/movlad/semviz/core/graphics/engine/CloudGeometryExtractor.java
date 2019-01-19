@@ -80,11 +80,6 @@ public class CloudGeometryExtractor {
                 data[i] = (float) (point.x - centroid.x);
                 data[i + 1] = (float) (point.y - centroid.y);
                 data[i + 2] = (float) (point.z - centroid.z);
-
-                /*
-                data[i + 3] = TransformationUtils.map((float) point.normalX, -1.0f, 1.0f, .0f, 1.0f);
-                data[i + 4] = TransformationUtils.map((float) point.normalY, -1.0f, 1.0f, .0f, 1.0f);
-                data[i + 5] = TransformationUtils.map((float) point.normalZ, -1.0f, 1.0f, .0f, 1.0f);*/
                 
                 data[i + 3] = Math.abs((float) point.normalX);
                 data[i + 4] = Math.abs((float) point.normalY);

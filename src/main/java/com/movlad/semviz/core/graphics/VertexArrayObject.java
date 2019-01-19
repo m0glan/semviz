@@ -1,21 +1,20 @@
 package com.movlad.semviz.core.graphics;
 
-import java.nio.IntBuffer;
-
 import com.jogamp.opengl.GL4;
+import java.nio.IntBuffer;
 
 /**
  * Stores the layout for one or more {@code VertexBufferObject} instances.
  */
 public class VertexArrayObject {
 
-    private int id;
+    private final int id;
     private int offset;
-    private GL4 gl;
+    private final GL4 gl;
 
     /**
      * Constructor.
-     * 
+     *
      * @param gl is the context
      */
     public VertexArrayObject(GL4 gl) {
@@ -28,7 +27,9 @@ public class VertexArrayObject {
         id = intBuffer.get(0);
     }
 
-    public int getId() { return id; }
+    public int getId() {
+        return id;
+    }
 
     /**
      * Binds this vertex array object.
@@ -56,8 +57,9 @@ public class VertexArrayObject {
     }
 
     /**
-     * Stores the layout information for a given instance of {@code VertexBufferObject}.
-     * 
+     * Stores the layout information for a given instance of
+     * {@code VertexBufferObject}.
+     *
      * @param vbo is the vertex buffer object
      * @param layout is its layout
      */
@@ -73,6 +75,5 @@ public class VertexArrayObject {
             offset += attribute.getSize();
         }
     }
-	
-}
 
+}

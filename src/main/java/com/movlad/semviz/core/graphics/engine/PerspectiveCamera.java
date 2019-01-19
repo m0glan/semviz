@@ -8,36 +8,46 @@ import org.joml.Matrix4f;
 public class PerspectiveCamera extends Camera {
 
     private float fov;
+
     private float aspect;
-    private float near;
-    private float far;
 
     public PerspectiveCamera(float fov, float aspect, float near, float far) {
         this.fov = fov;
         this.aspect = aspect;
-        this.near = near;
-        this.far = far;
+
+        setNear(near);
+        setFar(far);
 
         updateProjectionMatrix();
     }
 
-    public void setAspect(float aspect) { 
-        this.aspect = aspect; 
+    public final float getFov() {
+        return fov;
+    }
 
-        updateProjectionMatrix(); 
+    public final void setFov(float fov) {
+        this.fov = fov;
+    }
+
+    public final float getAspect() {
+        return aspect;
+    }
+
+    public final void setAspect(float aspect) {
+        this.aspect = aspect;
     }
 
     @Override
-    public boolean canZoom(float newZoom) {
-        float zoomedFov = fov - (newZoom / ZOOM_FACTOR);
-
-        return zoomedFov > 0 && zoomedFov < Math.PI;
+    public final void zoom(float zoom) {
+        if ((fov - zoom + 1.0f) > 0 && (fov - zoom + DEFAULT_ZOOM) < Math.PI) {
+            this.zoom = zoom;
+        }
     }
 
     @Override
-    protected void updateProjectionMatrix() {
+    public final void updateProjectionMatrix() {
         projectionMatrix = new Matrix4f();
-        projectionMatrix = projectionMatrix.perspective(fov + (getZoom() / ZOOM_FACTOR), aspect, near, far);
+        projectionMatrix = projectionMatrix.perspective(fov - zoom + DEFAULT_ZOOM, aspect, getNear(), getFar());
     }
-	
+
 }
