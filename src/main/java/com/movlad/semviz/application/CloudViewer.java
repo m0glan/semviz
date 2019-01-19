@@ -9,6 +9,7 @@ import com.jogamp.newt.awt.NewtCanvasAWT;
 import com.jogamp.newt.opengl.GLWindow;
 import com.jogamp.opengl.GLCapabilities;
 import com.jogamp.opengl.GLProfile;
+import com.jogamp.opengl.awt.GLCanvas;
 import com.jogamp.opengl.util.FPSAnimator;
 import com.movlad.semviz.core.graphics.engine.AxisHelper;
 import com.movlad.semviz.core.graphics.engine.Camera;
@@ -29,8 +30,7 @@ public class CloudViewer {
     // GL
     private final GLCapabilities glCaps;
     private final GLProfile glProfile;
-    private final GLWindow glWindow;
-    private final NewtCanvasAWT glCanvas;
+    private final GLCanvas glCanvas;
     private final FPSAnimator animator;
 
     // Display data
@@ -53,11 +53,9 @@ public class CloudViewer {
         // GL Init
         glProfile = GLProfile.get(GLProfile.GL4);
         glCaps = new GLCapabilities(glProfile);
-        glWindow = GLWindow.create(glCaps);
+        glCanvas = new GLCanvas(glCaps);
 
-        glCanvas = new NewtCanvasAWT(glWindow);
-        glWindow.setPosition(0, 0);
-        glWindow.setSize(width, height);
+        glCanvas.setSize(width, height);
 
         // Camera, Scene, Renderer, Controls...
         camera = new OrthographicCamera(-width, width, -height, height, 0.1f, 1000.0f);
@@ -76,16 +74,19 @@ public class CloudViewer {
         controls.setZoomSpeed(3.0f);
 
         // Adding event listeners
-        glWindow.addGLEventListener(renderer);
-        glWindow.setVisible(true);
-        glWindow.addMouseListener(controls);
 
-        animator = new FPSAnimator(glWindow, 60);
+        glCanvas.addGLEventListener(renderer);
+        glCanvas.addMouseListener(controls);
+        glCanvas.addMouseMotionListener(controls);
+        glCanvas.addMouseWheelListener(controls);
+        glCanvas.setVisible(true);
+
+        animator = new FPSAnimator(glCanvas, 60);
 
         animator.start();
     }
 
-    public NewtCanvasAWT getCanvas() {
+    public GLCanvas getCanvas() {
         return glCanvas;
     }
 
@@ -143,14 +144,14 @@ public class CloudViewer {
      */
     private void pauseRendering() {
         animator.stop();
-        glWindow.removeGLEventListener(renderer);
+        glCanvas.removeGLEventListener(renderer);
     }
 
     /**
      * Resumes the rendering after scene modification.
      */
     private void resumeRendering() {
-        glWindow.addGLEventListener(renderer);
+        glCanvas.addGLEventListener(renderer);
         animator.start();
     }
 

@@ -1,7 +1,12 @@
 package com.movlad.semviz.core.graphics.engine.controls;
 
 import com.jogamp.newt.event.MouseEvent;
-import com.jogamp.newt.event.MouseListener;
+
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
+
 import com.movlad.semviz.core.graphics.engine.Camera;
 import com.movlad.semviz.core.math.geometry.TransformationUtils;
 import org.joml.Vector3f;
@@ -9,7 +14,7 @@ import org.joml.Vector3f;
 /**
  * Controls making the camera move around the world's origin.
  */
-public class OrbitControls implements MouseListener {
+public class OrbitControls implements MouseListener, MouseMotionListener, MouseWheelListener {
 
     private final Camera camera;
     private float oldX, oldY;
@@ -28,33 +33,21 @@ public class OrbitControls implements MouseListener {
     }
 
     @Override
-    public void mouseClicked(MouseEvent e) {
+    public void mouseWheelMoved(MouseWheelEvent e) {
+        float zoom = camera.getZoom() - e.getWheelRotation() * zoomSpeed;
+
+        camera.zoom(zoom);
+        camera.updateProjectionMatrix();
     }
 
     @Override
-    public void mouseEntered(MouseEvent e) {
-    }
-
-    @Override
-    public void mouseExited(MouseEvent e) {
-    }
-
-    @Override
-    public void mousePressed(MouseEvent e) {
-    }
-
-    @Override
-    public void mouseReleased(MouseEvent e) {
+    public void mouseReleased(java.awt.event.MouseEvent e) {
         oldX = 0;
         oldY = 0;
     }
 
     @Override
-    public void mouseMoved(MouseEvent e) {
-    }
-
-    @Override
-    public final void mouseDragged(MouseEvent e) {
+    public void mouseDragged(java.awt.event.MouseEvent e) {
         if (oldX < 0.0005 && oldY < 0.0005) {
             oldX = e.getX();
             oldY = e.getY();
@@ -84,11 +77,28 @@ public class OrbitControls implements MouseListener {
     }
 
     @Override
-    public final void mouseWheelMoved(MouseEvent e) {
-        float zoom = camera.getZoom() + (e.getRotation()[1] * zoomSpeed);
+    public void mouseMoved(java.awt.event.MouseEvent e) {
+        return;
+    }
 
-        camera.zoom(zoom);
-        camera.updateProjectionMatrix();
+    @Override
+    public void mouseClicked(java.awt.event.MouseEvent e) {
+        return;
+    }
+
+    @Override
+    public void mousePressed(java.awt.event.MouseEvent e) {
+        return;
+    }
+
+    @Override
+    public void mouseEntered(java.awt.event.MouseEvent e) {
+        return;
+    }
+
+    @Override
+    public void mouseExited(java.awt.event.MouseEvent e) {
+        return;
     }
 
 }
