@@ -3,7 +3,7 @@ package com.movlad.semviz.core.graphics.engine;
 import com.github.quickhull3d.QuickHull3D;
 import com.jogamp.opengl.GL4;
 import com.movlad.semviz.core.graphics.BufferLayout;
-import com.movlad.semviz.core.graphics.MathUtils;
+import com.movlad.semviz.core.math.geometry.TransformationUtils;
 import com.movlad.semviz.core.math.geometry.Point;
 import com.movlad.semviz.core.math.geometry.PointCloud;
 
@@ -42,9 +42,9 @@ public class CloudGeometryExtractor {
                 data[i + 1] = (float) (point.y - centroid.y);
                 data[i + 2] = (float) (point.z - centroid.z);
 
-                data[i + 3] = MathUtils.map(point.r, 0.0f, 255.0f, 0.0f, 1.0f);
-                data[i + 4] = MathUtils.map(point.g, 0.0f, 255.0f, 0.0f, 1.0f);
-                data[i + 5] = MathUtils.map(point.b, 0.0f, 255.0f, 0.0f, 1.0f);
+                data[i + 3] = TransformationUtils.map(point.r, 0.0f, 255.0f, 0.0f, 1.0f);
+                data[i + 4] = TransformationUtils.map(point.g, 0.0f, 255.0f, 0.0f, 1.0f);
+                data[i + 5] = TransformationUtils.map(point.b, 0.0f, 255.0f, 0.0f, 1.0f);
 
                 i += 6;
             }
@@ -127,9 +127,9 @@ public class CloudGeometryExtractor {
                     data[offset] = (float) (p.x - centroid.x);
                     data[offset + 1] = (float) (p.y - centroid.y);
                     data[offset + 2] = (float) (p.z - centroid.z);
-                    data[offset + 3] = MathUtils.map(p.r, 0.0f, 255.0f, 0.0f, 1.0f);
-                    data[offset + 4] = MathUtils.map(p.g, 0.0f, 255.0f, 0.0f, 1.0f);
-                    data[offset + 5] = MathUtils.map(p.b, 0.0f, 255.0f, 0.0f, 1.0f);
+                    data[offset + 3] = TransformationUtils.map(p.r, 0.0f, 255.0f, 0.0f, 1.0f);
+                    data[offset + 4] = TransformationUtils.map(p.g, 0.0f, 255.0f, 0.0f, 1.0f);
+                    data[offset + 5] = TransformationUtils.map(p.b, 0.0f, 255.0f, 0.0f, 1.0f);
                     
                     offset += 6;
                 }

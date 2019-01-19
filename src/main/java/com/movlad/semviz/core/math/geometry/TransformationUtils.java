@@ -1,8 +1,8 @@
-package com.movlad.semviz.core.graphics;
+package com.movlad.semviz.core.math.geometry;
 
 import org.joml.Vector3f;
 
-public class MathUtils {
+public class TransformationUtils {
 
     /**
      * Converts a position in the Cartesian coordinate system to a position in the spherical coordinate system.

@@ -4,7 +4,7 @@ import org.joml.Vector3f;
 
 import com.jogamp.newt.event.MouseEvent;
 import com.jogamp.newt.event.MouseListener;
-import com.movlad.semviz.core.graphics.MathUtils;
+import com.movlad.semviz.core.math.geometry.TransformationUtils;
 import com.movlad.semviz.core.graphics.engine.Camera;
 
 /**
@@ -54,7 +54,7 @@ public class OrbitControls implements MouseListener {
 
             // getting the current position of the camera in the polar coordinate system
 
-            Vector3f sphericalCoords = MathUtils.toSphericalCoords(camera.getPosition());
+            Vector3f sphericalCoords = TransformationUtils.toSphericalCoords(camera.getPosition());
 
             float speedY = (float)Math.toRadians(differenceY / 4.0f);
             float speedX = (float)Math.toRadians(differenceX / 4.0f);
@@ -65,12 +65,12 @@ public class OrbitControls implements MouseListener {
 
             // making sure the angles are not outside the [0, 2 * PI] interval
 
-            sphericalCoords.y = MathUtils.wrapTo2Pi(sphericalCoords.y);
-            sphericalCoords.z = MathUtils.wrapTo2Pi(sphericalCoords.z);
+            sphericalCoords.y = TransformationUtils.wrapTo2Pi(sphericalCoords.y);
+            sphericalCoords.z = TransformationUtils.wrapTo2Pi(sphericalCoords.z);
 
             // updating the position of the camera
 
-            camera.setPosition(MathUtils.toCartesianCoords(sphericalCoords));
+            camera.setPosition(TransformationUtils.toCartesianCoords(sphericalCoords));
         }
     }
 
