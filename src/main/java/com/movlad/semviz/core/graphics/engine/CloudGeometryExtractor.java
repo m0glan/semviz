@@ -121,17 +121,15 @@ public class CloudGeometryExtractor {
             float[] data = new float[faces.length * 3 * 6];
             int offset = 0;
 
-            for (int i = 0; i < faces.length; i++) {
-                for (int j = 0; j < faces[i].length; j++) {
-                    Point point = cloud.get(faces[i][j]);
-
+            for (int[] face : faces) {
+                for (int j = 0; j < face.length; j++) {
+                    Point point = cloud.get(face[j]);
                     data[offset] = (float) (point.x - centroid.x);
                     data[offset + 1] = (float) (point.y - centroid.y);
                     data[offset + 2] = (float) (point.z - centroid.z);
                     data[offset + 3] = Math.abs((float) point.normalX);
                     data[offset + 4] = Math.abs((float) point.normalY);
                     data[offset + 5] = Math.abs((float) point.normalZ);
-
                     offset += 6;
                 }
             }
