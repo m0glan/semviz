@@ -37,6 +37,7 @@ public class Renderer implements GLEventListener {
         gl = (GL4) drawable.getGL();
 
         gl.glEnable(GL4.GL_DEPTH_TEST);
+        gl.glPointSize(2);
 
         try {
             program = new ShaderProgram(gl, this.getClass().getClassLoader()

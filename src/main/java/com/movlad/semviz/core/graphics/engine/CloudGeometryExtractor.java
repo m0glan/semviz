@@ -3,13 +3,13 @@ package com.movlad.semviz.core.graphics.engine;
 import com.github.quickhull3d.QuickHull3D;
 import com.jogamp.opengl.GL4;
 import com.movlad.semviz.core.graphics.BufferLayout;
-import com.movlad.semviz.core.math.geometry.TransformationUtils;
 import com.movlad.semviz.core.math.geometry.Point;
 import com.movlad.semviz.core.math.geometry.PointCloud;
+import com.movlad.semviz.core.math.geometry.TransformationUtils;
 
 /**
- * Given a 3D point cloud, this class is used to extract the different geometries stored within
- * for drawing with OpenGL.
+ * Given a 3D point cloud, this class is used to extract the different
+ * geometries stored within for drawing with OpenGL.
  */
 public class CloudGeometryExtractor {
 
@@ -58,7 +58,7 @@ public class CloudGeometryExtractor {
 
                 @Override
                 public int getDrawingMode() {
-                        return GL4.GL_POINTS;
+                    return GL4.GL_POINTS;
                 }
 
             };
@@ -68,8 +68,9 @@ public class CloudGeometryExtractor {
     }
 
     /**
-     * @return the geometry corresponding to the original hi-res cloud, the color of each point
-     * being given by the cloud's normal vector in that point
+     * @return the geometry corresponding to the original hi-res cloud, the
+     * color of each point being given by the cloud's normal vector in that
+     * point
      */
     public Geometry extractNormalRGBGeometry() {
         if (normalViewGeometry == null) {
@@ -80,7 +81,7 @@ public class CloudGeometryExtractor {
                 data[i] = (float) (point.x - centroid.x);
                 data[i + 1] = (float) (point.y - centroid.y);
                 data[i + 2] = (float) (point.z - centroid.z);
-                
+
                 data[i + 3] = Math.abs((float) point.normalX);
                 data[i + 4] = Math.abs((float) point.normalY);
                 data[i + 5] = Math.abs((float) point.normalZ);
@@ -97,7 +98,7 @@ public class CloudGeometryExtractor {
 
                 @Override
                 public int getDrawingMode() {
-                        return GL4.GL_POINTS;
+                    return GL4.GL_POINTS;
                 }
 
             };
@@ -109,11 +110,11 @@ public class CloudGeometryExtractor {
     /**
      * @return the convex hull geometry of the point cloud
      */
-    public Geometry extractConvexHullGeometry() { 
+    public Geometry extractConvexHullGeometry() {
         if (convexHullViewGeometry == null) {
             QuickHull3D hull = new QuickHull3D();
             Point[] points = cloud.getPoints();
-        
+
             hull.build(points);
 
             int[][] faces = hull.getFaces();
@@ -122,15 +123,15 @@ public class CloudGeometryExtractor {
 
             for (int i = 0; i < faces.length; i++) {
                 for (int j = 0; j < faces[i].length; j++) {
-                    Point p = cloud.get(faces[i][j]);
+                    Point point = cloud.get(faces[i][j]);
 
-                    data[offset] = (float) (p.x - centroid.x);
-                    data[offset + 1] = (float) (p.y - centroid.y);
-                    data[offset + 2] = (float) (p.z - centroid.z);
-                    data[offset + 3] = TransformationUtils.map(p.r, 0.0f, 255.0f, 0.0f, 1.0f);
-                    data[offset + 4] = TransformationUtils.map(p.g, 0.0f, 255.0f, 0.0f, 1.0f);
-                    data[offset + 5] = TransformationUtils.map(p.b, 0.0f, 255.0f, 0.0f, 1.0f);
-                    
+                    data[offset] = (float) (point.x - centroid.x);
+                    data[offset + 1] = (float) (point.y - centroid.y);
+                    data[offset + 2] = (float) (point.z - centroid.z);
+                    data[offset + 3] = Math.abs((float) point.normalX);
+                    data[offset + 4] = Math.abs((float) point.normalY);
+                    data[offset + 5] = Math.abs((float) point.normalZ);
+
                     offset += 6;
                 }
             }
@@ -139,17 +140,17 @@ public class CloudGeometryExtractor {
 
             layout.push("position", GL4.GL_FLOAT, 3, true);
             layout.push("color", GL4.GL_UNSIGNED_BYTE, 3, false);
-            
+
             convexHullViewGeometry = new Geometry(data, layout) {
-                
+
                 @Override
                 public int getDrawingMode() {
-                        return GL4.GL_TRIANGLES;
+                    return GL4.GL_TRIANGLES;
                 }
-                
+
             };
         }
-        
+
         return convexHullViewGeometry;
     }
 
@@ -166,5 +167,5 @@ public class CloudGeometryExtractor {
         centroid.y /= cloud.size();
         centroid.z /= cloud.size();
     }
-	
+
 }

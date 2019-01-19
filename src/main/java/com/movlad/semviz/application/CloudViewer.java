@@ -63,17 +63,17 @@ public class CloudViewer {
         camera = new OrthographicCamera(-width, width, -height, height, 0.1f, 1000.0f);
 
         camera.translate(new Vector3f(-10.0f, 0.0f, 0.0f));
-        camera.zoom(50);
+        camera.zoom(400);
 
         scene = new Scene();
 
-        scene.add(new AxisHelper(4.0f));
+        scene.add(new AxisHelper(8.0f));
 
         renderer = new Renderer(scene, camera);
 
         controls = new OrbitControls(camera);
 
-        controls.setZoomSpeed(1.0f);
+        controls.setZoomSpeed(3.0f);
 
         // Adding event listeners
         glWindow.addGLEventListener(renderer);

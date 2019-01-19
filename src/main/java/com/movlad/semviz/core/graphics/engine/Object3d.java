@@ -15,8 +15,6 @@ public class Object3d implements Iterable<Object3d> {
 
     private String id;
 
-    private float scale;
-
     private Vector3f position;
 
     // object vectors
@@ -33,8 +31,6 @@ public class Object3d implements Iterable<Object3d> {
 
     public Object3d() {
         id = UUID.randomUUID().toString();
-
-        scale = 1.0f;
 
         position = new Vector3f(0.0f, 0.0f, 0.0f);
 
@@ -54,14 +50,8 @@ public class Object3d implements Iterable<Object3d> {
         return id;
     }
 
-    public final float getScale() {
-        return scale;
-    }
-
-    public final void setScale(float scale) {
-        this.scale = scale;
-
-        updateVectors();
+    public final void setId(String id) {
+        this.id = id;
     }
 
     public final Vector3f getPosition() {
@@ -133,12 +123,15 @@ public class Object3d implements Iterable<Object3d> {
         updateVectors();
     }
 
+    public final void scale(float scale) {
+
+        updateVectors();
+    }
+
     public final void translate(Vector3f t) {
         position.add(t);
         updateVectors();
     }
-
-    ;
 
     /**
      * Recalculates object vectors upon a change of target or a translation.
@@ -164,11 +157,7 @@ public class Object3d implements Iterable<Object3d> {
      * @return the matrix world based on the object vectors
      */
     public Matrix4f getMatrixWorld() {
-        Matrix4f matrixWorldTemp = new Matrix4f();
-
-        this.matrixWorld.scale(scale, scale, scale, matrixWorldTemp);
-
-        return matrixWorldTemp;
+        return matrixWorld;
     }
 
     public int getDrawingMode() {
