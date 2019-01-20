@@ -1,10 +1,12 @@
 package com.movlad.semviz.core.graphics.engine;
 
 import com.jogamp.opengl.GL4;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
+
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
@@ -13,21 +15,16 @@ import org.joml.Vector3f;
  */
 public class Object3d implements Iterable<Object3d> {
 
+    private final Vector3f direction;
+    private final Vector3f up;
+    private final List<Object3d> children;
     private String id;
-
     private Vector3f position;
-
     // object vectors
     private Vector3f worldUp;
     private Vector3f target;
-    private final Vector3f direction;
-    private final Vector3f up;
-
     private Matrix4f matrixWorld;
-
     private boolean isVisible;
-
-    private final List<Object3d> children;
 
     public Object3d() {
         id = UUID.randomUUID().toString();
@@ -190,6 +187,10 @@ public class Object3d implements Iterable<Object3d> {
 
     public final int numChildren() {
         return children.size();
+    }
+
+    public final void clear() {
+        children.clear();
     }
 
     @Override

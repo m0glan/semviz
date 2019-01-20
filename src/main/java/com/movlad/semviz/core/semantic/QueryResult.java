@@ -17,11 +17,11 @@ public class QueryResult {
         attributes = new HashMap<>();
     }
 
-    public Individual getCloud() {
+    public Individual getCloudInd() {
         return cloud;
     }
 
-    public void setCloud(Individual cloud) {
+    public void setCloudInd(Individual cloud) {
         this.cloud = cloud;
     }
 

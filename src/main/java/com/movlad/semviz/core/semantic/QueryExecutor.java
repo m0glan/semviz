@@ -34,13 +34,13 @@ public class QueryExecutor {
                 Individual cloud = validateCloudResource(node);
 
                 if (cloud != null) {
-                    result.setCloud(cloud);
+                    result.setCloudInd(cloud);
                 } else {
                     result.putAttribute(varName, node.toString());
                 }
             }
 
-            if (result.getCloud() != null) {
+            if (result.getCloudInd() != null) {
                 queryResults.add(result);
             }
         });

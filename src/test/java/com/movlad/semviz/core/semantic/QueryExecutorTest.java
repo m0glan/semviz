@@ -1,14 +1,9 @@
 package com.movlad.semviz.core.semantic;
 
-import org.junit.jupiter.api.Test;
-
-import org.apache.jena.ontology.OntModel;
-import org.apache.jena.query.QueryFactory;
-import org.apache.jena.rdf.model.ModelFactory;
-
 import java.io.InputStream;
-
-import static org.junit.jupiter.api.Assertions.*;
+import org.apache.jena.ontology.OntModel;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.junit.jupiter.api.Test;
 
 class QueryExecutorTest {
 
