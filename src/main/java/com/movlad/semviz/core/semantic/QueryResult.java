@@ -9,20 +9,20 @@ import java.util.Set;
 
 public class QueryResult {
 
-    private Individual cloud;
+    private Individual individual;
     private Map<String, String> attributes;
 
     public QueryResult() {
-        cloud = null;
+        individual = null;
         attributes = new HashMap<>();
     }
 
-    public Individual getCloudInd() {
-        return cloud;
+    public Individual getIndividual() {
+        return individual;
     }
 
-    public void setCloudInd(Individual cloud) {
-        this.cloud = cloud;
+    public void setIndividual(Individual cloud) {
+        this.individual = cloud;
     }
 
     public void putAttribute(String key, String value) {

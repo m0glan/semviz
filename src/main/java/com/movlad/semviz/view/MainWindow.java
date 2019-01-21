@@ -5,12 +5,13 @@
  */
 package com.movlad.semviz.view;
 
-import com.movlad.semviz.core.graphics.viewer.OrbitViewerBuilder;
-import com.movlad.semviz.core.graphics.viewer.Viewer;
-import com.movlad.semviz.core.graphics.viewer.ViewerConstructor;
-import com.movlad.semviz.core.io.SemanticDirectory;
+import com.movlad.semviz.application.SuperCloud;
+import com.movlad.semviz.application.ViewItem;
+import com.movlad.semviz.application.Viewer;
+import com.movlad.semviz.core.io.DirectoryLoader;
 import com.movlad.semviz.core.semantic.QueryManager;
 import com.movlad.semviz.core.semantic.QueryResult;
+import java.awt.Color;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.KeyEvent;
@@ -18,46 +19,46 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.swing.DefaultListModel;
 import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 import javax.swing.table.DefaultTableModel;
 
 public class MainWindow extends javax.swing.JFrame {
 
-    private List<String> commands = new ArrayList<>();
-    private int commandIndex = -1;
+    private final List<String> commands;
+    private int commandSelection = -1;
 
     private Viewer viewer;
-    private List<DisplayableItem> items;
+    private final List<ViewItem> viewItems;
 
     private QueryManager queryManager;
-    private List<QueryResult> results;
-    private QueryResult selection;
+    private List<QueryResult> queryResults;
 
-    private DefaultListModel list_Individuals_Model = new DefaultListModel();
+    private final DefaultListModel listIndividualsModel;
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JComboBox<String> comboBox_ViewSelection;
-    private java.awt.Label label_Individuals;
-    private javax.swing.JLabel label_StatusLED;
-    private javax.swing.JLabel label_StatusText;
-    private javax.swing.JLabel label_VarInfo;
-    private javax.swing.JLabel label_ViewSelection;
-    private javax.swing.JList<String> list_Individuals;
+    private javax.swing.JComboBox<String> ComboBox_GeometrySelection;
+    private javax.swing.JLabel Label_GeometrySelection;
+    private java.awt.Label Label_Individuals;
+    private javax.swing.JLabel Label_StatusLED;
+    private javax.swing.JLabel Label_StatusText;
+    private javax.swing.JLabel Label_VarInfo;
+    private javax.swing.JList<String> List_Individuals;
+    private javax.swing.JPanel Panel_Control;
+    private javax.swing.JPanel Panel_GLCanvas;
+    private javax.swing.JPanel Panel_GeometrySelection;
+    private javax.swing.JPanel Panel_Individuals;
+    private javax.swing.JPanel Panel_Status;
+    private javax.swing.JPanel Panel_VarInfo;
+    private javax.swing.JScrollPane Scroll_Individuals;
+    private javax.swing.JScrollPane Scroll_VarInfo;
+    private javax.swing.JTextField TextField_Command;
     private javax.swing.JMenuBar menuBar;
     private javax.swing.JMenuItem menuItem_Open;
     private javax.swing.JMenuItem menuItem_Quit;
     private javax.swing.JMenu menu_File;
-    private javax.swing.JPanel panel_Control;
-    private javax.swing.JPanel panel_GLCanvas;
-    private javax.swing.JPanel panel_Individuals;
-    private javax.swing.JPanel panel_Status;
-    private javax.swing.JPanel panel_VarInfo;
-    private javax.swing.JPanel panel_ViewSelection;
-    private javax.swing.JScrollPane scroll_Individuals;
-    private javax.swing.JScrollPane sroll_VarTable;
     private javax.swing.JTable table_VarTable;
-    private javax.swing.JTextField textField_Command;
     // End of variables declaration//GEN-END:variables
 
     /**
@@ -65,11 +66,38 @@ public class MainWindow extends javax.swing.JFrame {
      */
     public MainWindow() {
         initComponents();
-        init3d();
-        initViewSelectionComboBox();
 
-        list_Individuals.setModel(list_Individuals_Model);
-        textField_Command.setEnabled(false);
+        updateStatus();
+
+        viewer = new Viewer(Panel_GLCanvas.getWidth(), Panel_GLCanvas.getHeight());
+
+        Panel_GLCanvas.add(viewer.getGlCanvas());
+        Panel_GLCanvas.addComponentListener(new ComponentAdapter() {
+
+            @Override
+            public void componentResized(ComponentEvent e) {
+                viewer.getGlCanvas().setSize(Panel_GLCanvas.getSize());
+            }
+
+        });
+
+        viewer.start();
+
+        ComboBox_GeometrySelection.setEnabled(false);
+        ComboBox_GeometrySelection.removeAllItems();
+
+        ComboBox_GeometrySelection.addItem("High Resolution");
+        ComboBox_GeometrySelection.addItem("High Resolution (Normals)");
+        ComboBox_GeometrySelection.addItem("Convex Hull");
+
+        TextField_Command.setEnabled(false);
+
+        // attribute init
+        commands = new ArrayList<>();
+        viewItems = new ArrayList<>();
+        listIndividualsModel = new DefaultListModel();
+
+        List_Individuals.setModel(listIndividualsModel);
     }
 
     /**
@@ -90,41 +118,12 @@ public class MainWindow extends javax.swing.JFrame {
         //</editor-fold>
 
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new MainWindow().setVisible(true);
-            }
+        java.awt.EventQueue.invokeLater(() -> {
+            JFrame mainWindow = new MainWindow();
+
+            mainWindow.setExtendedState(JFrame.MAXIMIZED_BOTH);
+            mainWindow.setVisible(true);
         });
-    }
-
-    private void init3d() {
-        ViewerConstructor constructor = new ViewerConstructor(
-                new OrbitViewerBuilder(panel_GLCanvas.getWidth(), panel_GLCanvas.getHeight()));
-
-        constructor.construct();
-
-        viewer = constructor.getViewer();
-
-        panel_GLCanvas.add(viewer.getGlCanvas());
-        panel_GLCanvas.addComponentListener(new ComponentAdapter() {
-
-            @Override
-            public void componentResized(ComponentEvent e) {
-                viewer.getGlCanvas().setSize(panel_GLCanvas.getSize());
-            }
-
-        });
-
-        viewer.start();
-    }
-
-    private void initViewSelectionComboBox() {
-        comboBox_ViewSelection.setEnabled(false);
-        comboBox_ViewSelection.removeAllItems();
-
-        comboBox_ViewSelection.addItem("High Resolution");
-        comboBox_ViewSelection.addItem("High Resolution (Normals)");
-        comboBox_ViewSelection.addItem("Convex Hull");
     }
 
     /**
@@ -136,23 +135,23 @@ public class MainWindow extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        textField_Command = new javax.swing.JTextField();
-        panel_GLCanvas = new javax.swing.JPanel();
-        panel_Control = new javax.swing.JPanel();
-        panel_Status = new javax.swing.JPanel();
-        label_StatusLED = new javax.swing.JLabel();
-        label_StatusText = new javax.swing.JLabel();
-        panel_Individuals = new javax.swing.JPanel();
-        label_Individuals = new java.awt.Label();
-        scroll_Individuals = new javax.swing.JScrollPane();
-        list_Individuals = new javax.swing.JList<>();
-        panel_VarInfo = new javax.swing.JPanel();
-        label_VarInfo = new javax.swing.JLabel();
-        sroll_VarTable = new javax.swing.JScrollPane();
+        TextField_Command = new javax.swing.JTextField();
+        Panel_GLCanvas = new javax.swing.JPanel();
+        Panel_Control = new javax.swing.JPanel();
+        Panel_Status = new javax.swing.JPanel();
+        Label_StatusLED = new javax.swing.JLabel();
+        Label_StatusText = new javax.swing.JLabel();
+        Panel_Individuals = new javax.swing.JPanel();
+        Label_Individuals = new java.awt.Label();
+        Scroll_Individuals = new javax.swing.JScrollPane();
+        List_Individuals = new javax.swing.JList<>();
+        Panel_VarInfo = new javax.swing.JPanel();
+        Label_VarInfo = new javax.swing.JLabel();
+        Scroll_VarInfo = new javax.swing.JScrollPane();
         table_VarTable = new javax.swing.JTable();
-        panel_ViewSelection = new javax.swing.JPanel();
-        label_ViewSelection = new javax.swing.JLabel();
-        comboBox_ViewSelection = new javax.swing.JComboBox<>();
+        Panel_GeometrySelection = new javax.swing.JPanel();
+        Label_GeometrySelection = new javax.swing.JLabel();
+        ComboBox_GeometrySelection = new javax.swing.JComboBox<>();
         menuBar = new javax.swing.JMenuBar();
         menu_File = new javax.swing.JMenu();
         menuItem_Open = new javax.swing.JMenuItem();
@@ -160,74 +159,79 @@ public class MainWindow extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        textField_Command.setFont(new java.awt.Font("Arial", 0, 18)); // NOI18N
-        textField_Command.addKeyListener(new java.awt.event.KeyAdapter() {
+        TextField_Command.setFont(new java.awt.Font("Arial", 0, 18)); // NOI18N
+        TextField_Command.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
-                textField_CommandKeyPressed(evt);
+                TextField_CommandKeyPressed(evt);
             }
         });
 
-        panel_GLCanvas.setBackground(new java.awt.Color(0, 0, 0));
+        Panel_GLCanvas.setBackground(new java.awt.Color(0, 0, 0));
 
-        javax.swing.GroupLayout panel_GLCanvasLayout = new javax.swing.GroupLayout(panel_GLCanvas);
-        panel_GLCanvas.setLayout(panel_GLCanvasLayout);
-        panel_GLCanvasLayout.setHorizontalGroup(
-            panel_GLCanvasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        javax.swing.GroupLayout Panel_GLCanvasLayout = new javax.swing.GroupLayout(Panel_GLCanvas);
+        Panel_GLCanvas.setLayout(Panel_GLCanvasLayout);
+        Panel_GLCanvasLayout.setHorizontalGroup(
+            Panel_GLCanvasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 708, Short.MAX_VALUE)
         );
-        panel_GLCanvasLayout.setVerticalGroup(
-            panel_GLCanvasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        Panel_GLCanvasLayout.setVerticalGroup(
+            Panel_GLCanvasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 0, Short.MAX_VALUE)
         );
 
-        panel_Control.setBackground(new java.awt.Color(204, 204, 204));
+        Panel_Control.setBackground(new java.awt.Color(204, 204, 204));
 
-        label_StatusLED.setFont(new java.awt.Font("Arial", 0, 20)); // NOI18N
-        label_StatusLED.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        label_StatusLED.setText("•");
+        Label_StatusLED.setFont(new java.awt.Font("Arial", 0, 20)); // NOI18N
+        Label_StatusLED.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        Label_StatusLED.setText("•");
 
-        label_StatusText.setFont(new java.awt.Font("Arial", 0, 20)); // NOI18N
-        label_StatusText.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
-        label_StatusText.setText("Ontology Model Loaded");
+        Label_StatusText.setFont(new java.awt.Font("Arial", 0, 20)); // NOI18N
+        Label_StatusText.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        Label_StatusText.setText("Ontology Model Loaded");
 
-        panel_Individuals.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        Panel_Individuals.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
 
-        label_Individuals.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
-        label_Individuals.setText("Cloud List");
+        Label_Individuals.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
+        Label_Individuals.setText("Cloud List");
 
-        list_Individuals.setModel(new javax.swing.AbstractListModel<String>() {
+        List_Individuals.setModel(new javax.swing.AbstractListModel<String>() {
             String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
             public int getSize() { return strings.length; }
             public String getElementAt(int i) { return strings[i]; }
         });
-        list_Individuals.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        scroll_Individuals.setViewportView(list_Individuals);
+        List_Individuals.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        List_Individuals.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
+            public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
+                List_IndividualsValueChanged(evt);
+            }
+        });
+        Scroll_Individuals.setViewportView(List_Individuals);
 
-        javax.swing.GroupLayout panel_IndividualsLayout = new javax.swing.GroupLayout(panel_Individuals);
-        panel_Individuals.setLayout(panel_IndividualsLayout);
-        panel_IndividualsLayout.setHorizontalGroup(
-            panel_IndividualsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(panel_IndividualsLayout.createSequentialGroup()
+        javax.swing.GroupLayout Panel_IndividualsLayout = new javax.swing.GroupLayout(Panel_Individuals);
+        Panel_Individuals.setLayout(Panel_IndividualsLayout);
+        Panel_IndividualsLayout.setHorizontalGroup(
+            Panel_IndividualsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(Panel_IndividualsLayout.createSequentialGroup()
                 .addGap(14, 14, 14)
-                .addGroup(panel_IndividualsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(panel_IndividualsLayout.createSequentialGroup()
-                        .addComponent(label_Individuals, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(Panel_IndividualsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(Panel_IndividualsLayout.createSequentialGroup()
+                        .addComponent(Label_Individuals, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(0, 0, Short.MAX_VALUE))
-                    .addComponent(scroll_Individuals))
+                    .addComponent(Scroll_Individuals))
                 .addContainerGap())
         );
-        panel_IndividualsLayout.setVerticalGroup(
-            panel_IndividualsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(panel_IndividualsLayout.createSequentialGroup()
+        Panel_IndividualsLayout.setVerticalGroup(
+            Panel_IndividualsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(Panel_IndividualsLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(label_Individuals, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(Label_Individuals, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(scroll_Individuals, javax.swing.GroupLayout.DEFAULT_SIZE, 147, Short.MAX_VALUE)
+                .addComponent(Scroll_Individuals, javax.swing.GroupLayout.DEFAULT_SIZE, 147, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
-        label_VarInfo.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
-        label_VarInfo.setText("Queried Info");
+        Label_VarInfo.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
+        Label_VarInfo.setText("Queried Info");
 
         table_VarTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -240,103 +244,103 @@ public class MainWindow extends javax.swing.JFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
-        sroll_VarTable.setViewportView(table_VarTable);
+        Scroll_VarInfo.setViewportView(table_VarTable);
 
-        javax.swing.GroupLayout panel_VarInfoLayout = new javax.swing.GroupLayout(panel_VarInfo);
-        panel_VarInfo.setLayout(panel_VarInfoLayout);
-        panel_VarInfoLayout.setHorizontalGroup(
-            panel_VarInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(panel_VarInfoLayout.createSequentialGroup()
+        javax.swing.GroupLayout Panel_VarInfoLayout = new javax.swing.GroupLayout(Panel_VarInfo);
+        Panel_VarInfo.setLayout(Panel_VarInfoLayout);
+        Panel_VarInfoLayout.setHorizontalGroup(
+            Panel_VarInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(Panel_VarInfoLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(panel_VarInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(sroll_VarTable, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                    .addGroup(panel_VarInfoLayout.createSequentialGroup()
-                        .addComponent(label_VarInfo)
+                .addGroup(Panel_VarInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(Scroll_VarInfo, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                    .addGroup(Panel_VarInfoLayout.createSequentialGroup()
+                        .addComponent(Label_VarInfo)
                         .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
-        panel_VarInfoLayout.setVerticalGroup(
-            panel_VarInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(panel_VarInfoLayout.createSequentialGroup()
+        Panel_VarInfoLayout.setVerticalGroup(
+            Panel_VarInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(Panel_VarInfoLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(label_VarInfo)
+                .addComponent(Label_VarInfo)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(sroll_VarTable, javax.swing.GroupLayout.PREFERRED_SIZE, 117, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(Scroll_VarInfo, javax.swing.GroupLayout.PREFERRED_SIZE, 117, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        label_ViewSelection.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
-        label_ViewSelection.setText("View");
+        Label_GeometrySelection.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
+        Label_GeometrySelection.setText("View");
 
-        comboBox_ViewSelection.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        comboBox_ViewSelection.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                none(evt);
+        ComboBox_GeometrySelection.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        ComboBox_GeometrySelection.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                ComboBox_GeometrySelectionItemStateChanged(evt);
             }
         });
 
-        javax.swing.GroupLayout panel_ViewSelectionLayout = new javax.swing.GroupLayout(panel_ViewSelection);
-        panel_ViewSelection.setLayout(panel_ViewSelectionLayout);
-        panel_ViewSelectionLayout.setHorizontalGroup(
-            panel_ViewSelectionLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(panel_ViewSelectionLayout.createSequentialGroup()
+        javax.swing.GroupLayout Panel_GeometrySelectionLayout = new javax.swing.GroupLayout(Panel_GeometrySelection);
+        Panel_GeometrySelection.setLayout(Panel_GeometrySelectionLayout);
+        Panel_GeometrySelectionLayout.setHorizontalGroup(
+            Panel_GeometrySelectionLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(Panel_GeometrySelectionLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(panel_ViewSelectionLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(comboBox_ViewSelection, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(panel_ViewSelectionLayout.createSequentialGroup()
-                        .addComponent(label_ViewSelection)
+                .addGroup(Panel_GeometrySelectionLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(ComboBox_GeometrySelection, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(Panel_GeometrySelectionLayout.createSequentialGroup()
+                        .addComponent(Label_GeometrySelection)
                         .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
-        panel_ViewSelectionLayout.setVerticalGroup(
-            panel_ViewSelectionLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(panel_ViewSelectionLayout.createSequentialGroup()
+        Panel_GeometrySelectionLayout.setVerticalGroup(
+            Panel_GeometrySelectionLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(Panel_GeometrySelectionLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(label_ViewSelection)
+                .addComponent(Label_GeometrySelection)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(comboBox_ViewSelection, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(ComboBox_GeometrySelection, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        javax.swing.GroupLayout panel_StatusLayout = new javax.swing.GroupLayout(panel_Status);
-        panel_Status.setLayout(panel_StatusLayout);
-        panel_StatusLayout.setHorizontalGroup(
-            panel_StatusLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(panel_StatusLayout.createSequentialGroup()
+        javax.swing.GroupLayout Panel_StatusLayout = new javax.swing.GroupLayout(Panel_Status);
+        Panel_Status.setLayout(Panel_StatusLayout);
+        Panel_StatusLayout.setHorizontalGroup(
+            Panel_StatusLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(Panel_StatusLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(label_StatusLED, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(Label_StatusLED, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(label_StatusText, javax.swing.GroupLayout.PREFERRED_SIZE, 208, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(Label_StatusText, javax.swing.GroupLayout.PREFERRED_SIZE, 208, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(34, Short.MAX_VALUE))
-            .addComponent(panel_Individuals, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(panel_VarInfo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(panel_ViewSelection, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(Panel_Individuals, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(Panel_VarInfo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(Panel_GeometrySelection, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
-        panel_StatusLayout.setVerticalGroup(
-            panel_StatusLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panel_StatusLayout.createSequentialGroup()
+        Panel_StatusLayout.setVerticalGroup(
+            Panel_StatusLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, Panel_StatusLayout.createSequentialGroup()
                 .addGap(27, 27, 27)
-                .addGroup(panel_StatusLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(label_StatusLED, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(label_StatusText, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(Panel_StatusLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(Label_StatusLED, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(Label_StatusText, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(panel_Individuals, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(Panel_Individuals, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(panel_VarInfo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(Panel_VarInfo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(panel_ViewSelection, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(Panel_GeometrySelection, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
 
-        javax.swing.GroupLayout panel_ControlLayout = new javax.swing.GroupLayout(panel_Control);
-        panel_Control.setLayout(panel_ControlLayout);
-        panel_ControlLayout.setHorizontalGroup(
-            panel_ControlLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(panel_Status, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        javax.swing.GroupLayout Panel_ControlLayout = new javax.swing.GroupLayout(Panel_Control);
+        Panel_Control.setLayout(Panel_ControlLayout);
+        Panel_ControlLayout.setHorizontalGroup(
+            Panel_ControlLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(Panel_Status, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
-        panel_ControlLayout.setVerticalGroup(
-            panel_ControlLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(panel_Status, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        Panel_ControlLayout.setVerticalGroup(
+            Panel_ControlLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(Panel_Status, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         menu_File.setText("File");
@@ -369,20 +373,20 @@ public class MainWindow extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(textField_Command)
+            .addComponent(TextField_Command)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(panel_Control, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(Panel_Control, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(panel_GLCanvas, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(Panel_GLCanvas, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(panel_GLCanvas, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(panel_Control, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(Panel_GLCanvas, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(Panel_Control, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(textField_Command, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(TextField_Command, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
         pack();
@@ -399,92 +403,153 @@ public class MainWindow extends javax.swing.JFrame {
             String path = fc.getSelectedFile().getAbsolutePath();
 
             try {
-                queryManager = new QueryManager(new SemanticDirectory(path));
+                DirectoryLoader loader = new DirectoryLoader(path);
+
+                loader.load();
+
+                queryManager = new QueryManager(loader);
 
                 JOptionPane.showMessageDialog(this, "Semviz data directory successfully loaded.",
                         "Info", JOptionPane.INFORMATION_MESSAGE);
 
-                textField_Command.setEnabled(true);
+                TextField_Command.setEnabled(true);
+                queryResults.clear();
+                viewer.clearScene();
+                viewer.start();
+                update();
             } catch (Exception e) {
                 JOptionPane.showMessageDialog(this, "File could not be loaded.", "Error", JOptionPane.ERROR_MESSAGE);
 
-                textField_Command.setEnabled(false);
+                TextField_Command.setEnabled(false);
             }
         }
     }//GEN-LAST:event_menuItem_OpenActionPerformed
-
-    private void none(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_none
-        // TODO add your handling code here:
-    }//GEN-LAST:event_none
 
     private void menuItem_QuitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItem_QuitActionPerformed
         System.exit(0);
     }//GEN-LAST:event_menuItem_QuitActionPerformed
 
-    private void textField_CommandKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_textField_CommandKeyPressed
+    private void TextField_CommandKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_TextField_CommandKeyPressed
         switch (evt.getKeyCode()) {
             case KeyEvent.VK_ENTER:
-                String queryString = textField_Command.getText();
-
-                commands.add(queryString);
-                commandIndex = commands.size();
-
-                try {
-                    results = queryManager.query(queryString);
-
-                    updateIndividuals();
-                } catch (Exception e) {
-                    JOptionPane.showMessageDialog(this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-                }
-
-                textField_Command.setText("");
+                onCommandExecution();
 
                 break;
             case KeyEvent.VK_UP:
-                if ((commandIndex - 1) >= 0) {
-                    commandIndex--;
-                    textField_Command.setText(commands.get(commandIndex));
+                commandBackward();
 
-                }
                 break;
             case KeyEvent.VK_DOWN:
-                if ((commandIndex + 1) <= commands.size()) {
-                    commandIndex++;
+                commandForward();
 
-                    String text;
-
-                    if (commandIndex >= commands.size()) {
-                        text = "";
-                    } else {
-                        text = commands.get(commandIndex);
-                    }
-
-                    textField_Command.setText(text);
-
-                }
                 break;
             default:
                 break;
         }
-    }//GEN-LAST:event_textField_CommandKeyPressed
+    }//GEN-LAST:event_TextField_CommandKeyPressed
+
+    private void List_IndividualsValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_List_IndividualsValueChanged
+        int at = List_Individuals.getSelectedIndex();
+
+        if (at != -1) {
+            int selection = viewItems.get(at).getSelection();
+
+            updateVarInfoTable();
+
+            ComboBox_GeometrySelection.setEnabled(true);
+            ComboBox_GeometrySelection.setSelectedIndex(selection);
+        } else {
+            ComboBox_GeometrySelection.setEnabled(false);
+        }
+    }//GEN-LAST:event_List_IndividualsValueChanged
+
+    private void ComboBox_GeometrySelectionItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_ComboBox_GeometrySelectionItemStateChanged
+        updateViewItemGeometry();
+    }//GEN-LAST:event_ComboBox_GeometrySelectionItemStateChanged
+
+    private void onCommandExecution() {
+        String queryString = TextField_Command.getText();
+
+        commands.add(queryString);
+        commandSelection = commands.size();
+
+        try {
+            queryResults = queryManager.query(queryString);
+
+            viewItems.clear();
+
+            SuperCloud superCloud = new SuperCloud(queryManager, queryResults);
+
+            superCloud.load();
+
+            superCloud.forEach(cluster -> {
+                viewItems.add(new ViewItem(cluster));
+            });
+
+            viewer.clearScene();
+
+            viewItems.forEach(item -> {
+                viewer.addObject(item.getGeometry(0));
+            });
+
+            viewer.start();
+
+            updateIndividualsList();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+
+        TextField_Command.setText("");
+    }
+
+    private void commandBackward() {
+        if ((commandSelection - 1) >= 0) {
+            commandSelection--;
+            TextField_Command.setText(commands.get(commandSelection));
+        }
+    }
+
+    private void commandForward() {
+        if ((commandSelection + 1) <= commands.size()) {
+            commandSelection++;
+
+            String text;
+
+            if (commandSelection >= commands.size()) {
+                text = "";
+            } else {
+                text = commands.get(commandSelection);
+            }
+
+            TextField_Command.setText(text);
+        }
+    }
+
+    private void update() {
+        updateStatus();
+        updateIndividualsList();
+        updateVarInfoTable();
+    }
 
     /**
      * Upon cloud URI selection, the table is updated with vars
      */
-    private void updateVarInfo() {
+    private void updateVarInfoTable() {
         DefaultTableModel tableModel = new DefaultTableModel();
 
         tableModel.addColumn("Variable");
         tableModel.addColumn("Value");
 
-        panel_VarInfo.setEnabled(false);
+        Panel_VarInfo.setEnabled(false);
 
-        if (selection != null) {
-            selection.getKeys().forEach(key -> {
+        int at = List_Individuals.getSelectedIndex();
+
+        if (at != -1) {
+            queryResults.get(at).getKeys().forEach(key -> {
                 String[] row = new String[2];
 
                 row[0] = key;
-                row[1] = selection.getAttribute(key);
+                row[1] = queryResults.get(at).getAttribute(key);
 
                 tableModel.addRow(row);
             });
@@ -493,15 +558,34 @@ public class MainWindow extends javax.swing.JFrame {
         table_VarTable.setModel(tableModel);
     }
 
-    private void updateIndividuals() {
-        DefaultListModel model = (DefaultListModel) list_Individuals.getModel();
+    private void updateIndividualsList() {
+        if (queryResults != null) {
+            listIndividualsModel.removeAllElements();
 
-        if (results != null) {
-            list_Individuals_Model.removeAllElements();
-
-            results.forEach(result -> {
-                list_Individuals_Model.addElement(result.getCloudInd().getLocalName());
+            queryResults.forEach(result -> {
+                listIndividualsModel.addElement(result.getIndividual().getLocalName());
             });
+        }
+    }
+
+    private void updateViewItemGeometry() {
+        int at = List_Individuals.getSelectedIndex();
+
+        if (at != -1) {
+            int selection = ComboBox_GeometrySelection.getSelectedIndex();
+
+            viewer.replaceObject(at, viewItems.get(at).getGeometry(selection));
+            viewer.start();
+        }
+    }
+
+    private void updateStatus() {
+        if (queryManager == null) {
+            Label_StatusLED.setForeground(Color.RED);
+            Label_StatusText.setText("Offline.");
+        } else {
+            Label_StatusLED.setForeground(Color.GREEN);
+            Label_StatusText.setText("Online.");
         }
     }
 

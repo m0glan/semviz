@@ -12,7 +12,7 @@ import java.nio.file.NotDirectoryException;
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.rdf.model.ModelFactory;
 
-public class SemanticDirectory {
+public class DirectoryLoader {
 
     private String dirPath;
     private OntModel model;
@@ -22,7 +22,7 @@ public class SemanticDirectory {
     /**
      * @param dirPath is the path to the directory
      */
-    public SemanticDirectory(String dirPath) {
+    public DirectoryLoader(String dirPath) {
         this.dirPath = dirPath;
         this.isValid = false;
     }

@@ -46,7 +46,7 @@ public class OrbitControls extends Controls {
             float speedX = (float) Math.toRadians(differenceX / 4.0f);
 
             // adding speedY to the theta angle and speedX to the phi angle
-            sphericalCoords.add(new Vector3f(0, speedY, speedX));
+            sphericalCoords.add(new Vector3f(0, -speedY, -speedX));
 
             // making sure the angles are not outside the [0, 2 * PI] interval
             sphericalCoords.y = TransformationUtils.wrapTo2Pi(sphericalCoords.y);

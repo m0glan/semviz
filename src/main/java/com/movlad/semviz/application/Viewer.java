@@ -3,35 +3,50 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.movlad.semviz.core.graphics.viewer;
+package com.movlad.semviz.application;
 
 import com.jogamp.opengl.GLCapabilities;
 import com.jogamp.opengl.GLProfile;
 import com.jogamp.opengl.awt.GLCanvas;
 import com.jogamp.opengl.util.FPSAnimator;
-import com.movlad.semviz.core.graphics.engine.AxisHelper;
 import com.movlad.semviz.core.graphics.engine.Camera;
 import com.movlad.semviz.core.graphics.engine.Controls;
 import com.movlad.semviz.core.graphics.engine.Object3d;
+import com.movlad.semviz.core.graphics.engine.OrbitControls;
+import com.movlad.semviz.core.graphics.engine.OrthographicCamera;
 import com.movlad.semviz.core.graphics.engine.Renderer;
 import com.movlad.semviz.core.graphics.engine.Scene;
+import org.joml.Vector3f;
 
 public class Viewer {
 
     private Scene scene;
-    private AxisHelper helper;
-    private Camera camera;
+    private final Camera camera;
     private Renderer renderer;
     private Controls controls;
 
-    private GLCanvas glCanvas;
+    private final GLCanvas glCanvas;
 
     private FPSAnimator animator;
 
     private boolean isRunning;
 
-    public Viewer() {
+    public Viewer(int width, int height) {
         glCanvas = new GLCanvas(new GLCapabilities(GLProfile.get(GLProfile.GL4)));
+        camera = new OrthographicCamera(-width, width,
+                -height, height, 0.1f, 1000.0f);
+
+        camera.translate(new Vector3f(-10.0f, -10.0f, 5.0f));
+        camera.zoom(100);
+
+        controls = new OrbitControls(camera);
+
+        controls.setZoomSpeed(3.0f);
+
+        scene = new Scene();
+
+        renderer = new Renderer(scene, camera);
+        animator = new FPSAnimator(glCanvas, 60);
     }
 
     public GLCanvas getGlCanvas() {
@@ -40,14 +55,6 @@ public class Viewer {
 
     public void setScene(Scene scene) {
         this.scene = scene;
-    }
-
-    public void setHelper(AxisHelper helper) {
-        this.helper = helper;
-    }
-
-    public void setCamera(Camera camera) {
-        this.camera = camera;
     }
 
     public void setRenderer(Renderer renderer) {
@@ -87,66 +94,29 @@ public class Viewer {
     }
 
     public void addObject(Object3d object) {
-        boolean wasRunning = isRunning;
-
         stop();
-
         scene.add(object);
-
-        if (wasRunning) {
-            start();
-        }
-    }
-
-    public void removeObject(Object3d object) {
-        boolean wasRunning = isRunning;
-
-        stop();
-
-        scene.remove(object);
-
-        if (wasRunning) {
-            start();
-        }
     }
 
     public void removeObject(int i) {
-        boolean wasRunning = isRunning;
-
         stop();
-
         scene.remove(i);
+    }
 
-        if (wasRunning) {
-            start();
-        }
+    public void replaceObject(int i, Object3d object) {
+        removeObject(i);
+
+        scene.add(i, object);
     }
 
     public void setObjectVisibility(int i, boolean isVisible) {
-        boolean wasRunning = isRunning;
-
         stop();
         scene.get(i).setVisible(isVisible);
-
-        if (wasRunning) {
-            start();
-        }
     }
 
     public void clearScene() {
-        boolean wasRunning = isRunning;
-
         stop();
-
         scene.clear();
-
-        if (helper != null) {
-            scene.add(helper);
-        }
-
-        if (wasRunning) {
-            start();
-        }
     }
 
 }

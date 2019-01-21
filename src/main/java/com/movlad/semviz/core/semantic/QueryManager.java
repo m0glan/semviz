@@ -7,7 +7,7 @@ package com.movlad.semviz.core.semantic;
 
 import com.movlad.semviz.core.io.CloudLoader;
 import com.movlad.semviz.core.io.InvalidDirectoryException;
-import com.movlad.semviz.core.io.SemanticDirectory;
+import com.movlad.semviz.core.io.DirectoryLoader;
 import com.movlad.semviz.core.math.geometry.PointCloud;
 import java.io.IOException;
 import java.util.List;
@@ -20,9 +20,9 @@ public class QueryManager {
     private static final String NS = "http://lab.ponciano.info/knowdip#";
     private static final String PREFIX = "PREFIX knowdip: <" + NS + ">";
 
-    SemanticDirectory dir;
+    DirectoryLoader dir;
 
-    public QueryManager(SemanticDirectory dir) throws InvalidDirectoryException {
+    public QueryManager(DirectoryLoader dir) throws InvalidDirectoryException {
         if (!dir.isValid()) {
             throw new InvalidDirectoryException("Invalid parameter directory.");
         }

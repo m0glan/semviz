@@ -2,6 +2,8 @@ package com.movlad.semviz.core.semantic;
 
 import java.io.InputStream;
 import org.apache.jena.ontology.OntModel;
+import org.apache.jena.query.Query;
+import org.apache.jena.query.QueryFactory;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.junit.jupiter.api.Test;
 
@@ -14,7 +16,7 @@ class QueryExecutorTest {
 
         model.read(is, null);
 
-        Query query = new Query("select ?cloud ?size { ?cloud knowdip:hasSize ?size . filter(?size > 1000) }");
+        Query query = QueryFactory.create("select ?cloud ?size { ?cloud knowdip:hasSize ?size . filter(?size > 1000) }");
         QueryExecutor queryExecutor = new QueryExecutor(query, model);
 
         queryExecutor.exec();

@@ -1,12 +1,10 @@
 package com.movlad.semviz.core.graphics.engine;
 
 import com.jogamp.opengl.GL4;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
-
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
@@ -171,6 +169,10 @@ public class Object3d implements Iterable<Object3d> {
 
     public final void add(Object3d object) {
         children.add(object);
+    }
+
+    public final void add(int i, Object3d object) {
+        children.add(i, object);
     }
 
     public final void remove(Object3d object) {
