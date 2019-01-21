@@ -1,14 +1,13 @@
 package com.movlad.semviz.core.semantic;
 
+import java.util.*;
 import org.apache.jena.ontology.Individual;
 import org.apache.jena.ontology.OntClass;
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.query.*;
 import org.apache.jena.rdf.model.RDFNode;
 
-import java.util.*;
-
-public class QueryExecutor {
+class QueryExecutor {
 
     private Query query;
     private OntModel model;
@@ -19,7 +18,7 @@ public class QueryExecutor {
     }
 
     public List<QueryResult> exec() {
-        QueryExecution execution = QueryExecutionFactory.create(query.getJenaQuery(), model);
+        QueryExecution execution = QueryExecutionFactory.create(query, model);
         ResultSet results = execution.execSelect();
         List<QuerySolution> solutions = ResultSetFormatter.toList(results);
         List<QueryResult> queryResults = new ArrayList<>();

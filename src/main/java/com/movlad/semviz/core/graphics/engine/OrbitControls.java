@@ -1,35 +1,16 @@
-package com.movlad.semviz.core.graphics.engine.controls;
+package com.movlad.semviz.core.graphics.engine;
 
-import com.jogamp.newt.event.MouseEvent;
-
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
-import java.awt.event.MouseWheelEvent;
-import java.awt.event.MouseWheelListener;
-
-import com.movlad.semviz.core.graphics.engine.Camera;
 import com.movlad.semviz.core.math.geometry.TransformationUtils;
+import java.awt.event.MouseWheelEvent;
 import org.joml.Vector3f;
 
 /**
  * Controls making the camera move around the world's origin.
  */
-public class OrbitControls implements MouseListener, MouseMotionListener, MouseWheelListener {
-
-    private final Camera camera;
-    private float oldX, oldY;
-    private float zoomSpeed = 1.0f;
+public class OrbitControls extends Controls {
 
     public OrbitControls(Camera camera) {
-        this.camera = camera;
-    }
-
-    public final void setZoomSpeed(float zoomSpeed) throws IllegalArgumentException {
-        if (zoomSpeed < 0.0f) {
-            throw new IllegalArgumentException("Zoom speed must be positive.");
-        }
-
-        this.zoomSpeed = zoomSpeed;
+        super(camera);
     }
 
     @Override

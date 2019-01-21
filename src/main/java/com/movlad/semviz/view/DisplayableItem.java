@@ -1,4 +1,4 @@
-package com.movlad.semviz.application;
+package com.movlad.semviz.view;
 
 import com.github.quickhull3d.QuickHull3D;
 import com.jogamp.opengl.GL4;
@@ -8,13 +8,56 @@ import com.movlad.semviz.core.math.geometry.Point;
 import com.movlad.semviz.core.math.geometry.PointCloud;
 import com.movlad.semviz.core.math.geometry.TransformationUtils;
 
-import java.nio.Buffer;
+class DisplayableItem {
 
-/**
- * Given a 3D point cloud, this class is used to extract the different
- * geometries stored within for drawing with OpenGL.
- */
-class CloudGeometries {
+    private static final int HIRES = 0;
+    private static final int HIRES_NORMALS = 1;
+    private static final int QHULL = 2;
+
+    private PointCloud cloud;
+    private Geometries geometries;
+
+    private int view;
+    private boolean isVisible;
+
+    public DisplayableItem(PointCloud cloud) {
+        this.view = HIRES;
+        this.isVisible = true;
+        this.cloud = cloud;
+        this.geometries = new Geometries(cloud);
+    }
+
+    public void setView(int view) {
+        this.view = view;
+    }
+
+    public void setVisibility(boolean isVisible) {
+        this.isVisible = isVisible;
+    }
+
+    public Geometry getGeometry() {
+        Geometry geometry = null;
+
+        switch (view) {
+            case HIRES:
+                geometry = geometries.getHiRes();
+                break;
+
+            case HIRES_NORMALS:
+                geometry = geometries.getHiResNormals();
+                break;
+
+            case QHULL:
+                geometry = geometries.getQHull();
+                break;
+        }
+
+        return geometry;
+    }
+
+}
+
+class Geometries {
 
     private PointCloud cloud;
     private Point centroid;
@@ -26,7 +69,7 @@ class CloudGeometries {
     /**
      * @param cloud is the cloud for which to extract different geometries
      */
-    public CloudGeometries(PointCloud cloud) {
+    public Geometries(PointCloud cloud) {
         this.cloud = cloud;
         this.qhull = null;
         this.hiresNormals = null;
@@ -48,7 +91,6 @@ class CloudGeometries {
                 offset = fillBufferSection(data, offset, (float) point.x, (float) (point.y), (float) (point.z),
                         rgb[0], rgb[1], rgb[2]);
             }
-
 
             hires = new Geometry(data, layout) {
 
@@ -113,7 +155,7 @@ class CloudGeometries {
             int offset = 0;
             BufferLayout layout = genLayout();
 
-            for (int[] face : faces)
+            for (int[] face : faces) {
                 for (int j = 0; j < face.length; j++) {
                     Point point = cloud.get(face[j]);
                     float[] rgb = rgbFromNormals(point.normalX, point.normalY, point.normalZ);
@@ -121,6 +163,7 @@ class CloudGeometries {
                     offset = fillBufferSection(data, offset, (float) point.x, (float) point.y, (float) point.z,
                             rgb[0], rgb[1], rgb[2]);
                 }
+            }
 
             qhull = new Geometry(data, layout) {
 

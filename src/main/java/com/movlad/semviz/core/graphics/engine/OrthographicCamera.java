@@ -12,6 +12,10 @@ public class OrthographicCamera extends Camera {
     private float bottom;
     private float top;
 
+    public OrthographicCamera() {
+
+    }
+
     /**
      * Constructor.
      *

@@ -1,4 +1,4 @@
-package com.movlad.semviz.application;
+package com.movlad.semviz.core.io;
 
 public class InvalidDirectoryException extends Exception {
 
