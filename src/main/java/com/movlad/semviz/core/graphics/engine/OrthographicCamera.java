@@ -82,7 +82,7 @@ public class OrthographicCamera extends Camera {
     public final void updateProjectionMatrix() {
         projectionMatrix = new Matrix4f();
         projectionMatrix = projectionMatrix.ortho(left / zoom, right / zoom,
-                bottom / zoom, top / zoom, getNear(), getFar());
+                bottom / zoom, top / zoom, near, far);
     }
 
 }

@@ -11,29 +11,16 @@ public abstract class Camera extends Object3d {
 
     protected Matrix4f projectionMatrix;
 
-    private float near;
-    private float far;
+    protected float near;
+    protected float far;
     protected float zoom;
 
     public Camera(float near, float far) {
         zoom = DEFAULT_ZOOM;
 
         setVisible(false);
-    }
 
-    public final float getNear() {
-        return near;
-    }
-
-    public final void setNear(float near) {
         this.near = near;
-    }
-
-    public final float getFar() {
-        return far;
-    }
-
-    public final void setFar(float far) {
         this.far = far;
     }
 

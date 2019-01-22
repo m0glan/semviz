@@ -46,7 +46,7 @@ public class PerspectiveCamera extends Camera {
     @Override
     public final void updateProjectionMatrix() {
         projectionMatrix = new Matrix4f();
-        projectionMatrix = projectionMatrix.perspective(fov - zoom + DEFAULT_ZOOM, aspect, getNear(), getFar());
+        projectionMatrix = projectionMatrix.perspective(fov - zoom + DEFAULT_ZOOM, aspect, near, far);
     }
 
 }

@@ -93,7 +93,7 @@ public class Viewer {
      * @param viewItems is a list of view items
      */
     public void fromViewItems(List<ViewItem> viewItems) {
-        clearScene();
+        scene.clear();
 
         viewItems.forEach(cluster -> {
             scene.add(cluster.getGeometry(0));
@@ -136,8 +136,6 @@ public class Viewer {
      * @param object is the replacement three-dimensional object
      */
     public void replaceObject(int i, Object3d object) {
-        removeObject(i);
-
         scene.add(i, object);
     }
 

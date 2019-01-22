@@ -86,7 +86,7 @@ public final class Configuration {
 
             changes.firePropertyChange("load", prev, queryManager);
         } catch (InvalidDirectoryException | NotDirectoryException e) {
-            changes.firePropertyChange("error", null, e.getMessage());
+            changes.firePropertyChange("loadError", null, e.getMessage());
         }
     }
 
@@ -109,7 +109,7 @@ public final class Configuration {
     public void queryExec(String queryString) {
         commands.add(queryString);
 
-        commandSelection = commands.size();
+        commandSelection = commands.size() - 1;
 
         List<QueryResult> prev = queryResults;
 
@@ -124,12 +124,12 @@ public final class Configuration {
 
             changes.firePropertyChange("queryExec", prev, queryResults);
         } catch (Exception e) {
-            changes.firePropertyChange("error", null, e.getMessage());
+            changes.firePropertyChange("queryExecError", null, e.getMessage());
         }
     }
 
     public String getCurrentCommand() {
-        if (commandSelection == -1) {
+        if (commandSelection < 0 || commandSelection > (commands.size() - 1)) {
             return "";
         }
 
