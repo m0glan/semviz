@@ -2,6 +2,9 @@ package com.movlad.semviz.core.math.geometry;
 
 import org.joml.Vector3f;
 
+/**
+ * Provides a series of mathematical tools for affine transformations.
+ */
 public class TransformationUtils {
 
     /**

@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.movlad.semviz.application;
 
 import com.jogamp.opengl.GLCapabilities;
@@ -19,16 +14,20 @@ import com.movlad.semviz.core.graphics.engine.Scene;
 import java.util.List;
 import org.joml.Vector3f;
 
+/**
+ * Structure gathering a scene, camera, renderer configuration that allows
+ * navigating a scene of three-dimensional object around an orbit.
+ */
 public class Viewer {
 
-    private Scene scene;
+    private final Scene scene;
     private final Camera camera;
-    private Renderer renderer;
-    private Controls controls;
+    private final Renderer renderer;
+    private final Controls controls;
 
     private final GLCanvas glCanvas;
 
-    private FPSAnimator animator;
+    private final FPSAnimator animator;
 
     private boolean isRunning;
 
@@ -55,6 +54,9 @@ public class Viewer {
         return glCanvas;
     }
 
+    /**
+     * Starts the viewer animation.
+     */
     public final void start() {
         if (!isRunning) {
             glCanvas.addGLEventListener(renderer);
@@ -67,6 +69,11 @@ public class Viewer {
         }
     }
 
+    /**
+     * Stops the viewer animation; used whenever the scene is modified to
+     * prevent the resource from being accessed by multiple components
+     * concurrently.
+     */
     public final void stop() {
         if (isRunning) {
             glCanvas.removeGLEventListener(renderer);
@@ -79,6 +86,12 @@ public class Viewer {
         }
     }
 
+    /**
+     * Builds a scene from a list of view items (base geometry for all the
+     * clouds).
+     *
+     * @param viewItems is a list of view items
+     */
     public void fromViewItems(List<ViewItem> viewItems) {
         clearScene();
 
@@ -87,34 +100,61 @@ public class Viewer {
         });
     }
 
+    /**
+     * Adds an object to the scene.
+     *
+     * @param object is the three-dimensional object to be added to the scene
+     */
     public void addObject(Object3d object) {
-        stop();
         scene.add(object);
     }
 
+    /**
+     * Removes an object from the scene.
+     *
+     * @param i is the index of the three-dimensional object to be removed from
+     * the scene
+     */
     public void removeObject(int i) {
-        stop();
         scene.remove(i);
     }
 
+    /**
+     * Adds an object to the scene.
+     *
+     * @param id is the id of the three-dimensional object to be removed from
+     * the scene
+     */
     public void removeObject(String id) {
-        stop();
         scene.remove(id);
     }
 
+    /**
+     * Replace an object at the given index in the scene with another.
+     *
+     * @param i is the position where the replacement takes place
+     * @param object is the replacement three-dimensional object
+     */
     public void replaceObject(int i, Object3d object) {
         removeObject(i);
 
         scene.add(i, object);
     }
 
+    /**
+     * Sets the visibility of the object at a given index.
+     *
+     * @param i is the index of the object
+     * @param isVisible is true if the object is visible
+     */
     public void setObjectVisibility(int i, boolean isVisible) {
-        stop();
         scene.get(i).setVisible(isVisible);
     }
 
+    /**
+     * Removes all objects from the scene.
+     */
     public void clearScene() {
-        stop();
         scene.clear();
     }
 

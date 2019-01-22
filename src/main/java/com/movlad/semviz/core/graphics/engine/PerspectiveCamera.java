@@ -11,16 +11,11 @@ public class PerspectiveCamera extends Camera {
 
     private float aspect;
 
-    public PerspectiveCamera() {
-
-    }
-
     public PerspectiveCamera(float fov, float aspect, float near, float far) {
+        super(near, far);
+
         this.fov = fov;
         this.aspect = aspect;
-
-        setNear(near);
-        setFar(far);
 
         updateProjectionMatrix();
     }

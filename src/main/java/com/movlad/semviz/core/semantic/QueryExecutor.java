@@ -11,8 +11,8 @@ import org.apache.jena.rdf.model.Resource;
 
 class QueryExecutor {
 
-    private Query query;
-    private OntModel model;
+    private final Query query;
+    private final OntModel model;
 
     public QueryExecutor(Query query, OntModel model) {
         this.query = query;

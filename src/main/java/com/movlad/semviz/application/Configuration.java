@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.movlad.semviz.application;
 
 import com.movlad.semviz.core.io.DirectoryLoader;
@@ -15,7 +10,12 @@ import java.nio.file.NotDirectoryException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Controller {
+/**
+ * The state of the application at a given time; acts like a controller (a
+ * bridge of communication between the view and the model) for the application
+ * within the MCV model.
+ */
+public final class Configuration {
 
     private boolean isInitialized;
 
@@ -28,7 +28,7 @@ public class Controller {
 
     private final PropertyChangeSupport changes;
 
-    public Controller() {
+    public Configuration() {
         commands = new ArrayList<>();
         commandSelection = -1;
         changes = new PropertyChangeSupport(this);
@@ -39,14 +39,34 @@ public class Controller {
         return isInitialized;
     }
 
+    /**
+     * Adds a listener to the property change support contained within this
+     * class.
+     *
+     * @param l the listener to be registered
+     */
     public void register(PropertyChangeListener l) {
         changes.addPropertyChangeListener(l);
     }
 
-    public void deregister(PropertyChangeListener l) {
+    /**
+     * Removes a listener from the property change support contained within this
+     * class.
+     *
+     * @param l the listener to be unregistered
+     */
+    public void unregister(PropertyChangeListener l) {
         changes.removePropertyChangeListener(l);
     }
 
+    /**
+     * Given a Semviz directory, this method loads a
+     * {@link com.movlad.semviz.core.semantic.QueryManager} from the ontology
+     * file within it and notifies the property change listeners of the success
+     * or failure.
+     *
+     * @param path is the path to the Semviz directory
+     */
     public void load(String path) {
         QueryManager prev = queryManager;
 
@@ -78,6 +98,14 @@ public class Controller {
         return queryResults;
     }
 
+    /**
+     * Executes a query on the currently loaded
+     * {@link com.movlad.semviz.core.semantic.QueryManager}, generates a
+     * {@link com.movlad.semviz.application.SuperCloud} formed by all the clouds
+     * retrieved using the query.
+     *
+     * @param queryString is the string of the query to be executed
+     */
     public void queryExec(String queryString) {
         commands.add(queryString);
 
@@ -108,6 +136,9 @@ public class Controller {
         return commands.get(commandSelection);
     }
 
+    /**
+     * Navigates to a previous command.
+     */
     public void commandBackward() {
         if ((commandSelection - 1) >= 0) {
             commandSelection--;
@@ -117,6 +148,9 @@ public class Controller {
         }
     }
 
+    /**
+     * Navigates to a more recent command.
+     */
     public void commandForward() {
         if ((commandSelection + 1) <= commands.size()) {
             commandSelection++;

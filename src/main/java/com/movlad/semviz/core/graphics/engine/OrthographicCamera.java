@@ -12,10 +12,6 @@ public class OrthographicCamera extends Camera {
     private float bottom;
     private float top;
 
-    public OrthographicCamera() {
-
-    }
-
     /**
      * Constructor.
      *
@@ -26,14 +22,14 @@ public class OrthographicCamera extends Camera {
      * @param near is the minimum distance at which the camera can see objects
      * @param far is the maximum distance at which the camera can see objects
      */
-    public OrthographicCamera(float left, float right, float bottom, float top, float near, float far) {
+    public OrthographicCamera(float left, float right, float bottom, float top,
+            float near, float far) {
+        super(near, far);
+
         this.left = left;
         this.right = right;
         this.bottom = bottom;
         this.top = top;
-
-        setNear(near);
-        setFar(far);
 
         updateProjectionMatrix();
     }

@@ -1,12 +1,10 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.movlad.semviz.core.math.geometry;
 
 import com.github.quickhull3d.Point3d;
 
+/**
+ * Axis aligned bounding box from a source point cloud.
+ */
 public class BoundingBox {
 
     Point3d pointMin;

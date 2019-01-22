@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.movlad.semviz.core.io;
 
 import java.io.File;
@@ -12,9 +7,12 @@ import java.nio.file.NotDirectoryException;
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.rdf.model.ModelFactory;
 
+/**
+ * Used for validating and loading a Semviz directory.
+ */
 public class DirectoryLoader {
 
-    private String dirPath;
+    private final String dirPath;
     private OntModel model;
     private File cloudsDir;
     private boolean isValid;
@@ -102,7 +100,7 @@ public class DirectoryLoader {
             if (file.getName().toLowerCase().endsWith(".owl")) {
                 model = ModelFactory.createOntologyModel();
 
-                FileInputStream is = null;
+                FileInputStream is;
 
                 try {
                     is = new FileInputStream(file.getAbsolutePath());

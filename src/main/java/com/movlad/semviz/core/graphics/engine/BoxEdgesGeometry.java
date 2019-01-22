@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.movlad.semviz.core.graphics.engine;
 
 import com.github.quickhull3d.Point3d;
@@ -14,9 +9,16 @@ import java.util.ArrayList;
 import java.util.List;
 import org.joml.Vector3f;
 
-public class BoxGeometry extends Geometry {
+/**
+ * Geometry containing the necessary buffer data to draw the edges of a box.
+ */
+public class BoxEdgesGeometry extends Geometry {
 
-    public BoxGeometry(BoundingBox bbox, Vector3f rgb) {
+    /**
+     * @param bbox is the bounding box containing the box information
+     * @param rgb is the color of the edges of the box
+     */
+    public BoxEdgesGeometry(BoundingBox bbox, Vector3f rgb) {
         float[] rgbNormalized = GraphicsUtils.normalizeRGB(rgb.x, rgb.y, rgb.z);
         List<Point3d> vertices = new ArrayList<>();
 
@@ -51,12 +53,17 @@ public class BoxGeometry extends Geometry {
 
         int offset = 0;
 
-        for (int i = 0; i < edges.length; i++) {
-            for (int j = 0; j < edges[i].length; j++) {
-                Point3d v = vertices.get(edges[i][j]);
+        for (int[] edge : edges) {
+            for (int j = 0; j < edge.length; j++) {
+                Point3d v = vertices.get(edge[j]);
+                float[] section = {
+                    (float) v.x, (float) (v.y), (float) (v.z),
+                    rgbNormalized[0], rgbNormalized[1], rgbNormalized[2]
+                };
 
-                offset = GraphicsUtils.fillBufferSection(data, offset, (float) v.x, (float) v.y, (float) v.z,
-                        rgbNormalized[0], rgbNormalized[1], rgbNormalized[2]);
+                System.arraycopy(section, 0, data, offset, section.length);
+
+                offset += section.length;
             }
         }
 

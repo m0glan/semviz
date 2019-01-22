@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.movlad.semviz.application;
 
 import com.jogamp.opengl.GL4;
@@ -11,7 +6,14 @@ import com.movlad.semviz.core.graphics.engine.Geometry;
 import com.movlad.semviz.core.math.geometry.Point;
 import com.movlad.semviz.core.math.geometry.PointCloud;
 
-public class NormalColoredCloudBuilder extends CloudGeometryBuilder {
+/**
+ * Concrete cloud builder that extracts the
+ * {@code x, y, z, normalX, normalY, normalZ} GL vertex buffer data from a point
+ * cloud; this generates the high resolution geometry of the base cloud, but
+ * instead of displaying each vertex in its original color, its color is
+ * generated from the components of the normal vector in it.
+ */
+public final class NormalColoredCloudBuilder extends CloudGeometryBuilder {
 
     public NormalColoredCloudBuilder(PointCloud source) {
         super(source);
@@ -22,13 +24,17 @@ public class NormalColoredCloudBuilder extends CloudGeometryBuilder {
         data = new float[source.size() * 6];
         int offset = 0;
 
-        int length = layout.length();
-
         for (Point point : source) {
-            float[] rgb = GraphicsUtils.rgbFromNormals(point.normalX, point.normalY, point.normalZ);
+            float[] rgb = GraphicsUtils.normalsToRGB(point.normalX, point.normalY,
+                    point.normalZ);
+            float[] section = {
+                (float) point.x, (float) (point.y), (float) (point.z),
+                rgb[0], rgb[1], rgb[2]
+            };
 
-            offset = GraphicsUtils.fillBufferSection(data, offset, (float) point.x, (float) point.y,
-                    (float) point.z, rgb[0], rgb[1], rgb[2]);
+            System.arraycopy(section, 0, data, offset, section.length);
+
+            offset += section.length;
         }
     }
 

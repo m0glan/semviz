@@ -15,7 +15,7 @@ public abstract class Camera extends Object3d {
     private float far;
     protected float zoom;
 
-    public Camera() {
+    public Camera(float near, float far) {
         zoom = DEFAULT_ZOOM;
 
         setVisible(false);

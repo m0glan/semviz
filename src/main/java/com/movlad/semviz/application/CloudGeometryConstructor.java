@@ -1,24 +1,24 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.movlad.semviz.application;
 
 import com.movlad.semviz.core.graphics.engine.Geometry;
 
 /**
- *
- * @author Vlad
+ * Director class for the
+ * {@link com.movlad.semviz.application.CloudGeometryBuilder}.
  */
-public class CloudGeometryConstructor {
+public final class CloudGeometryConstructor {
 
-    private CloudGeometryBuilder builder;
+    private final CloudGeometryBuilder builder;
 
     public CloudGeometryConstructor(CloudGeometryBuilder builder) {
         this.builder = builder;
     }
 
+    /**
+     * Constructs a cloud geometry, like a convex hull, based on the
+     * implementation of
+     * {@link com.movlad.semviz.application.CloudGeometryBuilder}.
+     */
     public void construct() {
         builder.buildDataBufferLayout();
         builder.buildDataBuffer();

@@ -5,6 +5,10 @@ import com.movlad.semviz.core.math.geometry.PointCloud;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Stores geometric information about a given cloud, so that it is not
+ * recalculated each time the display mode of the cloud is changed.
+ */
 public class ViewItem {
 
     private static final int HIRES_NORMALS = 1;
@@ -34,6 +38,11 @@ public class ViewItem {
         return selection;
     }
 
+    /**
+     * @param selection is the cloud display selection (<i>e.g.</i> high
+     * resolution)
+     * @return the cloud geometry associated with a given display selection.
+     */
     public Geometry getGeometry(int selection) {
         this.selection = selection;
 

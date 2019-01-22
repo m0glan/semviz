@@ -5,10 +5,10 @@
  */
 package com.movlad.semviz.view;
 
-import com.movlad.semviz.application.Controller;
+import com.movlad.semviz.application.Configuration;
 import com.movlad.semviz.application.ViewItem;
 import com.movlad.semviz.application.Viewer;
-import com.movlad.semviz.core.graphics.engine.BoxGeometry;
+import com.movlad.semviz.core.graphics.engine.BoxEdgesGeometry;
 import com.movlad.semviz.core.graphics.engine.Object3d;
 import com.movlad.semviz.core.math.geometry.BoundingBox;
 import java.awt.Color;
@@ -34,7 +34,7 @@ public class MainWindow extends javax.swing.JFrame implements PropertyChangeList
 
     private final DefaultListModel listIndividualsModel;
 
-    private Controller controller;
+    private Configuration controller;
 
     private boolean isInitialized = false;
 
@@ -68,7 +68,7 @@ public class MainWindow extends javax.swing.JFrame implements PropertyChangeList
     public MainWindow() {
         initComponents();
 
-        controller = new Controller();
+        controller = new Configuration();
 
         controller.register(this);
 
@@ -409,11 +409,11 @@ public class MainWindow extends javax.swing.JFrame implements PropertyChangeList
 
             controller.load(path);
             viewer.clearScene();
-            viewer.start();
         }
     }//GEN-LAST:event_menuItem_OpenActionPerformed
 
     private void menuItem_QuitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItem_QuitActionPerformed
+        viewer.stop();
         System.exit(0);
     }//GEN-LAST:event_menuItem_QuitActionPerformed
 
@@ -455,7 +455,6 @@ public class MainWindow extends javax.swing.JFrame implements PropertyChangeList
         if (isInitialized) {
             viewer.replaceObject(List_Individuals.getSelectedIndex(),
                     viewItems.get(List_Individuals.getSelectedIndex()).getGeometry(selection));
-            viewer.start();
         }
     }//GEN-LAST:event_ComboBox_GeometrySelectionItemStateChanged
 
@@ -521,15 +520,13 @@ public class MainWindow extends javax.swing.JFrame implements PropertyChangeList
                 model.addRow(row);
             });
 
-            Object3d box = new BoxGeometry(new BoundingBox(viewItems.get(index).getCloud()),
+            Object3d box = new BoxEdgesGeometry(new BoundingBox(viewItems.get(index).getCloud()),
                     new Vector3f(255.0f, 255.0f, 0.0f));
 
             box.setId("selection");
 
             viewer.addObject(box);
         }
-
-        viewer.start();
 
         Table_VarTable.setModel(model);
     }
@@ -565,8 +562,6 @@ public class MainWindow extends javax.swing.JFrame implements PropertyChangeList
             });
 
             viewer.fromViewItems(viewItems);
-
-            viewer.start();
         }
 
         update();

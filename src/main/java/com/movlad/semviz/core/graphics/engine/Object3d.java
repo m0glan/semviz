@@ -19,7 +19,6 @@ public class Object3d implements Iterable<Object3d> {
     private final List<Object3d> children;
     private String id;
     private Vector3f position;
-    // object vectors
     private Vector3f worldUp;
     private Vector3f target;
     private Matrix4f matrixWorld;
@@ -78,24 +77,41 @@ public class Object3d implements Iterable<Object3d> {
         updateVectors();
     }
 
+    /**
+     * @return the vector that gives the up direction within the world space
+     */
     public final Vector3f getWorldUp() {
         return worldUp;
     }
 
+    /**
+     * @param worldUp is the vector that gives the up direction within the world
+     * space
+     */
     public final void setWorldUp(Vector3f worldUp) {
         this.worldUp = worldUp;
 
         updateVectors();
     }
 
+    /**
+     * @return the up vector relative to this object (what "up" is from the
+     * perspective of the object)
+     */
     public final Vector3f getVectorUp() {
         return up;
     }
 
+    /**
+     * @return the vector that gives the direction the object is facing
+     */
     public final Vector3f getDirection() {
         return direction;
     }
 
+    /**
+     * @return right local axis of the object within the world space
+     */
     public final Vector3f getVectorRight() {
         Vector3f right = new Vector3f();
 
@@ -104,6 +120,9 @@ public class Object3d implements Iterable<Object3d> {
         return right;
     }
 
+    /**
+     * @return the point in space the object is looking at
+     */
     public final Vector3f getTarget() {
         return target;
     }
@@ -151,6 +170,9 @@ public class Object3d implements Iterable<Object3d> {
         return matrixWorld;
     }
 
+    /**
+     * @return the primitives that OpenGL uses to draw this object
+     */
     public int getDrawingMode() {
         return GL4.GL_TRIANGLES;
     }

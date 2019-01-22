@@ -1,7 +1,6 @@
 package com.movlad.semviz.core.graphics.engine;
 
 import com.movlad.semviz.core.graphics.BufferLayout;
-
 import java.io.Serializable;
 
 /**
@@ -19,7 +18,7 @@ public class Geometry extends Object3d implements Serializable {
     /**
      * Constructor.
      *
-     * @param data is the vertex data
+     * @param data is the OpenGL buffer vertex data
      * @param layout is the layout for vertex data interpretation
      */
     public Geometry(float[] data, BufferLayout layout) {

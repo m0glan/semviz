@@ -5,7 +5,7 @@ import java.awt.event.MouseWheelEvent;
 import org.joml.Vector3f;
 
 /**
- * Controls making the camera move around the world's origin.
+ * Controls making the camera move around its target.
  */
 public class OrbitControls extends Controls {
 
@@ -59,27 +59,22 @@ public class OrbitControls extends Controls {
 
     @Override
     public void mouseMoved(java.awt.event.MouseEvent e) {
-        return;
     }
 
     @Override
     public void mouseClicked(java.awt.event.MouseEvent e) {
-        return;
     }
 
     @Override
     public void mousePressed(java.awt.event.MouseEvent e) {
-        return;
     }
 
     @Override
     public void mouseEntered(java.awt.event.MouseEvent e) {
-        return;
     }
 
     @Override
     public void mouseExited(java.awt.event.MouseEvent e) {
-        return;
     }
 
 }
