@@ -5,16 +5,15 @@
  */
 package com.movlad.semviz.view;
 
-import com.movlad.semviz.application.SuperCloud;
+import com.movlad.semviz.application.Controller;
 import com.movlad.semviz.application.ViewItem;
 import com.movlad.semviz.application.Viewer;
-import com.movlad.semviz.core.io.DirectoryLoader;
-import com.movlad.semviz.core.semantic.QueryManager;
-import com.movlad.semviz.core.semantic.QueryResult;
 import java.awt.Color;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.KeyEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.DefaultListModel;
@@ -24,18 +23,16 @@ import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 import javax.swing.table.DefaultTableModel;
 
-public class MainWindow extends javax.swing.JFrame {
-
-    private final List<String> commands;
-    private int commandSelection = -1;
+public class MainWindow extends javax.swing.JFrame implements PropertyChangeListener {
 
     private Viewer viewer;
     private final List<ViewItem> viewItems;
 
-    private QueryManager queryManager;
-    private List<QueryResult> queryResults;
-
     private final DefaultListModel listIndividualsModel;
+
+    private Controller controller;
+
+    private boolean isInitialized = false;
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox<String> ComboBox_GeometrySelection;
@@ -53,12 +50,12 @@ public class MainWindow extends javax.swing.JFrame {
     private javax.swing.JPanel Panel_VarInfo;
     private javax.swing.JScrollPane Scroll_Individuals;
     private javax.swing.JScrollPane Scroll_VarInfo;
+    private javax.swing.JTable Table_VarTable;
     private javax.swing.JTextField TextField_Command;
     private javax.swing.JMenuBar menuBar;
     private javax.swing.JMenuItem menuItem_Open;
     private javax.swing.JMenuItem menuItem_Quit;
     private javax.swing.JMenu menu_File;
-    private javax.swing.JTable table_VarTable;
     // End of variables declaration//GEN-END:variables
 
     /**
@@ -67,7 +64,9 @@ public class MainWindow extends javax.swing.JFrame {
     public MainWindow() {
         initComponents();
 
-        updateStatus();
+        controller = new Controller();
+
+        controller.register(this);
 
         viewer = new Viewer(Panel_GLCanvas.getWidth(), Panel_GLCanvas.getHeight());
 
@@ -92,12 +91,14 @@ public class MainWindow extends javax.swing.JFrame {
 
         TextField_Command.setEnabled(false);
 
-        // attribute init
-        commands = new ArrayList<>();
         viewItems = new ArrayList<>();
         listIndividualsModel = new DefaultListModel();
 
         List_Individuals.setModel(listIndividualsModel);
+
+        update();
+
+        isInitialized = true;
     }
 
     /**
@@ -148,7 +149,7 @@ public class MainWindow extends javax.swing.JFrame {
         Panel_VarInfo = new javax.swing.JPanel();
         Label_VarInfo = new javax.swing.JLabel();
         Scroll_VarInfo = new javax.swing.JScrollPane();
-        table_VarTable = new javax.swing.JTable();
+        Table_VarTable = new javax.swing.JTable();
         Panel_GeometrySelection = new javax.swing.JPanel();
         Label_GeometrySelection = new javax.swing.JLabel();
         ComboBox_GeometrySelection = new javax.swing.JComboBox<>();
@@ -233,7 +234,7 @@ public class MainWindow extends javax.swing.JFrame {
         Label_VarInfo.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
         Label_VarInfo.setText("Queried Info");
 
-        table_VarTable.setModel(new javax.swing.table.DefaultTableModel(
+        Table_VarTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
                 {null, null, null, null},
@@ -244,7 +245,7 @@ public class MainWindow extends javax.swing.JFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
-        Scroll_VarInfo.setViewportView(table_VarTable);
+        Scroll_VarInfo.setViewportView(Table_VarTable);
 
         javax.swing.GroupLayout Panel_VarInfoLayout = new javax.swing.GroupLayout(Panel_VarInfo);
         Panel_VarInfo.setLayout(Panel_VarInfoLayout);
@@ -402,26 +403,9 @@ public class MainWindow extends javax.swing.JFrame {
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             String path = fc.getSelectedFile().getAbsolutePath();
 
-            try {
-                DirectoryLoader loader = new DirectoryLoader(path);
-
-                loader.load();
-
-                queryManager = new QueryManager(loader);
-
-                JOptionPane.showMessageDialog(this, "Semviz data directory successfully loaded.",
-                        "Info", JOptionPane.INFORMATION_MESSAGE);
-
-                TextField_Command.setEnabled(true);
-                queryResults.clear();
-                viewer.clearScene();
-                viewer.start();
-                update();
-            } catch (Exception e) {
-                JOptionPane.showMessageDialog(this, "File could not be loaded.", "Error", JOptionPane.ERROR_MESSAGE);
-
-                TextField_Command.setEnabled(false);
-            }
+            controller.load(path);
+            viewer.clearScene();
+            viewer.start();
         }
     }//GEN-LAST:event_menuItem_OpenActionPerformed
 
@@ -432,27 +416,25 @@ public class MainWindow extends javax.swing.JFrame {
     private void TextField_CommandKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_TextField_CommandKeyPressed
         switch (evt.getKeyCode()) {
             case KeyEvent.VK_ENTER:
-                onCommandExecution();
+                controller.queryExec(TextField_Command.getText());
 
                 break;
             case KeyEvent.VK_UP:
-                commandBackward();
+                controller.commandBackward();
 
                 break;
             case KeyEvent.VK_DOWN:
-                commandForward();
+                controller.commandForward();
 
-                break;
-            default:
                 break;
         }
     }//GEN-LAST:event_TextField_CommandKeyPressed
 
     private void List_IndividualsValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_List_IndividualsValueChanged
-        int at = List_Individuals.getSelectedIndex();
+        int index = List_Individuals.getSelectedIndex();
 
-        if (at != -1) {
-            int selection = viewItems.get(at).getSelection();
+        if (index != -1) {
+            int selection = viewItems.get(index).getSelection();
 
             updateVarInfoTable();
 
@@ -464,129 +446,115 @@ public class MainWindow extends javax.swing.JFrame {
     }//GEN-LAST:event_List_IndividualsValueChanged
 
     private void ComboBox_GeometrySelectionItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_ComboBox_GeometrySelectionItemStateChanged
-        updateViewItemGeometry();
-    }//GEN-LAST:event_ComboBox_GeometrySelectionItemStateChanged
+        int selection = ComboBox_GeometrySelection.getSelectedIndex();
 
-    private void onCommandExecution() {
-        String queryString = TextField_Command.getText();
-
-        commands.add(queryString);
-        commandSelection = commands.size();
-
-        try {
-            queryResults = queryManager.query(queryString);
-
-            viewItems.clear();
-
-            SuperCloud superCloud = new SuperCloud(queryManager, queryResults);
-
-            superCloud.load();
-
-            superCloud.forEach(cluster -> {
-                viewItems.add(new ViewItem(cluster));
-            });
-
-            viewer.clearScene();
-
-            viewItems.forEach(item -> {
-                viewer.addObject(item.getGeometry(0));
-            });
-
+        if (isInitialized) {
+            viewer.replaceObject(List_Individuals.getSelectedIndex(),
+                    viewItems.get(List_Individuals.getSelectedIndex()).getGeometry(selection));
             viewer.start();
-
-            updateIndividualsList();
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
-
-        TextField_Command.setText("");
-    }
-
-    private void commandBackward() {
-        if ((commandSelection - 1) >= 0) {
-            commandSelection--;
-            TextField_Command.setText(commands.get(commandSelection));
-        }
-    }
-
-    private void commandForward() {
-        if ((commandSelection + 1) <= commands.size()) {
-            commandSelection++;
-
-            String text;
-
-            if (commandSelection >= commands.size()) {
-                text = "";
-            } else {
-                text = commands.get(commandSelection);
-            }
-
-            TextField_Command.setText(text);
-        }
-    }
+    }//GEN-LAST:event_ComboBox_GeometrySelectionItemStateChanged
 
     private void update() {
         updateStatus();
+        updateCommandLine();
         updateIndividualsList();
         updateVarInfoTable();
-    }
-
-    /**
-     * Upon cloud URI selection, the table is updated with vars
-     */
-    private void updateVarInfoTable() {
-        DefaultTableModel tableModel = new DefaultTableModel();
-
-        tableModel.addColumn("Variable");
-        tableModel.addColumn("Value");
-
-        Panel_VarInfo.setEnabled(false);
-
-        int at = List_Individuals.getSelectedIndex();
-
-        if (at != -1) {
-            queryResults.get(at).getKeys().forEach(key -> {
-                String[] row = new String[2];
-
-                row[0] = key;
-                row[1] = queryResults.get(at).getAttribute(key);
-
-                tableModel.addRow(row);
-            });
-        }
-
-        table_VarTable.setModel(tableModel);
-    }
-
-    private void updateIndividualsList() {
-        if (queryResults != null) {
-            listIndividualsModel.removeAllElements();
-
-            queryResults.forEach(result -> {
-                listIndividualsModel.addElement(result.getIndividual().getLocalName());
-            });
-        }
-    }
-
-    private void updateViewItemGeometry() {
-        int at = List_Individuals.getSelectedIndex();
-
-        if (at != -1) {
-            int selection = ComboBox_GeometrySelection.getSelectedIndex();
-
-            viewer.replaceObject(at, viewItems.get(at).getGeometry(selection));
-            viewer.start();
-        }
+        updateGeometrySelectionComboBox();
     }
 
     private void updateStatus() {
-        if (queryManager == null) {
+        if (!controller.isInitialized()) {
             Label_StatusLED.setForeground(Color.RED);
             Label_StatusText.setText("Offline.");
         } else {
             Label_StatusLED.setForeground(Color.GREEN);
             Label_StatusText.setText("Online.");
         }
+    }
+
+    private void updateIndividualsList() {
+        listIndividualsModel.removeAllElements();
+
+        if (controller.getQueryResults() != null
+                && !controller.getQueryResults().isEmpty()) {
+            controller.getQueryResults().forEach(result -> {
+                listIndividualsModel.addElement(result.getIndividual().getLocalName());
+            });
+        }
+    }
+
+    private void updateGeometrySelectionComboBox() {
+        int index = List_Individuals.getSelectedIndex();
+
+        if (index != -1) {
+            ComboBox_GeometrySelection.setEnabled(true);
+        } else {
+            ComboBox_GeometrySelection.setSelectedIndex(0);
+            ComboBox_GeometrySelection.setEnabled(false);
+        }
+    }
+
+    private void updateVarInfoTable() {
+        DefaultTableModel model = new DefaultTableModel();
+
+        model.addColumn("Variable");
+        model.addColumn("Value");
+
+        Panel_VarInfo.setEnabled(false);
+
+        int index = List_Individuals.getSelectedIndex();
+
+        if (index != -1) {
+            controller.getQueryResults().get(index).getKeys().forEach(key -> {
+                String[] row = new String[2];
+
+                row[0] = key;
+                row[1] = controller.getQueryResults().get(index).getAttribute(key);
+
+                model.addRow(row);
+            });
+        }
+
+        Table_VarTable.setModel(model);
+    }
+
+    private void updateCommandLine() {
+        if (!controller.isInitialized()) {
+            TextField_Command.setText("");
+            TextField_Command.setEnabled(false);
+        } else {
+            TextField_Command.setEnabled(true);
+            TextField_Command.setText(controller.getCurrentCommand());
+        }
+    }
+
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+        if (evt.getPropertyName().equals("error")) {
+            JOptionPane.showMessageDialog(this, evt.getNewValue(), "Error",
+                    JOptionPane.ERROR_MESSAGE);
+        }
+
+        if (evt.getPropertyName().equals("load")) {
+            JOptionPane.showMessageDialog(this, "Semviz data directory successfully loaded.",
+                    "Info", JOptionPane.INFORMATION_MESSAGE);
+        }
+
+        if (evt.getPropertyName().equals("queryExec")) {
+            viewer.clearScene();
+            viewItems.clear();
+
+            controller.getSuperCloud().forEach(cluster -> {
+                viewItems.add(new ViewItem(cluster));
+            });
+
+            viewer.fromViewItems(viewItems);
+
+            viewer.start();
+        }
+
+        update();
     }
 
 }

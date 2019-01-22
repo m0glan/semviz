@@ -5,7 +5,9 @@ import org.apache.jena.ontology.Individual;
 import org.apache.jena.ontology.OntClass;
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.query.*;
+import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.Resource;
 
 class QueryExecutor {
 
@@ -35,7 +37,11 @@ class QueryExecutor {
                 if (cloud != null) {
                     result.setIndividual(cloud);
                 } else {
-                    result.putAttribute(varName, node.toString());
+                    if (node.isResource()) {
+                        result.putAttribute(varName, ((Resource) node).getURI());
+                    } else {
+                        result.putAttribute(varName, ((Literal) node).getLexicalForm());
+                    }
                 }
             }
 

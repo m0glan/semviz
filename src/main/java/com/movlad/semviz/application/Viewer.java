@@ -16,6 +16,7 @@ import com.movlad.semviz.core.graphics.engine.OrbitControls;
 import com.movlad.semviz.core.graphics.engine.OrthographicCamera;
 import com.movlad.semviz.core.graphics.engine.Renderer;
 import com.movlad.semviz.core.graphics.engine.Scene;
+import java.util.List;
 import org.joml.Vector3f;
 
 public class Viewer {
@@ -53,22 +54,6 @@ public class Viewer {
         return glCanvas;
     }
 
-    public void setScene(Scene scene) {
-        this.scene = scene;
-    }
-
-    public void setRenderer(Renderer renderer) {
-        this.renderer = renderer;
-    }
-
-    public void setControls(Controls controls) {
-        this.controls = controls;
-    }
-
-    public void setAnimator(FPSAnimator animator) {
-        this.animator = animator;
-    }
-
     public final void start() {
         if (!isRunning) {
             glCanvas.addGLEventListener(renderer);
@@ -91,6 +76,14 @@ public class Viewer {
 
             isRunning = false;
         }
+    }
+
+    public void fromViewItems(List<ViewItem> viewItems) {
+        clearScene();
+
+        viewItems.forEach(cluster -> {
+            scene.add(cluster.getGeometry(0));
+        });
     }
 
     public void addObject(Object3d object) {
