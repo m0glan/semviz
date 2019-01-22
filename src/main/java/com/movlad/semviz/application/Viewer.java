@@ -38,6 +38,7 @@ public class Viewer {
                 -height, height, 0.1f, 1000.0f);
 
         camera.translate(new Vector3f(-10.0f, -10.0f, 5.0f));
+        camera.setTarget(new Vector3f(0.0f, 0.0f, 0.0f));
         camera.zoom(100);
 
         controls = new OrbitControls(camera);
@@ -94,6 +95,11 @@ public class Viewer {
     public void removeObject(int i) {
         stop();
         scene.remove(i);
+    }
+
+    public void removeObject(String id) {
+        stop();
+        scene.remove(id);
     }
 
     public void replaceObject(int i, Object3d object) {

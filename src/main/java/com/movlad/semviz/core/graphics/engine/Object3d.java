@@ -4,6 +4,7 @@ import com.jogamp.opengl.GL4;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.UUID;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
@@ -118,11 +119,6 @@ public class Object3d implements Iterable<Object3d> {
         updateVectors();
     }
 
-    public final void scale(float scale) {
-
-        updateVectors();
-    }
-
     public final void translate(Vector3f t) {
         position.add(t);
         updateVectors();
@@ -181,6 +177,16 @@ public class Object3d implements Iterable<Object3d> {
 
     public final void remove(int i) {
         children.remove(i);
+    }
+
+    public final void remove(String id) {
+        ListIterator<Object3d> it = children.listIterator();
+
+        while (it.hasNext()) {
+            if (it.next().getId().equals(id)) {
+                it.remove();
+            }
+        }
     }
 
     public final Object3d get(int i) {

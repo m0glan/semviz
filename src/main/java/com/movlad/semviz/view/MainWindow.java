@@ -8,6 +8,9 @@ package com.movlad.semviz.view;
 import com.movlad.semviz.application.Controller;
 import com.movlad.semviz.application.ViewItem;
 import com.movlad.semviz.application.Viewer;
+import com.movlad.semviz.core.graphics.engine.BoxGeometry;
+import com.movlad.semviz.core.graphics.engine.Object3d;
+import com.movlad.semviz.core.math.geometry.BoundingBox;
 import java.awt.Color;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
@@ -22,6 +25,7 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 import javax.swing.table.DefaultTableModel;
+import org.joml.Vector3f;
 
 public class MainWindow extends javax.swing.JFrame implements PropertyChangeListener {
 
@@ -436,7 +440,7 @@ public class MainWindow extends javax.swing.JFrame implements PropertyChangeList
         if (index != -1) {
             int selection = viewItems.get(index).getSelection();
 
-            updateVarInfoTable();
+            onIndividualSelection();
 
             ComboBox_GeometrySelection.setEnabled(true);
             ComboBox_GeometrySelection.setSelectedIndex(selection);
@@ -459,7 +463,7 @@ public class MainWindow extends javax.swing.JFrame implements PropertyChangeList
         updateStatus();
         updateCommandLine();
         updateIndividualsList();
-        updateVarInfoTable();
+        onIndividualSelection();
         updateGeometrySelectionComboBox();
     }
 
@@ -495,7 +499,7 @@ public class MainWindow extends javax.swing.JFrame implements PropertyChangeList
         }
     }
 
-    private void updateVarInfoTable() {
+    private void onIndividualSelection() {
         DefaultTableModel model = new DefaultTableModel();
 
         model.addColumn("Variable");
@@ -504,6 +508,8 @@ public class MainWindow extends javax.swing.JFrame implements PropertyChangeList
         Panel_VarInfo.setEnabled(false);
 
         int index = List_Individuals.getSelectedIndex();
+
+        viewer.removeObject("selection");
 
         if (index != -1) {
             controller.getQueryResults().get(index).getKeys().forEach(key -> {
@@ -514,7 +520,16 @@ public class MainWindow extends javax.swing.JFrame implements PropertyChangeList
 
                 model.addRow(row);
             });
+
+            Object3d box = new BoxGeometry(new BoundingBox(viewItems.get(index).getCloud()),
+                    new Vector3f(255.0f, 255.0f, 0.0f));
+
+            box.setId("selection");
+
+            viewer.addObject(box);
         }
+
+        viewer.start();
 
         Table_VarTable.setModel(model);
     }

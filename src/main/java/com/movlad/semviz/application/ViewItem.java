@@ -26,6 +26,10 @@ public class ViewItem {
         this.selection = 0;
     }
 
+    public PointCloud getCloud() {
+        return cloud;
+    }
+
     public int getSelection() {
         return selection;
     }

@@ -10,9 +10,8 @@ import org.joml.Vector3f;
  */
 public class AxisHelper extends Geometry {
 
-    public AxisHelper(float scale) {
+    public AxisHelper() {
         this.setPosition(new Vector3f(0.0f, 0.0f, 0.0f));
-        this.scale(scale);
         this.setTarget(new Vector3f(1.0f, 0.0f, 0.0f));
 
         this.data = new float[]{
