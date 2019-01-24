@@ -1,5 +1,6 @@
-package com.movlad.semviz.application;
+package com.movlad.semviz.view;
 
+import com.movlad.semviz.core.semantic.SemanticCloud;
 import com.jogamp.opengl.GLCapabilities;
 import com.jogamp.opengl.GLProfile;
 import com.jogamp.opengl.awt.GLCanvas;
@@ -11,6 +12,10 @@ import com.movlad.semviz.core.graphics.engine.OrbitControls;
 import com.movlad.semviz.core.graphics.engine.OrthographicCamera;
 import com.movlad.semviz.core.graphics.engine.Renderer;
 import com.movlad.semviz.core.graphics.engine.Scene;
+import com.movlad.semviz.core.graphics.engine.WireframeBox;
+import com.movlad.semviz.core.math.geometry.BoundingBox;
+import com.movlad.semviz.core.math.geometry.PointCloud;
+import java.util.ArrayList;
 import java.util.List;
 import org.joml.Vector3f;
 
@@ -19,6 +24,8 @@ import org.joml.Vector3f;
  * navigating a scene of three-dimensional object around an orbit.
  */
 public class Viewer {
+
+    private final List<ViewItem> viewItems;
 
     private final Scene scene;
     private final Camera camera;
@@ -32,6 +39,8 @@ public class Viewer {
     private boolean isRunning;
 
     public Viewer(int width, int height) {
+        viewItems = new ArrayList<>();
+
         glCanvas = new GLCanvas(new GLCapabilities(GLProfile.get(GLProfile.GL4)));
         camera = new OrthographicCamera(-width, width,
                 -height, height, 0.1f, 1000.0f);
@@ -90,43 +99,68 @@ public class Viewer {
      * Builds a scene from a list of view items (base geometry for all the
      * clouds).
      *
-     * @param viewItems is a list of view items
+     * @param superCloud contains the clusters to display
      */
-    public void fromViewItems(List<ViewItem> viewItems) {
-        scene.clear();
+    public void load(SemanticCloud superCloud) {
+        reset();
 
-        viewItems.forEach(cluster -> {
-            scene.add(cluster.getGeometry(0));
+        superCloud.forEach(cluster -> {
+            viewItems.add(new ViewItem(cluster));
+
+            scene.add(viewItems.get(viewItems.size() - 1).getGeometrySelection());
         });
     }
 
     /**
-     * Adds an object to the scene.
-     *
-     * @param object is the three-dimensional object to be added to the scene
+     * Clears the list of view items and the scene.
      */
-    public void addObject(Object3d object) {
-        scene.add(object);
+    public void reset() {
+        viewItems.clear();
+        scene.clear();
     }
 
     /**
-     * Removes an object from the scene.
+     * Sets the selected view item in the scene by building its axis aligned
+     * bounding box around it.
      *
-     * @param i is the index of the three-dimensional object to be removed from
-     * the scene
+     * @param i is the index of the view item to be selected
      */
-    public void removeObject(int i) {
-        scene.remove(i);
+    public void setSelectedViewItem(int i) {
+        scene.remove("selection");
+
+        if (i != -1) {
+            PointCloud cloud = viewItems.get(i).getCloud();
+            BoundingBox bbox = new BoundingBox(cloud);
+            WireframeBox geometry = new WireframeBox(bbox, new Vector3f(255, 255, 0));
+
+            geometry.setId("selection");
+            scene.add(geometry);
+        }
     }
 
     /**
-     * Adds an object to the scene.
+     * Returns the selected geometry for the view item at a given index.
      *
-     * @param id is the id of the three-dimensional object to be removed from
-     * the scene
+     * @param i is the index of the view item
+     * @return the index of the selected geometry for a view item
      */
-    public void removeObject(String id) {
-        scene.remove(id);
+    public int getSelectedGeometryIndex(int i) {
+        return viewItems.get(i).getSelectedGeometryIndex();
+    }
+
+    /**
+     * Sets the selected geometry for the view item at a given index.
+     *
+     * @param i is the view item to be selected
+     * @param geometryIndex the index of the geometry selection for the view
+     * item
+     */
+    public void setSelectedGeometryIndex(int i, int geometryIndex) {
+        viewItems.get(i).setSelectedGeometryIndex(geometryIndex);
+
+        Object3d geometry = viewItems.get(i).getGeometrySelection();
+
+        replaceObject(i, geometry);
     }
 
     /**
@@ -135,7 +169,8 @@ public class Viewer {
      * @param i is the position where the replacement takes place
      * @param object is the replacement three-dimensional object
      */
-    public void replaceObject(int i, Object3d object) {
+    private void replaceObject(int i, Object3d object) {
+        scene.remove(i);
         scene.add(i, object);
     }
 
@@ -149,11 +184,8 @@ public class Viewer {
         scene.get(i).setVisible(isVisible);
     }
 
-    /**
-     * Removes all objects from the scene.
-     */
-    public void clearScene() {
-        scene.clear();
+    public int numViewItems() {
+        return viewItems.size();
     }
 
 }

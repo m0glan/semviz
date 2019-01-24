@@ -1,4 +1,4 @@
-package com.movlad.semviz.application;
+package com.movlad.semviz.core.semantic;
 
 import com.github.quickhull3d.Point3d;
 import com.github.quickhull3d.Vector3d;
@@ -19,7 +19,7 @@ import org.joml.Vector3f;
  * class groups all of the retrieved clusters, calculates the centroid of their
  * base cloud and then centers them.
  */
-public class SuperCloud implements Iterable<PointCloud> {
+public class SemanticCloud implements Iterable<PointCloud> {
 
     private final List<PointCloud> clusters;
     private final QueryManager queryManager;
@@ -33,7 +33,7 @@ public class SuperCloud implements Iterable<PointCloud> {
      * @param queryResults is the list of results obtained after the execution
      * of a SPARQL query on the query manager
      */
-    public SuperCloud(QueryManager queryManager, List<QueryResult> queryResults) {
+    public SemanticCloud(QueryManager queryManager, List<QueryResult> queryResults) {
         this.clusters = new ArrayList<>();
         this.queryManager = queryManager;
         this.queryResults = queryResults;

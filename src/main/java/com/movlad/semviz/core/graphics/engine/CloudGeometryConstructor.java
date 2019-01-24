@@ -1,10 +1,10 @@
-package com.movlad.semviz.application;
+package com.movlad.semviz.core.graphics.engine;
 
 import com.movlad.semviz.core.graphics.engine.Geometry;
 
 /**
  * Director class for the
- * {@link com.movlad.semviz.application.CloudGeometryBuilder}.
+ * {@link com.movlad.semviz.core.graphics.engine.CloudGeometryBuilder}.
  */
 public final class CloudGeometryConstructor {
 
@@ -17,7 +17,7 @@ public final class CloudGeometryConstructor {
     /**
      * Constructs a cloud geometry, like a convex hull, based on the
      * implementation of
-     * {@link com.movlad.semviz.application.CloudGeometryBuilder}.
+     * {@link com.movlad.semviz.core.graphics.engine.CloudGeometryBuilder}.
      */
     public void construct() {
         builder.buildDataBufferLayout();

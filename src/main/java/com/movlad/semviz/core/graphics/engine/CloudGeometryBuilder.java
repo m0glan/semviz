@@ -1,4 +1,4 @@
-package com.movlad.semviz.application;
+package com.movlad.semviz.core.graphics.engine;
 
 import com.jogamp.opengl.GL4;
 import com.movlad.semviz.core.graphics.BufferLayout;

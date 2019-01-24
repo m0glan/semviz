@@ -12,13 +12,13 @@ import org.joml.Vector3f;
 /**
  * Geometry containing the necessary buffer data to draw the edges of a box.
  */
-public class BoxEdgesGeometry extends Geometry {
+public class WireframeBox extends Geometry {
 
     /**
      * @param bbox is the bounding box containing the box information
      * @param rgb is the color of the edges of the box
      */
-    public BoxEdgesGeometry(BoundingBox bbox, Vector3f rgb) {
+    public WireframeBox(BoundingBox bbox, Vector3f rgb) {
         float[] rgbNormalized = GraphicsUtils.normalizeRGB(rgb.x, rgb.y, rgb.z);
         List<Point3d> vertices = new ArrayList<>();
 

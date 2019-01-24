@@ -5,19 +5,18 @@
  */
 package com.movlad.semviz.view;
 
-import com.movlad.semviz.application.Configuration;
-import com.movlad.semviz.application.ViewItem;
-import com.movlad.semviz.application.Viewer;
-import com.movlad.semviz.core.graphics.engine.BoxEdgesGeometry;
-import com.movlad.semviz.core.graphics.engine.Object3d;
-import com.movlad.semviz.core.math.geometry.BoundingBox;
+import com.movlad.semviz.application.CommandNavigationController;
+import com.movlad.semviz.application.QueryManagerController;
+import com.movlad.semviz.application.SemanticCloudController;
+import com.movlad.semviz.core.semantic.QueryManager;
+import com.movlad.semviz.core.semantic.QueryResult;
+import com.movlad.semviz.core.semantic.SemanticCloud;
 import java.awt.Color;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.ArrayList;
 import java.util.List;
 import javax.swing.DefaultListModel;
 import javax.swing.JFileChooser;
@@ -26,16 +25,14 @@ import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 import javax.swing.table.DefaultTableModel;
-import org.joml.Vector3f;
 
 public class MainWindow extends javax.swing.JFrame implements PropertyChangeListener {
 
     private Viewer viewer;
-    private final List<ViewItem> viewItems;
 
-    private final Configuration config;
-
-    private boolean isInitialized = false;
+    private QueryManagerController queryManagerController;
+    private SemanticCloudController semanticCloudController;
+    private CommandNavigationController commandNavigationController;
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox<String> ComboBox_GeometrySelection;
@@ -66,21 +63,13 @@ public class MainWindow extends javax.swing.JFrame implements PropertyChangeList
      */
     public MainWindow() {
         initComponents();
-
-        config = new Configuration();
-
-        config.register(this);
-
-        viewItems = new ArrayList<>();
-
+        initControllers();
         initStatusBar();
         initIndividualsList();
         initVarInfoTable();
         initViewer();
         initGeometrySelectionComboBox();
         initCommandTextField();
-
-        isInitialized = true;
     }
 
     /**
@@ -386,8 +375,7 @@ public class MainWindow extends javax.swing.JFrame implements PropertyChangeList
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             String path = fc.getSelectedFile().getAbsolutePath();
 
-            config.load(path);
-            viewer.clearScene();
+            queryManagerController.loadQueryManager(path);
         }
     }//GEN-LAST:event_menuItem_OpenActionPerformed
 
@@ -398,43 +386,75 @@ public class MainWindow extends javax.swing.JFrame implements PropertyChangeList
     private void TextField_CommandKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_TextField_CommandKeyPressed
         switch (evt.getKeyCode()) {
             case KeyEvent.VK_ENTER:
-                config.queryExec(TextField_Command.getText());
+                String queryString = TextField_Command.getText();
+
+                commandNavigationController.enter(queryString);
+                queryManagerController.executeQuery(queryString);
 
                 break;
             case KeyEvent.VK_UP:
-                config.commandBackward();
+                commandNavigationController.up();
 
                 break;
             case KeyEvent.VK_DOWN:
-                config.commandForward();
+                commandNavigationController.down();
 
                 break;
         }
     }//GEN-LAST:event_TextField_CommandKeyPressed
 
     private void ComboBox_GeometrySelectionItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_ComboBox_GeometrySelectionItemStateChanged
-        int selection = ComboBox_GeometrySelection.getSelectedIndex();
+        int itemIndex = List_Individuals.getSelectedIndex();
+        int geometryIndex = ComboBox_GeometrySelection.getSelectedIndex();
 
-        if (isInitialized) {
-            viewer.replaceObject(List_Individuals.getSelectedIndex(),
-                    viewItems.get(List_Individuals.getSelectedIndex()).getGeometry(selection));
+        if (itemIndex != -1) {
+            viewer.setSelectedGeometryIndex(itemIndex, geometryIndex);
         }
     }//GEN-LAST:event_ComboBox_GeometrySelectionItemStateChanged
 
     private void List_IndividualsValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_List_IndividualsValueChanged
         int index = List_Individuals.getSelectedIndex();
 
-        onIndividualSelection();
+        resetVarInfoTable();
+        viewer.setSelectedViewItem(-1);
+
+        DefaultTableModel model = (DefaultTableModel) Table_VarInfo.getModel();
 
         if (index != -1) {
-            int selection = viewItems.get(index).getSelection();
+            // An individual is selected
 
             ComboBox_GeometrySelection.setEnabled(true);
-            ComboBox_GeometrySelection.setSelectedIndex(selection);
-        } else {
-            ComboBox_GeometrySelection.setEnabled(false);
+            ComboBox_GeometrySelection.setSelectedIndex(viewer
+                    .getSelectedGeometryIndex(index));
+
+            /*
+             Filling in variable information table with the semantic attributes
+             decribing the selected individual.
+             */
+            List<QueryResult> queryResults = queryManagerController.getQueryResults();
+
+            queryResults.get(index).getKeys().forEach(key -> {
+                String[] row = new String[2];
+
+                row[0] = key;
+                row[1] = queryResults.get(index).getAttribute(key);
+
+                model.addRow(row);
+            });
+
+            viewer.setSelectedViewItem(index);
         }
     }//GEN-LAST:event_List_IndividualsValueChanged
+
+    private void initControllers() {
+        queryManagerController = new QueryManagerController();
+        semanticCloudController = new SemanticCloudController();
+        commandNavigationController = new CommandNavigationController();
+
+        queryManagerController.register(this);
+        semanticCloudController.register(this);
+        commandNavigationController.register(this);
+    }
 
     private void initStatusBar() {
         Label_StatusLED.setForeground(Color.RED);
@@ -484,124 +504,81 @@ public class MainWindow extends javax.swing.JFrame implements PropertyChangeList
         TextField_Command.setEnabled(false);
     }
 
-    /**
-     * Called when a query is successfully executed.
-     */
-    private void onQueryExecutionSuccess() {
-        DefaultListModel listModel = (DefaultListModel) List_Individuals.getModel();
+    private void resetInterface() {
+        resetGeometrySelectionComboBox();
+        resetVarInfoTable();
+        resetIndividualsList();
+        initStatusBar();
+        viewer.reset();
 
-        listModel.clear();
-
-        if (config.getQueryResults() != null
-                && !config.getQueryResults().isEmpty()) {
-            config.getQueryResults().forEach(result -> {
-                listModel.addElement(result.getIndividual().getLocalName());
-            });
-        }
-
-        viewer.clearScene();
-        viewItems.clear();
-
-        config.getSuperCloud().forEach(cluster -> {
-            viewItems.add(new ViewItem(cluster));
-        });
-
-        viewer.fromViewItems(viewItems);
+        TextField_Command.setText("");
+        TextField_Command.setEnabled(false);
     }
 
-    /**
-     * Called whenever a cloud individual is selected in the graphical
-     * interface.
-     */
-    private void onIndividualSelection() {
+    private void resetVarInfoTable() {
         DefaultTableModel model = (DefaultTableModel) Table_VarInfo.getModel();
 
         model.setRowCount(0);
-
-        int index = List_Individuals.getSelectedIndex();
-
-        viewer.removeObject("selection");
-
-        if (index != -1) {
-            // An individual is selected
-
-            ComboBox_GeometrySelection.setEnabled(true);
-
-            /*
-             Filling in variable information table with the semantic attributes
-             decribing the selected individual.
-             */
-            config.getQueryResults().get(index).getKeys().forEach(key -> {
-                String[] row = new String[2];
-
-                row[0] = key;
-                row[1] = config.getQueryResults().get(index).getAttribute(key);
-
-                model.addRow(row);
-            });
-
-            /*
-            Surrounding the cloud corresponding to the selected individual with the
-            bounding box.
-             */
-            Object3d box = new BoxEdgesGeometry(new BoundingBox(viewItems.get(index).getCloud()),
-                    new Vector3f(255.0f, 255.0f, 0.0f));
-
-            box.setId("selection");
-
-            viewer.addObject(box);
-        } else {
-            ComboBox_GeometrySelection.setSelectedIndex(0);
-            ComboBox_GeometrySelection.setEnabled(false);
-        }
     }
 
-    /**
-     * Called whenever a Semviz directory is loaded in the configuration.
-     */
-    private void onDirectoryLoad() {
-        ((DefaultListModel) List_Individuals.getModel()).clear();
+    private void resetIndividualsList() {
+        DefaultListModel listModel = (DefaultListModel) List_Individuals.getModel();
 
-        if (!config.isInitialized()) {
-            TextField_Command.setText("");
-            TextField_Command.setEnabled(false);
-            Label_StatusLED.setForeground(Color.RED);
-            Label_StatusText.setText("Inactive");
-        } else {
-            TextField_Command.setEnabled(true);
-            TextField_Command.setText(config.getCurrentCommand());
-            Label_StatusLED.setForeground(Color.GREEN);
-            Label_StatusText.setText("Active");
-        }
+        listModel.clear();
+    }
+
+    private void resetGeometrySelectionComboBox() {
+        ComboBox_GeometrySelection.setSelectedIndex(0);
+        ComboBox_GeometrySelection.setEnabled(false);
     }
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        if (evt.getPropertyName().equals("loadError")) {
-            JOptionPane.showMessageDialog(this, evt.getNewValue(), "Error",
-                    JOptionPane.ERROR_MESSAGE);
-
-            onDirectoryLoad();
-        }
-
-        if (evt.getPropertyName().equals("queryExecError")) {
+        if (evt.getPropertyName().contains("Error")) {
             JOptionPane.showMessageDialog(this, evt.getNewValue(), "Error",
                     JOptionPane.ERROR_MESSAGE);
         }
 
-        if (evt.getPropertyName().equals("load")) {
-            JOptionPane.showMessageDialog(this, "Semviz data directory successfully loaded.",
-                    "Info", JOptionPane.INFORMATION_MESSAGE);
-
-            onDirectoryLoad();
+        if (evt.getPropertyName().contains("QueryManagerLoad")) {
+            resetInterface();
         }
 
-        if (evt.getPropertyName().equals("commandSelection")) {
-            TextField_Command.setText(config.getCurrentCommand());
+        if (evt.getPropertyName().equals("QueryManagerLoadSuccess")) {
+            Label_StatusLED.setForeground(Color.GREEN);
+            Label_StatusText.setText("Active");
+            TextField_Command.setEnabled(true);
+
+            JOptionPane.showMessageDialog(this, "Load complete.", "Info",
+                    JOptionPane.INFORMATION_MESSAGE);
         }
 
-        if (evt.getPropertyName().equals("queryExec")) {
-            onQueryExecutionSuccess();
+        if (evt.getPropertyName().contains("QueryExecution")) {
+            resetIndividualsList();
+            resetVarInfoTable();
+            resetGeometrySelectionComboBox();
+            viewer.reset();
+        }
+
+        if (evt.getPropertyName().equals("QueryExecutionSuccess")) {
+            DefaultListModel listModel = (DefaultListModel) List_Individuals.getModel();
+
+            List<QueryResult> queryResults = (List<QueryResult>) evt.getNewValue();
+
+            queryResults.forEach(result -> {
+                listModel.addElement(result.getIndividual().getLocalName());
+            });
+
+            QueryManager queryManager = queryManagerController.getQueryManager();
+
+            semanticCloudController.loadSuperCloud(queryManager, queryResults);
+        }
+
+        if (evt.getPropertyName().equals("SemanticCloudChange")) {
+            viewer.load((SemanticCloud) evt.getNewValue());
+        }
+
+        if (evt.getPropertyName().contains("CommandNavigation")) {
+            TextField_Command.setText((String) evt.getNewValue());
         }
     }
 

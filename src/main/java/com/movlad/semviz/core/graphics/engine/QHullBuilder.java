@@ -1,4 +1,4 @@
-package com.movlad.semviz.application;
+package com.movlad.semviz.core.graphics.engine;
 
 import com.github.quickhull3d.QuickHull3D;
 import com.jogamp.opengl.GL4;
