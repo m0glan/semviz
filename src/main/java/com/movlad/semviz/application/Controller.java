@@ -1,13 +1,12 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.movlad.semviz.application;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 
+/**
+ * Base controller class that allows modifying a model and then notifying the
+ * listeners about the change.
+ */
 public class Controller {
 
     protected PropertyChangeSupport changeSupport;

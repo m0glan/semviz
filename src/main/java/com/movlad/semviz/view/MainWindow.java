@@ -539,47 +539,73 @@ public class MainWindow extends javax.swing.JFrame implements PropertyChangeList
                     JOptionPane.ERROR_MESSAGE);
         }
 
+        if (evt.getPropertyName().contains("CommandNavigation")) {
+            TextField_Command.setText((String) evt.getNewValue());
+        }
+
         if (evt.getPropertyName().contains("QueryManagerLoad")) {
             resetInterface();
         }
 
-        if (evt.getPropertyName().equals("QueryManagerLoadSuccess")) {
-            Label_StatusLED.setForeground(Color.GREEN);
-            Label_StatusText.setText("Active");
-            TextField_Command.setEnabled(true);
-
-            JOptionPane.showMessageDialog(this, "Load complete.", "Info",
-                    JOptionPane.INFORMATION_MESSAGE);
-        }
-
         if (evt.getPropertyName().contains("QueryExecution")) {
-            resetIndividualsList();
-            resetVarInfoTable();
-            resetGeometrySelectionComboBox();
-            viewer.reset();
+            onQueryExecution(evt);
         }
 
-        if (evt.getPropertyName().equals("QueryExecutionSuccess")) {
-            DefaultListModel listModel = (DefaultListModel) List_Individuals.getModel();
+        switch (evt.getPropertyName()) {
+            case "QueryManagerLoadSuccess":
+                onQueryManagerLoadSuccess(evt);
 
-            List<QueryResult> queryResults = (List<QueryResult>) evt.getNewValue();
+                break;
 
-            queryResults.forEach(result -> {
-                listModel.addElement(result.getIndividual().getLocalName());
-            });
+            case "QueryExecutionSuccess":
+                onQueryExecutionSuccess(evt);
 
-            QueryManager queryManager = queryManagerController.getQueryManager();
+                break;
 
-            semanticCloudController.loadSuperCloud(queryManager, queryResults);
+            case "SemanticCloudChange":
+                viewer.load((SemanticCloud) evt.getNewValue());
+
+                break;
         }
+    }
 
-        if (evt.getPropertyName().equals("SemanticCloudChange")) {
-            viewer.load((SemanticCloud) evt.getNewValue());
-        }
+    /**
+     * Called when the query manager is successfully loaded.
+     */
+    private void onQueryManagerLoadSuccess(PropertyChangeEvent evt) {
+        Label_StatusLED.setForeground(Color.GREEN);
+        Label_StatusText.setText("Active");
+        TextField_Command.setEnabled(true);
 
-        if (evt.getPropertyName().contains("CommandNavigation")) {
-            TextField_Command.setText((String) evt.getNewValue());
-        }
+        JOptionPane.showMessageDialog(this, "Load complete.", "Info",
+                JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    /**
+     * Called whenever a query is executed.
+     */
+    private void onQueryExecution(PropertyChangeEvent evt) {
+        resetIndividualsList();
+        resetVarInfoTable();
+        resetGeometrySelectionComboBox();
+        viewer.reset();
+    }
+
+    /**
+     * Called upon successful execution of a query.
+     */
+    private void onQueryExecutionSuccess(PropertyChangeEvent evt) {
+        DefaultListModel listModel = (DefaultListModel) List_Individuals.getModel();
+
+        List<QueryResult> queryResults = (List<QueryResult>) evt.getNewValue();
+
+        queryResults.forEach(result -> {
+            listModel.addElement(result.getIndividual().getLocalName());
+        });
+
+        QueryManager queryManager = queryManagerController.getQueryManager();
+
+        semanticCloudController.loadSuperCloud(queryManager, queryResults);
     }
 
 }

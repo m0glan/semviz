@@ -3,6 +3,9 @@ package com.movlad.semviz.application;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Controller used for navigating through the command history.
+ */
 public class CommandNavigationController extends Controller {
 
     private final List<String> commands;
@@ -20,10 +23,18 @@ public class CommandNavigationController extends Controller {
         return commands.get(selectedIndex);
     }
 
+    /**
+     * Adds new command to history.
+     *
+     * @param command is the command to be added to history.
+     */
     public void enter(String command) {
         commands.add(commands.size() - 1, command);
     }
 
+    /**
+     * Selects previous command.
+     */
     public void up() {
         if (selectedIndex - 1 >= 0) {
             String prev = getSelection();
@@ -34,6 +45,9 @@ public class CommandNavigationController extends Controller {
         }
     }
 
+    /**
+     * Selects a more recent command.
+     */
     public void down() {
         if (selectedIndex + 1 < commands.size()) {
             String prev = getSelection();

@@ -3,8 +3,6 @@ package com.movlad.semviz.core.semantic;
 import com.github.quickhull3d.Point3d;
 import com.github.quickhull3d.Vector3d;
 import com.movlad.semviz.core.math.geometry.PointCloud;
-import com.movlad.semviz.core.semantic.QueryManager;
-import com.movlad.semviz.core.semantic.QueryResult;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;

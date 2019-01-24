@@ -28,7 +28,8 @@ public class DirectoryLoader {
     /**
      * @throws InvalidDirectoryException if something goes wrong when loading a
      * directory
-     * @throws java.nio.file.NotDirectoryException
+     * @throws java.nio.file.NotDirectoryException if the file at the given path
+     * is not a directory
      */
     public void load() throws InvalidDirectoryException, NotDirectoryException {
         this.model = null;

@@ -7,6 +7,10 @@ import com.movlad.semviz.core.semantic.QueryResult;
 import java.nio.file.NotDirectoryException;
 import java.util.List;
 
+/**
+ * Controller that creates a bridge between the view and the query manager
+ * model; SPARQL queries can be executed through this controller.
+ */
 public class QueryManagerController extends Controller {
 
     private QueryManager queryManager;
@@ -53,7 +57,7 @@ public class QueryManagerController extends Controller {
     /**
      * Executes a query on the currently loaded
      * {@link com.movlad.semviz.core.semantic.QueryManager}, generates a
-     * {@link com.movlad.semviz.application.SemanticCloud} formed by all the
+     * {@link com.movlad.semviz.core.semantic.SemanticCloud} formed by all the
      * clouds retrieved using the query.
      *
      * @param queryString is the string of the query to be executed
