@@ -1,7 +1,7 @@
 package com.movlad.semviz.core.graphics.engine;
 
 import com.github.quickhull3d.Point3d;
-import com.jogamp.opengl.GL4;
+import com.jogamp.opengl.GL3;
 import com.movlad.semviz.core.graphics.BufferLayout;
 import com.movlad.semviz.core.graphics.GraphicsUtils;
 import com.movlad.semviz.core.math.geometry.BoundingBox;
@@ -69,13 +69,13 @@ public class WireframeBox extends Geometry {
 
         layout = new BufferLayout();
 
-        layout.push("position", GL4.GL_FLOAT, 3, false);
-        layout.push("color", GL4.GL_UNSIGNED_BYTE, 3, false);
+        layout.push("position", GL3.GL_FLOAT, 3, false);
+        layout.push("color", GL3.GL_UNSIGNED_BYTE, 3, false);
     }
 
     @Override
     public int getDrawingMode() {
-        return GL4.GL_LINES;
+        return GL3.GL_LINES;
     }
 
 }

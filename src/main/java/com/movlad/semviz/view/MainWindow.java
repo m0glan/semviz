@@ -15,6 +15,8 @@ import java.awt.Color;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.List;
@@ -93,9 +95,16 @@ public class MainWindow extends javax.swing.JFrame implements PropertyChangeList
         java.awt.EventQueue.invokeLater(() -> {
             MainWindow mainWindow = new MainWindow();
 
+            mainWindow.addWindowListener(new WindowAdapter() {
+                @Override
+                public void windowClosing(WindowEvent e) {
+                    mainWindow.exit();
+                }
+            });
+
             mainWindow.setExtendedState(JFrame.MAXIMIZED_BOTH);
+            mainWindow.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
             mainWindow.setVisible(true);
-            mainWindow.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         });
     }
 
@@ -380,7 +389,7 @@ public class MainWindow extends javax.swing.JFrame implements PropertyChangeList
     }//GEN-LAST:event_menuItem_OpenActionPerformed
 
     private void menuItem_QuitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItem_QuitActionPerformed
-        System.exit(0);
+        exit();
     }//GEN-LAST:event_menuItem_QuitActionPerformed
 
     private void TextField_CommandKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_TextField_CommandKeyPressed
@@ -606,6 +615,13 @@ public class MainWindow extends javax.swing.JFrame implements PropertyChangeList
         QueryManager queryManager = queryManagerController.getQueryManager();
 
         semanticCloudController.loadSuperCloud(queryManager, queryResults);
+    }
+
+    public void exit() {
+        viewer.stop();
+        this.setVisible(false);
+        this.dispose();
+        System.exit(0);
     }
 
 }

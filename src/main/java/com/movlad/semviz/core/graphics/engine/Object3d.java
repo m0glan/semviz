@@ -1,6 +1,6 @@
 package com.movlad.semviz.core.graphics.engine;
 
-import com.jogamp.opengl.GL4;
+import com.jogamp.opengl.GL3;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -174,7 +174,7 @@ public class Object3d implements Iterable<Object3d> {
      * @return the primitives that OpenGL uses to draw this object
      */
     public int getDrawingMode() {
-        return GL4.GL_TRIANGLES;
+        return GL3.GL_TRIANGLES;
     }
 
     public final boolean isVisible() {

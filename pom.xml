@@ -12,7 +12,7 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.8.0</version>
                 <configuration>
-                    <release>11</release>
+                    <release>10</release>
                 </configuration>
                 <dependencies>
                     <dependency>
@@ -97,7 +97,6 @@
     </build>
 
     <dependencies>
-        <!-- https://mvnrepository.com/artifact/org.jogamp.jogl/jogl-all-main -->
         <dependency>
             <groupId>org.jogamp.jogl</groupId>
             <artifactId>jogl-all-main</artifactId>
@@ -116,7 +115,6 @@
             <version>3.8.1</version>
         </dependency>
 
-        <!-- https://mvnrepository.com/artifact/org.joml/joml -->
         <dependency>
             <groupId>org.joml</groupId>
             <artifactId>joml</artifactId>
@@ -155,12 +153,6 @@
             <artifactId>apache-jena-libs</artifactId>
             <version>3.7.0</version>
             <type>pom</type>
-        </dependency>
-
-        <dependency>
-            <groupId>org.openjfx</groupId>
-            <artifactId>javafx-controls</artifactId>
-            <version>11</version>
         </dependency>
     </dependencies>
 </project>

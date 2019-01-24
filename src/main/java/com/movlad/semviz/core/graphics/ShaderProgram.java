@@ -1,6 +1,6 @@
 package com.movlad.semviz.core.graphics;
 
-import com.jogamp.opengl.GL4;
+import com.jogamp.opengl.GL3;
 import com.jogamp.opengl.GLException;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -14,6 +14,7 @@ class ShaderSource {
 
     public String[] vertexShaderSource = {""};
     public String[] fragmentShaderSource = {""};
+
 }
 
 enum ShaderType {
@@ -27,7 +28,7 @@ enum ShaderType {
 public class ShaderProgram {
 
     private final int id;
-    private final GL4 gl;
+    private final GL3 gl;
 
     /**
      * Constructor.
@@ -37,13 +38,13 @@ public class ShaderProgram {
      * @param fragmentShaderSource is the GLSL source for the fragment shader
      * @throws GLException upon compilation, linkage or validation errors.
      */
-    public ShaderProgram(GL4 gl, String[] vertexShaderSource, String[] fragmentShaderSource)
+    public ShaderProgram(GL3 gl, String[] vertexShaderSource, String[] fragmentShaderSource)
             throws GLException {
         this.gl = gl;
         this.id = createProgram(vertexShaderSource, fragmentShaderSource);
     }
 
-    public ShaderProgram(GL4 gl, InputStream is) throws IOException {
+    public ShaderProgram(GL3 gl, InputStream is) throws IOException {
         this.gl = gl;
 
         ShaderSource source = parse(is);
@@ -86,12 +87,12 @@ public class ShaderProgram {
 
         IntBuffer success = IntBuffer.allocate(1);
 
-        gl.glGetShaderiv(idTemp, GL4.GL_COMPILE_STATUS, success);
+        gl.glGetShaderiv(idTemp, GL3.GL_COMPILE_STATUS, success);
 
-        if (success.get(0) == GL4.GL_FALSE) {
+        if (success.get(0) == GL3.GL_FALSE) {
             IntBuffer infoLogLength = IntBuffer.allocate(1);
 
-            gl.glGetShaderiv(idTemp, GL4.GL_INFO_LOG_LENGTH, infoLogLength);
+            gl.glGetShaderiv(idTemp, GL3.GL_INFO_LOG_LENGTH, infoLogLength);
 
             ByteBuffer infoLog = ByteBuffer.allocate(infoLogLength.get(0));
 
@@ -116,8 +117,8 @@ public class ShaderProgram {
      */
     private int createProgram(String[] vertexShaderSource, String[] fragmentShaderSource)
             throws GLException {
-        int vertexShader = compileShader(GL4.GL_VERTEX_SHADER, vertexShaderSource);
-        int fragmentShader = compileShader(GL4.GL_FRAGMENT_SHADER, fragmentShaderSource);
+        int vertexShader = compileShader(GL3.GL_VERTEX_SHADER, vertexShaderSource);
+        int fragmentShader = compileShader(GL3.GL_FRAGMENT_SHADER, fragmentShaderSource);
         int idTemp = gl.glCreateProgram();
 
         gl.glAttachShader(idTemp, vertexShader);
@@ -130,13 +131,13 @@ public class ShaderProgram {
         IntBuffer linkSuccess = IntBuffer.allocate(1);
         IntBuffer valid = IntBuffer.allocate(1);
 
-        gl.glGetProgramiv(idTemp, GL4.GL_LINK_STATUS, linkSuccess);
-        gl.glGetProgramiv(idTemp, GL4.GL_VALIDATE_STATUS, valid);
+        gl.glGetProgramiv(idTemp, GL3.GL_LINK_STATUS, linkSuccess);
+        gl.glGetProgramiv(idTemp, GL3.GL_VALIDATE_STATUS, valid);
 
-        if (linkSuccess.get(0) == GL4.GL_FALSE || valid.get(0) == GL4.GL_FALSE) {
+        if (linkSuccess.get(0) == GL3.GL_FALSE || valid.get(0) == GL3.GL_FALSE) {
             IntBuffer infoLogLength = IntBuffer.allocate(1);
 
-            gl.glGetProgramiv(idTemp, GL4.GL_INFO_LOG_LENGTH, infoLogLength);
+            gl.glGetProgramiv(idTemp, GL3.GL_INFO_LOG_LENGTH, infoLogLength);
 
             ByteBuffer infoLog = ByteBuffer.allocate(infoLogLength.get(0));
 

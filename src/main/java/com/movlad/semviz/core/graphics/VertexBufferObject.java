@@ -1,6 +1,6 @@
 package com.movlad.semviz.core.graphics;
 
-import com.jogamp.opengl.GL4;
+import com.jogamp.opengl.GL3;
 import java.nio.Buffer;
 import java.nio.IntBuffer;
 
@@ -11,7 +11,7 @@ import java.nio.IntBuffer;
 public class VertexBufferObject {
 
     private final int id;
-    private final GL4 gl;
+    private final GL3 gl;
 
     /**
      * Constructor.
@@ -22,7 +22,7 @@ public class VertexBufferObject {
      * @param usage indicates OpenGL how the data should be drawn (<i>e.g.</i>
      * {@code GL_STATIC_DRAW)})
      */
-    public VertexBufferObject(GL4 gl, Buffer data, int size, int usage) {
+    public VertexBufferObject(GL3 gl, Buffer data, int size, int usage) {
         this.gl = gl;
 
         IntBuffer intBuffer = IntBuffer.allocate(1);
@@ -31,8 +31,8 @@ public class VertexBufferObject {
 
         this.id = intBuffer.get(0);
 
-        this.gl.glBindBuffer(GL4.GL_ARRAY_BUFFER, id);
-        this.gl.glBufferData(GL4.GL_ARRAY_BUFFER, size, data, usage);
+        this.gl.glBindBuffer(GL3.GL_ARRAY_BUFFER, id);
+        this.gl.glBufferData(GL3.GL_ARRAY_BUFFER, size, data, usage);
     }
 
     public int getId() {
@@ -43,14 +43,14 @@ public class VertexBufferObject {
      * Binds this vertex buffer object.
      */
     public void bind() {
-        gl.glBindBuffer(GL4.GL_ARRAY_BUFFER, id);
+        gl.glBindBuffer(GL3.GL_ARRAY_BUFFER, id);
     }
 
     /**
      * Binds vertex buffer object 0.
      */
     public void unbind() {
-        gl.glBindBuffer(GL4.GL_ARRAY_BUFFER, 0);
+        gl.glBindBuffer(GL3.GL_ARRAY_BUFFER, 0);
     }
 
     /**

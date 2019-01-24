@@ -1,6 +1,6 @@
 package com.movlad.semviz.core.graphics;
 
-import com.jogamp.opengl.GL4;
+import com.jogamp.opengl.GL3;
 import java.nio.IntBuffer;
 
 /**
@@ -10,14 +10,14 @@ public class VertexArrayObject {
 
     private final int id;
     private int offset;
-    private final GL4 gl;
+    private final GL3 gl;
 
     /**
      * Constructor.
      *
      * @param gl is the context
      */
-    public VertexArrayObject(GL4 gl) {
+    public VertexArrayObject(GL3 gl) {
         this.gl = gl;
 
         IntBuffer intBuffer = IntBuffer.allocate(1);

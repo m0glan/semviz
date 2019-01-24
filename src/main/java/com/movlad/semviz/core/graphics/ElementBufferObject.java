@@ -1,6 +1,6 @@
 package com.movlad.semviz.core.graphics;
 
-import com.jogamp.opengl.GL4;
+import com.jogamp.opengl.GL3;
 import java.nio.Buffer;
 import java.nio.IntBuffer;
 
@@ -12,7 +12,7 @@ import java.nio.IntBuffer;
 public class ElementBufferObject {
 
     private final int id;
-    private final GL4 gl;
+    private final GL3 gl;
 
     /**
      * Constructor.
@@ -24,16 +24,16 @@ public class ElementBufferObject {
      * @param usage indicates OpenGL on how to draw the elements (<i>e.g.</i>
      * {@code GL_STATIC_DRAW})
      */
-    public ElementBufferObject(GL4 gl, Buffer data, int count, int usage) {
+    public ElementBufferObject(GL3 gl, Buffer data, int count, int usage) {
         this.gl = gl;
 
         IntBuffer intBuffer = IntBuffer.allocate(1);
 
-        this.gl.glGenBuffers(GL4.GL_ELEMENT_ARRAY_BUFFER, intBuffer);
+        this.gl.glGenBuffers(GL3.GL_ELEMENT_ARRAY_BUFFER, intBuffer);
 
         this.id = intBuffer.get(0);
 
-        this.gl.glBindBuffer(GL4.GL_ELEMENT_ARRAY_BUFFER, id);
+        this.gl.glBindBuffer(GL3.GL_ELEMENT_ARRAY_BUFFER, id);
         this.gl.glBufferData(id, count * Integer.BYTES, data, usage);
     }
 
@@ -45,14 +45,14 @@ public class ElementBufferObject {
      * Binds this element buffer object.
      */
     public void bind() {
-        gl.glBindBuffer(GL4.GL_ELEMENT_ARRAY_BUFFER, id);
+        gl.glBindBuffer(GL3.GL_ELEMENT_ARRAY_BUFFER, id);
     }
 
     /**
      * Binds the 0 element buffer object.
      */
     public void unbind() {
-        gl.glBindBuffer(GL4.GL_ELEMENT_ARRAY_BUFFER, 0);
+        gl.glBindBuffer(GL3.GL_ELEMENT_ARRAY_BUFFER, 0);
     }
 
     /**

@@ -41,7 +41,7 @@ public class Viewer {
     public Viewer(int width, int height) {
         viewItems = new ArrayList<>();
 
-        glCanvas = new GLCanvas(new GLCapabilities(GLProfile.get(GLProfile.GL4)));
+        glCanvas = new GLCanvas(new GLCapabilities(GLProfile.get(GLProfile.GL3)));
         camera = new OrthographicCamera(-width, width,
                 -height, height, 0.1f, 1000.0f);
 

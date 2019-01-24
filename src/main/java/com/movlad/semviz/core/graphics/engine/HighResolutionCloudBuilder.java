@@ -1,6 +1,6 @@
 package com.movlad.semviz.core.graphics.engine;
 
-import com.jogamp.opengl.GL4;
+import com.jogamp.opengl.GL3;
 import com.movlad.semviz.core.graphics.GraphicsUtils;
 import com.movlad.semviz.core.graphics.engine.Geometry;
 import com.movlad.semviz.core.math.geometry.Point;
@@ -41,7 +41,7 @@ public final class HighResolutionCloudBuilder extends CloudGeometryBuilder {
 
             @Override
             public int getDrawingMode() {
-                return GL4.GL_POINTS;
+                return GL3.GL_POINTS;
             }
 
         };

@@ -1,6 +1,6 @@
 package com.movlad.semviz.core.graphics.engine;
 
-import com.jogamp.opengl.GL4;
+import com.jogamp.opengl.GL3;
 import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.GLEventListener;
 import com.movlad.semviz.core.graphics.ShaderProgram;
@@ -21,7 +21,7 @@ public class Renderer implements GLEventListener {
     protected Scene scene;
     protected Camera camera;
 
-    protected GL4 gl;
+    protected GL3 gl;
     protected ShaderProgram program;
 
     private final List<Renderable> renderables;
@@ -34,10 +34,9 @@ public class Renderer implements GLEventListener {
 
     @Override
     public final void init(GLAutoDrawable drawable) {
-        gl = (GL4) drawable.getGL();
+        gl = (GL3) drawable.getGL();
 
-        gl.glEnable(GL4.GL_DEPTH_TEST);
-        gl.glPointSize(2);
+        gl.glEnable(GL3.GL_DEPTH_TEST);
 
         try {
             program = new ShaderProgram(gl, this.getClass().getClassLoader()
@@ -51,7 +50,7 @@ public class Renderer implements GLEventListener {
 
     @Override
     public final void display(GLAutoDrawable drawable) {
-        gl.glClear(GL4.GL_DEPTH_BUFFER_BIT | GL4.GL_COLOR_BUFFER_BIT);
+        gl.glClear(GL3.GL_DEPTH_BUFFER_BIT | GL3.GL_COLOR_BUFFER_BIT);
         gl.glClearColor(0.027f, 0.184f, 0.372f, 1.0f);
 
         program.use();
@@ -138,7 +137,7 @@ public class Renderer implements GLEventListener {
 
                 Buffer dataBuffer = FloatBuffer.wrap(geometry.getData());
                 VertexBufferObject vertexBufferObject = new VertexBufferObject(gl, dataBuffer, dataBuffer.capacity()
-                        * Float.BYTES, GL4.GL_STATIC_DRAW);
+                        * Float.BYTES, GL3.GL_STATIC_DRAW);
 
                 vertexArrayObject.addBuffer(vertexBufferObject, geometry.getLayout());
 
