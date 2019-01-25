@@ -24,6 +24,8 @@ public final class QHullBuilder extends CloudGeometryBuilder {
 
         int[][] faces = hull.getFaces();
         int[] vertexPointIndices = hull.getVertexPointIndices();
+
+        // calculating average color for the hull
         Vector3f colorAvg = new Vector3f();
 
         for (int i = 0; i < vertexPointIndices.length; i++) {
@@ -34,6 +36,7 @@ public final class QHullBuilder extends CloudGeometryBuilder {
 
         colorAvg.div(vertexPointIndices.length);
 
+        // generating the data buffer for OpenGL
         data = new float[faces.length * 3 * 6];
 
         for (int[] face : faces) {
