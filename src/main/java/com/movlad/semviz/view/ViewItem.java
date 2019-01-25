@@ -1,11 +1,11 @@
 package com.movlad.semviz.view;
 
-import com.movlad.semviz.core.graphics.engine.QHullBuilder;
-import com.movlad.semviz.core.graphics.engine.CloudGeometryConstructor;
-import com.movlad.semviz.core.graphics.engine.NormalColoredCloudBuilder;
 import com.movlad.semviz.core.graphics.engine.CloudGeometryBuilder;
-import com.movlad.semviz.core.graphics.engine.HighResolutionCloudBuilder;
+import com.movlad.semviz.core.graphics.engine.CloudGeometryConstructor;
 import com.movlad.semviz.core.graphics.engine.Geometry;
+import com.movlad.semviz.core.graphics.engine.HighResolutionCloudBuilder;
+import com.movlad.semviz.core.graphics.engine.NormalColoredCloudBuilder;
+import com.movlad.semviz.core.graphics.engine.QHullBuilder;
 import com.movlad.semviz.core.math.geometry.PointCloud;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,8 +30,8 @@ class ViewItem {
         this.geometries = new ArrayList<>();
 
         this.geometries.add(extractGeometry(CloudGeometryType.HIRES));
-        this.geometries.add(extractGeometry(CloudGeometryType.N_HIRES));
-        this.geometries.add(extractGeometry(CloudGeometryType.QHULL));
+        this.geometries.add(null);
+        this.geometries.add(null);
 
         this.selectedIndex = 0;
     }
@@ -41,6 +41,27 @@ class ViewItem {
     }
 
     public Geometry getGeometrySelection() {
+        if (geometries.get(selectedIndex) == null) {
+            Geometry g;
+
+            switch (selectedIndex) {
+                case 1:
+                    g = extractGeometry(CloudGeometryType.N_HIRES);
+
+                    break;
+
+                case 2:
+                    g = extractGeometry(CloudGeometryType.QHULL);
+
+                    break;
+
+                default:
+                    g = null;
+            }
+
+            geometries.set(selectedIndex, g);
+        }
+
         return geometries.get(selectedIndex);
     }
 

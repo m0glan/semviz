@@ -337,7 +337,7 @@ public class MainWindow extends javax.swing.JFrame implements PropertyChangeList
         });
         menu_File.add(menuItem_Open);
 
-        menuItem_Quit.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_X, java.awt.event.InputEvent.CTRL_MASK));
+        menuItem_Quit.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_F4, java.awt.event.InputEvent.ALT_MASK));
         menuItem_Quit.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/icons8-exit-16.png"))); // NOI18N
         menuItem_Quit.setText("Exit");
         menuItem_Quit.addActionListener(new java.awt.event.ActionListener() {

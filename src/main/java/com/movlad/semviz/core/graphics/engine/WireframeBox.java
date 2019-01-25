@@ -69,7 +69,7 @@ public class WireframeBox extends Geometry {
 
         layout = new BufferLayout();
 
-        layout.push("position", GL3.GL_FLOAT, 3, false);
+        layout.push("position", GL3.GL_FLOAT, 3, true);
         layout.push("color", GL3.GL_UNSIGNED_BYTE, 3, false);
     }
 

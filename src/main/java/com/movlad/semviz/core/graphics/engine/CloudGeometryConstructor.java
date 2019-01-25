@@ -1,7 +1,5 @@
 package com.movlad.semviz.core.graphics.engine;
 
-import com.movlad.semviz.core.graphics.engine.Geometry;
-
 /**
  * Director class for the
  * {@link com.movlad.semviz.core.graphics.engine.CloudGeometryBuilder}.

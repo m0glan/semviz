@@ -15,6 +15,14 @@ public class PointCloud implements Iterable<Point> {
         this.points = new ArrayList<>();
     }
 
+    public PointCloud(PointCloud cloud) {
+        this.points = new ArrayList<>();
+
+        cloud.forEach(point -> {
+            this.points.add(point);
+        });
+    }
+
     public void add(Point point) {
         points.add(point);
     }
@@ -27,12 +35,28 @@ public class PointCloud implements Iterable<Point> {
         points.remove(i);
     }
 
+    public void remove(int... indices) {
+        List<Point> toRemove = new ArrayList<>();
+
+        for (int i = 0; i < indices.length; i++) {
+            toRemove.add(get(indices[i]));
+        }
+
+        toRemove.forEach(point -> {
+            remove(point);
+        });
+    }
+
     public Point get(int i) {
         return points.get(i);
     }
 
     public int size() {
         return points.size();
+    }
+
+    public boolean isEmpty() {
+        return points.isEmpty();
     }
 
     public Point[] getPoints() {

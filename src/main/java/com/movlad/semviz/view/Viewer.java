@@ -1,6 +1,5 @@
 package com.movlad.semviz.view;
 
-import com.movlad.semviz.core.semantic.SemanticCloud;
 import com.jogamp.opengl.GLCapabilities;
 import com.jogamp.opengl.GLProfile;
 import com.jogamp.opengl.awt.GLCanvas;
@@ -15,6 +14,7 @@ import com.movlad.semviz.core.graphics.engine.Scene;
 import com.movlad.semviz.core.graphics.engine.WireframeBox;
 import com.movlad.semviz.core.math.geometry.BoundingBox;
 import com.movlad.semviz.core.math.geometry.PointCloud;
+import com.movlad.semviz.core.semantic.SemanticCloud;
 import java.util.ArrayList;
 import java.util.List;
 import org.joml.Vector3f;
@@ -99,12 +99,12 @@ public class Viewer {
      * Builds a scene from a list of view items (base geometry for all the
      * clouds).
      *
-     * @param superCloud contains the clusters to display
+     * @param semanticCloud contains the clusters to display
      */
-    public void load(SemanticCloud superCloud) {
+    public void load(SemanticCloud semanticCloud) {
         reset();
 
-        superCloud.forEach(cluster -> {
+        semanticCloud.forEach(cluster -> {
             viewItems.add(new ViewItem(cluster));
 
             scene.add(viewItems.get(viewItems.size() - 1).getGeometrySelection());

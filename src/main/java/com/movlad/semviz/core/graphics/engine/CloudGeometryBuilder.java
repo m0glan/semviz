@@ -2,7 +2,6 @@ package com.movlad.semviz.core.graphics.engine;
 
 import com.jogamp.opengl.GL3;
 import com.movlad.semviz.core.graphics.BufferLayout;
-import com.movlad.semviz.core.graphics.engine.Geometry;
 import com.movlad.semviz.core.math.geometry.PointCloud;
 
 /**
