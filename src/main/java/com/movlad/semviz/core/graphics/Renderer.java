@@ -70,21 +70,23 @@ public abstract class Renderer implements GLEventListener {
         gl.glClear(GL3.GL_COLOR_BUFFER_BIT | GL3.GL_DEPTH_BUFFER_BIT);
 
         scene.forEach(object -> {
-            Geometry geometry = object.getGeometry();
-            Buffer dataBuffer = FloatBuffer.wrap(geometry.getData());
-            VertexBufferObject vbo = new VertexBufferObject(gl, dataBuffer,
-                    dataBuffer.capacity() * Float.BYTES, GL3.GL_STATIC_DRAW);
+            if (object.isVisible()) {
+                Geometry geometry = object.getGeometry();
+                Buffer dataBuffer = FloatBuffer.wrap(geometry.getData());
+                VertexBufferObject vbo = new VertexBufferObject(gl, dataBuffer,
+                        dataBuffer.capacity() * Float.BYTES, GL3.GL_STATIC_DRAW);
 
-            vbos.add(vbo);
+                vbos.add(vbo);
 
-            VertexArrayObject vao = new VertexArrayObject(gl);
+                VertexArrayObject vao = new VertexArrayObject(gl);
 
-            vaos.add(vao);
-            vao.addBuffer(gl, vbo, geometry.getLayout());
+                vaos.add(vao);
+                vao.addBuffer(gl, vbo, geometry.getLayout());
 
-            setObjectMatrixUniforms(gl, object);
+                setObjectMatrixUniforms(gl, object);
 
-            gl.glDrawArrays(geometry.getDrawingMode(), 0, geometry.getVertexCount());
+                gl.glDrawArrays(geometry.getDrawingMode(), 0, geometry.getVertexCount());
+            }
         });
     }
 
