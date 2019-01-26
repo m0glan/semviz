@@ -1,30 +1,33 @@
-package com.movlad.semviz.core.graphics.engine;
+package com.movlad.semviz.core.graphics;
 
-import com.movlad.semviz.core.graphics.BufferLayout;
-import java.io.Serializable;
+import com.jogamp.opengl.GL3;
 
 /**
  * Basic geometry grouping vertex data and buffer layout.
  */
-public class Geometry extends Object3d implements Serializable {
+public abstract class Geometry {
 
-    protected BufferLayout layout;
+    private final BufferLayout layout;
     protected float[] data;
 
     protected Geometry() {
-        this.setVisible(true);
+        this.layout = new BufferLayout();
+
+        layout.push("position", GL3.GL_FLOAT, 3, false);
+        layout.push("color", GL3.GL_UNSIGNED_BYTE, 3, false);
     }
 
     /**
      * Constructor.
      *
      * @param data is the OpenGL buffer vertex data
-     * @param layout is the layout for vertex data interpretation
      */
-    public Geometry(float[] data, BufferLayout layout) {
+    public Geometry(float[] data) {
         this.data = data;
-        this.layout = layout;
-        this.setVisible(true);
+        this.layout = new BufferLayout();
+
+        layout.push("position", GL3.GL_FLOAT, 3, false);
+        layout.push("color", GL3.GL_UNSIGNED_BYTE, 3, false);
     }
 
     public float[] getData() {
@@ -46,5 +49,10 @@ public class Geometry extends Object3d implements Serializable {
     public BufferLayout getLayout() {
         return layout;
     }
+
+    /**
+     * @return the primitives that OpenGL uses to draw this object
+     */
+    public abstract int getDrawingMode();
 
 }

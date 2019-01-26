@@ -5,6 +5,9 @@
  */
 package com.movlad.semviz.view;
 
+import com.jogamp.opengl.GLCapabilities;
+import com.jogamp.opengl.GLProfile;
+import com.jogamp.opengl.awt.GLJPanel;
 import com.movlad.semviz.application.CommandNavigationController;
 import com.movlad.semviz.application.QueryManagerController;
 import com.movlad.semviz.application.SemanticCloudController;
@@ -45,7 +48,7 @@ public class MainWindow extends javax.swing.JFrame implements PropertyChangeList
     private javax.swing.JLabel Label_VarInfo;
     private javax.swing.JList<String> List_Individuals;
     private javax.swing.JPanel Panel_Control;
-    private javax.swing.JPanel Panel_GLCanvas;
+    private javax.swing.JPanel Panel_GLContainer;
     private javax.swing.JPanel Panel_GeometrySelection;
     private javax.swing.JPanel Panel_Individuals;
     private javax.swing.JPanel Panel_Status;
@@ -118,7 +121,6 @@ public class MainWindow extends javax.swing.JFrame implements PropertyChangeList
     private void initComponents() {
 
         TextField_Command = new javax.swing.JTextField();
-        Panel_GLCanvas = new javax.swing.JPanel();
         Panel_Control = new javax.swing.JPanel();
         Panel_Status = new javax.swing.JPanel();
         Label_StatusLED = new javax.swing.JLabel();
@@ -134,6 +136,7 @@ public class MainWindow extends javax.swing.JFrame implements PropertyChangeList
         Panel_GeometrySelection = new javax.swing.JPanel();
         Label_GeometrySelection = new javax.swing.JLabel();
         ComboBox_GeometrySelection = new javax.swing.JComboBox<>();
+        Panel_GLContainer = new javax.swing.JPanel();
         menuBar = new javax.swing.JMenuBar();
         menu_File = new javax.swing.JMenu();
         menuItem_Open = new javax.swing.JMenuItem();
@@ -147,19 +150,6 @@ public class MainWindow extends javax.swing.JFrame implements PropertyChangeList
                 TextField_CommandKeyPressed(evt);
             }
         });
-
-        Panel_GLCanvas.setBackground(new java.awt.Color(0, 0, 0));
-
-        javax.swing.GroupLayout Panel_GLCanvasLayout = new javax.swing.GroupLayout(Panel_GLCanvas);
-        Panel_GLCanvas.setLayout(Panel_GLCanvasLayout);
-        Panel_GLCanvasLayout.setHorizontalGroup(
-            Panel_GLCanvasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 708, Short.MAX_VALUE)
-        );
-        Panel_GLCanvasLayout.setVerticalGroup(
-            Panel_GLCanvasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
-        );
 
         Panel_Control.setBackground(new java.awt.Color(204, 204, 204));
 
@@ -325,6 +315,19 @@ public class MainWindow extends javax.swing.JFrame implements PropertyChangeList
             .addComponent(Panel_Status, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
+        Panel_GLContainer.setBackground(new java.awt.Color(0, 0, 0));
+
+        javax.swing.GroupLayout Panel_GLContainerLayout = new javax.swing.GroupLayout(Panel_GLContainer);
+        Panel_GLContainer.setLayout(Panel_GLContainerLayout);
+        Panel_GLContainerLayout.setHorizontalGroup(
+            Panel_GLContainerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 698, Short.MAX_VALUE)
+        );
+        Panel_GLContainerLayout.setVerticalGroup(
+            Panel_GLContainerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
+        );
+
         menu_File.setText("File");
 
         menuItem_Open.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_O, java.awt.event.InputEvent.CTRL_MASK));
@@ -359,13 +362,16 @@ public class MainWindow extends javax.swing.JFrame implements PropertyChangeList
             .addGroup(layout.createSequentialGroup()
                 .addComponent(Panel_Control, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(Panel_GLCanvas, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(Panel_GLContainer, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(Panel_GLCanvas, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(Panel_GLContainer, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addComponent(Panel_Control, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(TextField_Command, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -494,17 +500,22 @@ public class MainWindow extends javax.swing.JFrame implements PropertyChangeList
     }
 
     private void initViewer() {
-        viewer = new Viewer(Panel_GLCanvas.getWidth(), Panel_GLCanvas.getHeight());
+        GLJPanel panel = new GLJPanel(new GLCapabilities(GLProfile.get(GLProfile.GL3)));
 
-        Panel_GLCanvas.add(viewer.getGlCanvas());
-        Panel_GLCanvas.addComponentListener(new ComponentAdapter() {
+        panel.setSize(Panel_GLContainer.getSize());
+        Panel_GLContainer.add(panel);
+        Panel_GLContainer.addComponentListener(new ComponentAdapter() {
 
             @Override
             public void componentResized(ComponentEvent e) {
-                viewer.getGlCanvas().setSize(Panel_GLCanvas.getSize());
+                panel.setSize(Panel_GLContainer.getSize());
             }
 
         });
+
+        panel.setVisible(true);
+
+        viewer = new Viewer(panel);
 
         viewer.start();
     }
@@ -619,8 +630,8 @@ public class MainWindow extends javax.swing.JFrame implements PropertyChangeList
 
     public void exit() {
         viewer.stop();
-        this.setVisible(false);
-        this.dispose();
+        setVisible(false);
+        dispose();
         System.exit(0);
     }
 

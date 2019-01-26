@@ -1,4 +1,4 @@
-package com.movlad.semviz.core.graphics.engine;
+package com.movlad.semviz.core.graphics;
 
 import com.movlad.semviz.core.math.geometry.TransformationUtils;
 import java.awt.event.MouseWheelEvent;

@@ -1,10 +1,5 @@
-package com.movlad.semviz.core.graphics.engine;
+package com.movlad.semviz.core.graphics;
 
-import com.jogamp.opengl.GL3;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.ListIterator;
 import java.util.UUID;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
@@ -12,17 +7,16 @@ import org.joml.Vector3f;
 /**
  * Generic representation of a 3d object.
  */
-public class Object3d implements Iterable<Object3d> {
+public class Object3d {
 
     private final Vector3f direction;
     private final Vector3f up;
-    private final List<Object3d> children;
-    private String id;
+
+    private final String id;
     private Vector3f position;
     private Vector3f worldUp;
     private Vector3f target;
     private Matrix4f matrixWorld;
-    private boolean isVisible;
 
     public Object3d() {
         id = UUID.randomUUID().toString();
@@ -35,18 +29,10 @@ public class Object3d implements Iterable<Object3d> {
         up = new Vector3f();
 
         setTarget(new Vector3f(1.0f, 0.0f, 0.0f));
-
-        isVisible = true;
-
-        children = new ArrayList<>();
     }
 
     public final String getId() {
         return id;
-    }
-
-    public final void setId(String id) {
-        this.id = id;
     }
 
     public final Vector3f getPosition() {
@@ -168,64 +154,6 @@ public class Object3d implements Iterable<Object3d> {
      */
     public Matrix4f getMatrixWorld() {
         return matrixWorld;
-    }
-
-    /**
-     * @return the primitives that OpenGL uses to draw this object
-     */
-    public int getDrawingMode() {
-        return GL3.GL_TRIANGLES;
-    }
-
-    public final boolean isVisible() {
-        return isVisible;
-    }
-
-    public final void setVisible(boolean isVisible) {
-        this.isVisible = isVisible;
-    }
-
-    public final void add(Object3d object) {
-        children.add(object);
-    }
-
-    public final void add(int i, Object3d object) {
-        children.add(i, object);
-    }
-
-    public final void remove(Object3d object) {
-        children.remove(object);
-    }
-
-    public final void remove(int i) {
-        children.remove(i);
-    }
-
-    public final void remove(String id) {
-        ListIterator<Object3d> it = children.listIterator();
-
-        while (it.hasNext()) {
-            if (it.next().getId().equals(id)) {
-                it.remove();
-            }
-        }
-    }
-
-    public final Object3d get(int i) {
-        return children.get(i);
-    }
-
-    public final int numChildren() {
-        return children.size();
-    }
-
-    public final void clear() {
-        children.clear();
-    }
-
-    @Override
-    public final Iterator<Object3d> iterator() {
-        return children.iterator();
     }
 
 }

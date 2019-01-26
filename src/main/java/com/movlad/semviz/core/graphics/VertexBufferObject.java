@@ -8,31 +8,28 @@ import java.nio.IntBuffer;
  * Stores the raw data concerning what is to be drawn by OpenGL, such as vertex
  * positions, colors, texture coordinates etc. .
  */
-public class VertexBufferObject {
+class VertexBufferObject {
 
     private final int id;
-    private final GL3 gl;
 
     /**
      * Constructor.
      *
-     * @param gl is the context
+     * @param gl is the current gl context
      * @param data is the buffer containing the raw data
      * @param size is the size of the buffer in bytes
      * @param usage indicates OpenGL how the data should be drawn (<i>e.g.</i>
      * {@code GL_STATIC_DRAW)})
      */
     public VertexBufferObject(GL3 gl, Buffer data, int size, int usage) {
-        this.gl = gl;
-
         IntBuffer intBuffer = IntBuffer.allocate(1);
 
-        this.gl.glGenBuffers(1, intBuffer);
+        gl.glGenBuffers(1, intBuffer);
 
         this.id = intBuffer.get(0);
 
-        this.gl.glBindBuffer(GL3.GL_ARRAY_BUFFER, id);
-        this.gl.glBufferData(GL3.GL_ARRAY_BUFFER, size, data, usage);
+        gl.glBindBuffer(GL3.GL_ARRAY_BUFFER, id);
+        gl.glBufferData(GL3.GL_ARRAY_BUFFER, size, data, usage);
     }
 
     public int getId() {
@@ -41,22 +38,26 @@ public class VertexBufferObject {
 
     /**
      * Binds this vertex buffer object.
+     *
+     * @param gl is the current gl context
      */
-    public void bind() {
+    public void bind(GL3 gl) {
         gl.glBindBuffer(GL3.GL_ARRAY_BUFFER, id);
     }
 
     /**
      * Binds vertex buffer object 0.
+     *
+     * @param gl is the current gl context
      */
-    public void unbind() {
+    public void unbind(GL3 gl) {
         gl.glBindBuffer(GL3.GL_ARRAY_BUFFER, 0);
     }
 
     /**
      * Deletes this vertex buffer object.
      */
-    public void delete() {
+    public void delete(GL3 gl) {
         IntBuffer intBuffer = IntBuffer.allocate(1);
 
         intBuffer.put(0, id);

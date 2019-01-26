@@ -1,4 +1,4 @@
-package com.movlad.semviz.core.graphics.engine;
+package com.movlad.semviz.core.graphics;
 
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;

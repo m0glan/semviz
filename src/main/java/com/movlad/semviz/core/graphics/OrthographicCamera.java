@@ -1,4 +1,4 @@
-package com.movlad.semviz.core.graphics.engine;
+package com.movlad.semviz.core.graphics;
 
 import org.joml.Matrix4f;
 
@@ -11,6 +11,10 @@ public class OrthographicCamera extends Camera {
     private float right;
     private float bottom;
     private float top;
+
+    public OrthographicCamera(float near, float far) {
+        super(near, far);
+    }
 
     /**
      * Constructor.
@@ -63,6 +67,13 @@ public class OrthographicCamera extends Camera {
     }
 
     public void setTop(float top) {
+        this.top = top;
+    }
+
+    public void setFrustum(float left, float right, float bottom, float top) {
+        this.left = left;
+        this.right = right;
+        this.bottom = bottom;
         this.top = top;
     }
 

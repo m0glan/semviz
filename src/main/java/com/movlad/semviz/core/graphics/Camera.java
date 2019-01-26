@@ -1,4 +1,4 @@
-package com.movlad.semviz.core.graphics.engine;
+package com.movlad.semviz.core.graphics;
 
 import org.joml.Matrix4f;
 
@@ -17,8 +17,6 @@ public abstract class Camera extends Object3d {
 
     public Camera(float near, float far) {
         zoom = DEFAULT_ZOOM;
-
-        setVisible(false);
 
         this.near = near;
         this.far = far;

@@ -1,14 +1,13 @@
 package com.movlad.semviz.view;
 
-import com.movlad.semviz.core.graphics.engine.CloudGeometryBuilder;
-import com.movlad.semviz.core.graphics.engine.CloudGeometryConstructor;
-import com.movlad.semviz.core.graphics.engine.Geometry;
-import com.movlad.semviz.core.graphics.engine.HighResolutionCloudBuilder;
-import com.movlad.semviz.core.graphics.engine.NormalColoredCloudBuilder;
-import com.movlad.semviz.core.graphics.engine.QHullBuilder;
+import com.movlad.semviz.core.graphics.CloudGeometryBuilder;
+import com.movlad.semviz.core.graphics.CloudGeometryConstructor;
+import com.movlad.semviz.core.graphics.Geometry;
+import com.movlad.semviz.core.graphics.HighResolutionCloudBuilder;
+import com.movlad.semviz.core.graphics.NormalColoredCloudBuilder;
+import com.movlad.semviz.core.graphics.QHullBuilder;
+import com.movlad.semviz.core.graphics.SceneObject;
 import com.movlad.semviz.core.math.geometry.PointCloud;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Stores geometric information about a given cloud, so that it is not
@@ -21,17 +20,15 @@ class ViewItem {
     }
 
     private final PointCloud cloud;
-    private final List<Geometry> geometries;
+    private final Geometry[] geometries;
 
     private int selectedIndex;
 
     public ViewItem(PointCloud cloud) {
         this.cloud = cloud;
-        this.geometries = new ArrayList<>();
+        this.geometries = new Geometry[3];
 
-        this.geometries.add(extractGeometry(CloudGeometryType.HIRES));
-        this.geometries.add(null);
-        this.geometries.add(null);
+        this.geometries[0] = extractGeometry(CloudGeometryType.HIRES);
 
         this.selectedIndex = 0;
     }
@@ -40,29 +37,29 @@ class ViewItem {
         return cloud;
     }
 
-    public Geometry getGeometrySelection() {
-        if (geometries.get(selectedIndex) == null) {
-            Geometry g;
+    public SceneObject getSceneObject() {
+        if (geometries[selectedIndex] == null) {
+            Geometry geometry;
 
             switch (selectedIndex) {
                 case 1:
-                    g = extractGeometry(CloudGeometryType.N_HIRES);
+                    geometry = extractGeometry(CloudGeometryType.N_HIRES);
 
                     break;
 
                 case 2:
-                    g = extractGeometry(CloudGeometryType.QHULL);
+                    geometry = extractGeometry(CloudGeometryType.QHULL);
 
                     break;
 
                 default:
-                    g = null;
+                    geometry = null;
             }
 
-            geometries.set(selectedIndex, g);
+            geometries[selectedIndex] = geometry;
         }
 
-        return geometries.get(selectedIndex);
+        return new SceneObject(geometries[selectedIndex]);
     }
 
     public int getSelectedGeometryIndex() {
@@ -70,11 +67,11 @@ class ViewItem {
     }
 
     /**
-     * @param geometryIndex is the cloud display selectedIndex (<i>e.g.</i> high
-     * resolution)
+     * @param geometryIndex is the cloud display selectedIndex
+     * (<i>e.geometry.</i> high resolution)
      */
     public void setSelectedGeometryIndex(int geometryIndex) {
-        if (geometryIndex < 0 || geometryIndex >= geometries.size()) {
+        if (geometryIndex < 0 || geometryIndex >= geometries.length) {
             throw new ArrayIndexOutOfBoundsException("No geometry at that index.");
         }
 

@@ -1,17 +1,15 @@
 package com.movlad.semviz.view;
 
-import com.jogamp.opengl.GLCapabilities;
-import com.jogamp.opengl.GLProfile;
-import com.jogamp.opengl.awt.GLCanvas;
+import com.jogamp.opengl.GLAutoDrawable;
+import com.jogamp.opengl.awt.GLJPanel;
 import com.jogamp.opengl.util.FPSAnimator;
-import com.movlad.semviz.core.graphics.engine.Camera;
-import com.movlad.semviz.core.graphics.engine.Controls;
-import com.movlad.semviz.core.graphics.engine.Object3d;
-import com.movlad.semviz.core.graphics.engine.OrbitControls;
-import com.movlad.semviz.core.graphics.engine.OrthographicCamera;
-import com.movlad.semviz.core.graphics.engine.Renderer;
-import com.movlad.semviz.core.graphics.engine.Scene;
-import com.movlad.semviz.core.graphics.engine.WireframeBox;
+import com.movlad.semviz.core.graphics.Controls;
+import com.movlad.semviz.core.graphics.OrbitControls;
+import com.movlad.semviz.core.graphics.OrthographicCamera;
+import com.movlad.semviz.core.graphics.Renderer;
+import com.movlad.semviz.core.graphics.Scene;
+import com.movlad.semviz.core.graphics.SceneObject;
+import com.movlad.semviz.core.graphics.WireframeBoxGeometry;
 import com.movlad.semviz.core.math.geometry.BoundingBox;
 import com.movlad.semviz.core.math.geometry.PointCloud;
 import com.movlad.semviz.core.semantic.SemanticCloud;
@@ -28,54 +26,56 @@ public class Viewer {
     private final List<ViewItem> viewItems;
 
     private final Scene scene;
-    private final Camera camera;
+    private final OrthographicCamera camera;
     private final Renderer renderer;
     private final Controls controls;
 
-    private final GLCanvas glCanvas;
-
     private final FPSAnimator animator;
 
-    private boolean isRunning;
-
-    public Viewer(int width, int height) {
+    public Viewer(GLJPanel panel) {
         viewItems = new ArrayList<>();
 
-        glCanvas = new GLCanvas(new GLCapabilities(GLProfile.get(GLProfile.GL3)));
-        camera = new OrthographicCamera(-width, width,
-                -height, height, 0.1f, 1000.0f);
+        int width = panel.getWidth();
+        int height = panel.getHeight();
+
+        camera = new OrthographicCamera(-width / 2, width / 2, -height / 2, height / 2,
+                0.1f, 1000.0f);
 
         camera.translate(new Vector3f(-10.0f, -10.0f, 5.0f));
         camera.setTarget(new Vector3f(0.0f, 0.0f, 0.0f));
-        camera.zoom(100);
+        camera.zoom(50);
 
         controls = new OrbitControls(camera);
 
         controls.setZoomSpeed(3.0f);
 
+        panel.addMouseListener(controls);
+        panel.addMouseMotionListener(controls);
+        panel.addMouseWheelListener(controls);
+
         scene = new Scene();
 
-        renderer = new Renderer(scene, camera);
-        animator = new FPSAnimator(glCanvas, 60);
-    }
+        renderer = new Renderer(scene, camera) {
 
-    public GLCanvas getGlCanvas() {
-        return glCanvas;
+            @Override
+            public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
+                drawable.getGL().glViewport(x, y, width, height);
+                ((OrthographicCamera) camera).setFrustum(-width / 2, width / 2, -height / 2, height / 2);
+                camera.updateProjectionMatrix();
+            }
+
+        };
+
+        panel.addGLEventListener(renderer);
+
+        animator = new FPSAnimator(panel, 60);
     }
 
     /**
      * Starts the viewer animation.
      */
     public final void start() {
-        if (!isRunning) {
-            glCanvas.addGLEventListener(renderer);
-            glCanvas.addMouseListener(controls);
-            glCanvas.addMouseMotionListener(controls);
-            glCanvas.addMouseWheelListener(controls);
-            animator.start();
-
-            isRunning = true;
-        }
+        animator.start();
     }
 
     /**
@@ -84,15 +84,7 @@ public class Viewer {
      * concurrently.
      */
     public final void stop() {
-        if (isRunning) {
-            glCanvas.removeGLEventListener(renderer);
-            glCanvas.removeMouseListener(controls);
-            glCanvas.removeMouseMotionListener(controls);
-            glCanvas.removeMouseWheelListener(controls);
-            animator.stop();
-
-            isRunning = false;
-        }
+        animator.stop();
     }
 
     /**
@@ -107,7 +99,7 @@ public class Viewer {
         semanticCloud.forEach(cluster -> {
             viewItems.add(new ViewItem(cluster));
 
-            scene.add(viewItems.get(viewItems.size() - 1).getGeometrySelection());
+            scene.add(viewItems.get(viewItems.size() - 1).getSceneObject());
         });
     }
 
@@ -126,15 +118,16 @@ public class Viewer {
      * @param i is the index of the view item to be selected
      */
     public void setSelectedViewItem(int i) {
-        scene.remove("selection");
+        scene.remove(scene.getByName("selection"));
 
         if (i != -1) {
             PointCloud cloud = viewItems.get(i).getCloud();
             BoundingBox bbox = new BoundingBox(cloud);
-            WireframeBox geometry = new WireframeBox(bbox, new Vector3f(255, 255, 0));
+            WireframeBoxGeometry geometry = new WireframeBoxGeometry(bbox, new Vector3f(255, 255, 0));
+            SceneObject box = new SceneObject(geometry);
 
-            geometry.setId("selection");
-            scene.add(geometry);
+            box.setName("selection");
+            scene.add(box);
         }
     }
 
@@ -158,9 +151,9 @@ public class Viewer {
     public void setSelectedGeometryIndex(int i, int geometryIndex) {
         viewItems.get(i).setSelectedGeometryIndex(geometryIndex);
 
-        Object3d geometry = viewItems.get(i).getGeometrySelection();
+        SceneObject object = viewItems.get(i).getSceneObject();
 
-        replaceObject(i, geometry);
+        replaceObject(i, object);
     }
 
     /**
@@ -169,7 +162,7 @@ public class Viewer {
      * @param i is the position where the replacement takes place
      * @param object is the replacement three-dimensional object
      */
-    private void replaceObject(int i, Object3d object) {
+    private void replaceObject(int i, SceneObject object) {
         scene.remove(i);
         scene.add(i, object);
     }

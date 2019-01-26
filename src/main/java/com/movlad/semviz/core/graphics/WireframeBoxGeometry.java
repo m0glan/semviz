@@ -1,9 +1,7 @@
-package com.movlad.semviz.core.graphics.engine;
+package com.movlad.semviz.core.graphics;
 
 import com.github.quickhull3d.Point3d;
 import com.jogamp.opengl.GL3;
-import com.movlad.semviz.core.graphics.BufferLayout;
-import com.movlad.semviz.core.graphics.GraphicsUtils;
 import com.movlad.semviz.core.math.geometry.BoundingBox;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,14 +10,13 @@ import org.joml.Vector3f;
 /**
  * Geometry containing the necessary buffer data to draw the edges of a box.
  */
-public class WireframeBox extends Geometry {
+public class WireframeBoxGeometry extends Geometry {
 
     /**
      * @param bbox is the bounding box containing the box information
      * @param rgb is the color of the edges of the box
      */
-    public WireframeBox(BoundingBox bbox, Vector3f rgb) {
-        float[] rgbNormalized = GraphicsUtils.normalizeRGB(rgb.x, rgb.y, rgb.z);
+    public WireframeBoxGeometry(BoundingBox bbox, Vector3f rgb) {
         List<Point3d> vertices = new ArrayList<>();
 
         Point3d min = bbox.getMinBounds();
@@ -49,6 +46,8 @@ public class WireframeBox extends Geometry {
             {6, 7}
         };
 
+        float[] rgbNormalized = GraphicsUtils.normalizeRGB(rgb.x, rgb.y, rgb.z);
+
         data = new float[edges.length * 2 * 6];
 
         int offset = 0;
@@ -66,11 +65,6 @@ public class WireframeBox extends Geometry {
                 offset += section.length;
             }
         }
-
-        layout = new BufferLayout();
-
-        layout.push("position", GL3.GL_FLOAT, 3, true);
-        layout.push("color", GL3.GL_UNSIGNED_BYTE, 3, false);
     }
 
     @Override

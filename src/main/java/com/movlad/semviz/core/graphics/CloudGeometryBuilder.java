@@ -1,7 +1,5 @@
-package com.movlad.semviz.core.graphics.engine;
+package com.movlad.semviz.core.graphics;
 
-import com.jogamp.opengl.GL3;
-import com.movlad.semviz.core.graphics.BufferLayout;
 import com.movlad.semviz.core.math.geometry.PointCloud;
 
 /**
@@ -23,17 +21,6 @@ public abstract class CloudGeometryBuilder {
      * Generates the GL vertex buffer.
      */
     public abstract void buildDataBuffer();
-
-    /**
-     * Builds the layout of the vertex buffer, which is composed of a position
-     * and a color.
-     */
-    public final void buildDataBufferLayout() {
-        layout = new BufferLayout();
-
-        layout.push("position", GL3.GL_FLOAT, 3, true);
-        layout.push("color", GL3.GL_UNSIGNED_BYTE, 3, false);
-    }
 
     /**
      * Generates the geometry from the data buffer and the layout; defines the

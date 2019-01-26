@@ -3,26 +3,20 @@ package com.movlad.semviz.core.graphics;
 import com.jogamp.opengl.GL3;
 import java.nio.IntBuffer;
 
-/**
- * Stores the layout for one or more {@code VertexBufferObject} instances.
- */
-public class VertexArrayObject {
+class VertexArrayObject {
 
     private final int id;
     private int offset;
-    private final GL3 gl;
 
     /**
      * Constructor.
      *
-     * @param gl is the context
+     * @param gl is the current gl context
      */
     public VertexArrayObject(GL3 gl) {
-        this.gl = gl;
-
         IntBuffer intBuffer = IntBuffer.allocate(1);
 
-        this.gl.glGenVertexArrays(1, intBuffer);
+        gl.glGenVertexArrays(1, intBuffer);
 
         id = intBuffer.get(0);
     }
@@ -33,22 +27,28 @@ public class VertexArrayObject {
 
     /**
      * Binds this vertex array object.
+     *
+     * @param gl is the current gl context
      */
-    public void bind() {
+    public void bind(GL3 gl) {
         gl.glBindVertexArray(id);
     }
 
     /**
      * Binds the vertex array object 0.
+     *
+     * @param gl is the current gl context
      */
-    public void unbind() {
+    public void unbind(GL3 gl) {
         gl.glBindVertexArray(0);
     }
 
     /**
      * Deletes this vertex array object.
+     *
+     * @param gl is the current gl context
      */
-    public void delete() {
+    public void delete(GL3 gl) {
         IntBuffer intBuffer = IntBuffer.allocate(1);
 
         intBuffer.put(0, id);
@@ -60,12 +60,13 @@ public class VertexArrayObject {
      * Stores the layout information for a given instance of
      * {@code VertexBufferObject}.
      *
+     * @param gl is the current gl context
      * @param vbo is the vertex buffer object
      * @param layout is its layout
      */
-    public void addBuffer(VertexBufferObject vbo, BufferLayout layout) {
-        bind();
-        vbo.bind();
+    public void addBuffer(GL3 gl, VertexBufferObject vbo, BufferLayout layout) {
+        bind(gl);
+        vbo.bind(gl);
 
         for (int i = 0; i < layout.size(); i++) {
             BufferAttribute attribute = layout.get(i);

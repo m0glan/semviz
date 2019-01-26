@@ -1,8 +1,7 @@
-package com.movlad.semviz.core.graphics.engine;
+package com.movlad.semviz.core.graphics;
 
 import com.github.quickhull3d.QuickHull3D;
 import com.jogamp.opengl.GL3;
-import com.movlad.semviz.core.graphics.GraphicsUtils;
 import com.movlad.semviz.core.math.geometry.Point;
 import com.movlad.semviz.core.math.geometry.PointCloud;
 import org.joml.Vector3f;
@@ -58,7 +57,7 @@ public final class QHullBuilder extends CloudGeometryBuilder {
 
     @Override
     public void buildGeometry() {
-        geometry = new Geometry(data, layout) {
+        geometry = new Geometry(data) {
 
             @Override
             public int getDrawingMode() {
