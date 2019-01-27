@@ -1,6 +1,6 @@
 package com.movlad.semviz.core.graphics;
 
-import com.jogamp.opengl.GL3;
+import java.nio.FloatBuffer;
 
 /**
  * Basic geometry grouping vertex data and buffer layout.
@@ -8,42 +8,23 @@ import com.jogamp.opengl.GL3;
 public abstract class Geometry {
 
     private final BufferLayout layout;
-    protected float[] data;
+    protected FloatBuffer data;
 
-    protected Geometry() {
-        this.layout = new BufferLayout();
-
-        layout.push("position", GL3.GL_FLOAT, 3, false);
-        layout.push("color", GL3.GL_UNSIGNED_BYTE, 3, false);
-    }
-
-    /**
-     * Constructor.
-     *
-     * @param data is the OpenGL buffer vertex data
-     */
-    public Geometry(float[] data) {
+    protected Geometry(FloatBuffer data, BufferLayout layout) {
         this.data = data;
-        this.layout = new BufferLayout();
-
-        layout.push("position", GL3.GL_FLOAT, 3, false);
-        layout.push("color", GL3.GL_UNSIGNED_BYTE, 3, false);
+        this.layout = layout;
     }
 
-    public float[] getData() {
+    public FloatBuffer getData() {
         return data;
     }
 
-    public void setData(float[] data) {
-        this.data = data;
-    }
-
     public int getDataSize() {
-        return data.length * Float.BYTES;
+        return data.capacity() * Float.BYTES;
     }
 
     public int getVertexCount() {
-        return data.length / layout.getAttributes().size();
+        return data.capacity() / layout.rowLength();
     }
 
     public BufferLayout getLayout() {

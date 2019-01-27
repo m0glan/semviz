@@ -4,12 +4,13 @@ import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.awt.GLJPanel;
 import com.jogamp.opengl.util.FPSAnimator;
 import com.movlad.semviz.core.graphics.Controls;
+import com.movlad.semviz.core.graphics.Geometry;
+import com.movlad.semviz.core.graphics.GeometryFactory;
 import com.movlad.semviz.core.graphics.OrbitControls;
 import com.movlad.semviz.core.graphics.OrthographicCamera;
 import com.movlad.semviz.core.graphics.Renderer;
 import com.movlad.semviz.core.graphics.Scene;
 import com.movlad.semviz.core.graphics.SceneObject;
-import com.movlad.semviz.core.graphics.WireframeBoxGeometry;
 import com.movlad.semviz.core.math.geometry.BoundingBox;
 import com.movlad.semviz.core.math.geometry.PointCloud;
 import com.movlad.semviz.core.semantic.SemanticCloud;
@@ -123,7 +124,9 @@ public class Viewer {
         if (i != -1) {
             PointCloud cloud = viewItems.get(i).getCloud();
             BoundingBox bbox = new BoundingBox(cloud);
-            WireframeBoxGeometry geometry = new WireframeBoxGeometry(bbox, new Vector3f(255, 255, 0));
+            Geometry geometry = GeometryFactory.getInstance()
+                    .createBoundingBoxGeometry(bbox, (short) 255, (short) 255, (short) 0);
+
             SceneObject box = new SceneObject(geometry);
 
             box.setName("selection");

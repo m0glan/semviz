@@ -7,22 +7,19 @@ package com.movlad.semviz.core.graphics;
 class BufferAttribute {
 
     private final String name;
-    private final int type;
-    private final int count;
+    private final int size;
     private final boolean normalized;
 
     /**
      * Constructor.
      *
      * @param name is the name of the attribute as present in the shader
-     * @param type is the GL enum type of the attribute
-     * @param count is the number of components of the attribute
+     * @param size is the number of components of the attribute
      * @param normalized is true if the value is between 0 and 1
      */
-    public BufferAttribute(String name, int type, int count, boolean normalized) {
+    public BufferAttribute(String name, int size, boolean normalized) {
         this.name = name;
-        this.type = type;
-        this.count = count;
+        this.size = size;
         this.normalized = normalized;
     }
 
@@ -30,15 +27,11 @@ class BufferAttribute {
         return name;
     }
 
-    public int getType() {
-        return type;
+    public int getSize() {
+        return size;
     }
 
-    public int getCount() {
-        return count;
-    }
-
-    public boolean isNormalized() {
+    public boolean getNormalized() {
         return normalized;
     }
 
@@ -46,8 +39,8 @@ class BufferAttribute {
      * @return the total size of the layout element in bytes
      * ({@code count * sizeof(type)})
      */
-    public int getSize() {
-        return count * Float.BYTES;
+    public int sizeInBytes() {
+        return size * 32;
     }
 
 }

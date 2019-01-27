@@ -18,10 +18,6 @@ class BufferLayout implements Iterable<BufferAttribute> {
         this.attributes = new ArrayList<>();
     }
 
-    public List<BufferAttribute> getAttributes() {
-        return attributes;
-    }
-
     /**
      * @return sum of the sizes of all the layout elements
      */
@@ -37,29 +33,19 @@ class BufferLayout implements Iterable<BufferAttribute> {
         return attributes.size();
     }
 
-    public int length() {
+    public int rowLength() {
         int length = 0;
 
-        for (BufferAttribute attr : this) {
-            length += attr.getCount();
+        for (BufferAttribute attribute : this) {
+            length += attribute.getSize();
         }
 
         return length;
     }
 
-    /**
-     * Adds a layout component which is a sequence of floats.
-     *
-     * @param name is the name of the attribute (<i>e.g.</i> position)
-     * @param type is the type of the attribute (<i>e.g.</i> {@code GL_FLOAT})
-     * @param count is the length of the sequence
-     * @param normalized is true if the sequence elements are normalized
-     */
-    public void push(String name, int type, int count, boolean normalized) {
-        BufferAttribute attribute = new BufferAttribute(name, type, count, normalized);
-
+    public void add(BufferAttribute attribute) {
         attributes.add(attribute);
-        stride += attribute.getSize();
+        stride += attribute.sizeInBytes();
     }
 
     @Override
