@@ -1,7 +1,6 @@
 com.movlad.semviz.application
 com.movlad.semviz.core
 com.movlad.semviz.core.graphics
-com.movlad.semviz.core.graphics.engine
 com.movlad.semviz.core.io
 com.movlad.semviz.core.math.geometry
 com.movlad.semviz.core.semantic
