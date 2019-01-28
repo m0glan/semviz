@@ -9,7 +9,7 @@ import java.util.List;
  * Controller that notifies listeners about change concerning a loaded semantic
  * cloud.
  */
-public class SemanticCloudController extends Controller {
+public final class SemanticCloudController extends Controller {
 
     private SemanticCloud semanticCloud;
 

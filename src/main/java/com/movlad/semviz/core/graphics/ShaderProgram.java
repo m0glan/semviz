@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.movlad.semviz.core.graphics;
 
 import com.jogamp.opengl.GL3;
@@ -13,6 +8,9 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Abstraction for a GL program.
+ */
 class ShaderProgram {
 
     private final List<Shader> shaders;
@@ -26,10 +24,20 @@ class ShaderProgram {
         return id;
     }
 
-    public void push(Shader shader) {
+    /**
+     * Adds a shader for linkage.
+     *
+     * @param shader is the shader to be added.
+     */
+    public void add(Shader shader) {
         shaders.add(shader);
     }
 
+    /**
+     * Links all the shaders currently in the list.
+     *
+     * @param gl is the gl context
+     */
     public void link(GL3 gl) {
         int tempId = gl.glCreateProgram();
 
@@ -41,8 +49,8 @@ class ShaderProgram {
         gl.glLinkProgram(tempId);
         gl.glValidateProgram(tempId);
 
-        shaders.forEach(shader -> {
-            shader.delete(gl);
+        shaders.forEach((Shader shader) -> {
+            gl.glDeleteShader(shader.getId());
         });
 
         IntBuffer linkSuccess = IntBuffer.allocate(1);
@@ -66,14 +74,6 @@ class ShaderProgram {
         }
 
         this.id = tempId;
-    }
-
-    public void use(GL3 gl) {
-        gl.glUseProgram(id);
-    }
-
-    public void delete(GL3 gl) {
-        gl.glDeleteProgram(id);
     }
 
 }

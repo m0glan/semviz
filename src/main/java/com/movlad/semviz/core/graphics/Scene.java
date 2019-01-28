@@ -8,7 +8,7 @@ import java.util.ListIterator;
 /**
  * Collection of scene objects to be rendered.
  */
-public class Scene implements Iterable<SceneObject> {
+public final class Scene implements Iterable<SceneObject> {
 
     private final List<SceneObject> children;
 
@@ -16,23 +16,28 @@ public class Scene implements Iterable<SceneObject> {
         children = new ArrayList<>();
     }
 
-    public final void add(SceneObject object) {
+    public void add(SceneObject object) {
         children.add(object);
     }
 
-    public final void add(int i, SceneObject object) {
+    public void add(int i, SceneObject object) {
         children.add(i, object);
     }
 
-    public final void remove(SceneObject object) {
+    public void remove(SceneObject object) {
         children.remove(object);
     }
 
-    public final void remove(int i) {
+    public void remove(int i) {
         children.remove(i);
     }
 
-    public final SceneObject getById(String id) {
+    public void replace(int i, SceneObject object) {
+        remove(i);
+        add(i, object);
+    }
+
+    public SceneObject getById(String id) {
         ListIterator<SceneObject> it = children.listIterator();
 
         while (it.hasNext()) {
@@ -46,7 +51,7 @@ public class Scene implements Iterable<SceneObject> {
         return null;
     }
 
-    public final SceneObject getByName(String name) {
+    public SceneObject getByName(String name) {
         ListIterator<SceneObject> it = children.listIterator();
 
         while (it.hasNext()) {
@@ -60,20 +65,20 @@ public class Scene implements Iterable<SceneObject> {
         return null;
     }
 
-    public final SceneObject get(int i) {
+    public SceneObject get(int i) {
         return children.get(i);
     }
 
-    public final int size() {
+    public int size() {
         return children.size();
     }
 
-    public final void clear() {
+    public void clear() {
         children.clear();
     }
 
     @Override
-    public final Iterator<SceneObject> iterator() {
+    public Iterator<SceneObject> iterator() {
         return children.iterator();
     }
 

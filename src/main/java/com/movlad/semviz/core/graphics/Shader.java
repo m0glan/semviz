@@ -10,12 +10,22 @@ import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.nio.charset.Charset;
 
+/**
+ * Abstraction for a GL shader.
+ */
 class Shader {
 
     private int id;
     private final int type;
     private final String[] source;
 
+    /**
+     * Constructor.
+     *
+     * @param is is the input stream containing the shader information
+     * @param type is the type of shader (<i>e.g.</i> GL_VERTEX_SHADER)
+     * @throws IOException when unsuccessfully trying to read the stream
+     */
     public Shader(InputStream is, int type) throws IOException {
         this.type = type;
         this.source = new String[]{""};
@@ -33,7 +43,13 @@ class Shader {
         return id;
     }
 
-    public void compile(GL3 gl) {
+    /**
+     * Compiles the shader.
+     *
+     * @param gl is the gl context
+     * @throws GLException if the compilation is unsuccessful
+     */
+    public void compile(GL3 gl) throws GLException {
         int tempId = gl.glCreateShader(type);
 
         gl.glShaderSource(tempId, 1, source, null);
@@ -58,10 +74,6 @@ class Shader {
         }
 
         this.id = tempId;
-    }
-
-    public void delete(GL3 gl) {
-        gl.glDeleteShader(id);
     }
 
 }

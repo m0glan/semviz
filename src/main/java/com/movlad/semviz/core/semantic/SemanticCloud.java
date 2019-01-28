@@ -94,6 +94,10 @@ public class SemanticCloud implements Iterable<PointCloud> {
         }
     }
 
+    public int size() {
+        return clusters.size();
+    }
+
     @Override
     public Iterator<PointCloud> iterator() {
         return clusters.iterator();

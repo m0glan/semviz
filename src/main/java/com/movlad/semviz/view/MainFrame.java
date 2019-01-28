@@ -5,11 +5,10 @@
  */
 package com.movlad.semviz.view;
 
-import com.jogamp.opengl.GLCapabilities;
-import com.jogamp.opengl.GLProfile;
 import com.jogamp.opengl.awt.GLJPanel;
 import com.movlad.semviz.application.CommandNavigationController;
 import com.movlad.semviz.application.QueryManagerController;
+import com.movlad.semviz.application.SceneController;
 import com.movlad.semviz.application.SemanticCloudController;
 import com.movlad.semviz.core.semantic.QueryManager;
 import com.movlad.semviz.core.semantic.QueryResult;
@@ -24,6 +23,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.List;
 import javax.swing.DefaultListModel;
+import javax.swing.DefaultListSelectionModel;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -31,13 +31,12 @@ import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 import javax.swing.table.DefaultTableModel;
 
-public class MainWindow extends javax.swing.JFrame implements PropertyChangeListener {
-
-    private Viewer viewer;
+public class MainFrame extends javax.swing.JFrame implements PropertyChangeListener {
 
     private QueryManagerController queryManagerController;
     private SemanticCloudController semanticCloudController;
     private CommandNavigationController commandNavigationController;
+    private SceneController sceneController;
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox<String> ComboBox_GeometrySelection;
@@ -66,13 +65,13 @@ public class MainWindow extends javax.swing.JFrame implements PropertyChangeList
     /**
      * Creates new form MainWindow
      */
-    public MainWindow() {
+    public MainFrame() {
         initComponents();
         initControllers();
         initStatusBar();
         initIndividualsList();
         initVarInfoTable();
-        initViewer();
+        initViewerPanel();
         initGeometrySelectionComboBox();
         initCommandTextField();
     }
@@ -96,7 +95,7 @@ public class MainWindow extends javax.swing.JFrame implements PropertyChangeList
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(() -> {
-            MainWindow mainWindow = new MainWindow();
+            MainFrame mainWindow = new MainFrame();
 
             mainWindow.addWindowListener(new WindowAdapter() {
                 @Override
@@ -423,7 +422,7 @@ public class MainWindow extends javax.swing.JFrame implements PropertyChangeList
         int geometryIndex = ComboBox_GeometrySelection.getSelectedIndex();
 
         if (itemIndex != -1) {
-            viewer.setSelectedGeometryIndex(itemIndex, geometryIndex);
+            sceneController.setSelectedViewIndex(itemIndex, geometryIndex);
         }
     }//GEN-LAST:event_ComboBox_GeometrySelectionItemStateChanged
 
@@ -431,20 +430,15 @@ public class MainWindow extends javax.swing.JFrame implements PropertyChangeList
         int index = List_Individuals.getSelectedIndex();
 
         resetVarInfoTable();
-        viewer.setSelectedViewItem(-1);
 
         DefaultTableModel model = (DefaultTableModel) Table_VarInfo.getModel();
 
         if (index != -1) {
             // An individual is selected
 
-            ComboBox_GeometrySelection.setEnabled(true);
-            ComboBox_GeometrySelection.setSelectedIndex(viewer
-                    .getSelectedGeometryIndex(index));
-
             /*
-             Filling in variable information table with the semantic attributes
-             decribing the selected individual.
+            Filling in variable information table with the semantic attributes
+            decribing the selected individual.
              */
             List<QueryResult> queryResults = queryManagerController.getQueryResults();
 
@@ -457,7 +451,9 @@ public class MainWindow extends javax.swing.JFrame implements PropertyChangeList
                 model.addRow(row);
             });
 
-            viewer.setSelectedViewItem(index);
+            sceneController.setDisplaySelection(index);
+            ComboBox_GeometrySelection.setEnabled(true);
+            ComboBox_GeometrySelection.setSelectedIndex(sceneController.getSelectedViewIndex(index));
         }
     }//GEN-LAST:event_List_IndividualsValueChanged
 
@@ -465,10 +461,12 @@ public class MainWindow extends javax.swing.JFrame implements PropertyChangeList
         queryManagerController = new QueryManagerController();
         semanticCloudController = new SemanticCloudController();
         commandNavigationController = new CommandNavigationController();
+        sceneController = new SceneController();
 
         queryManagerController.register(this);
         semanticCloudController.register(this);
         commandNavigationController.register(this);
+        sceneController.register(this);
     }
 
     private void initStatusBar() {
@@ -480,6 +478,7 @@ public class MainWindow extends javax.swing.JFrame implements PropertyChangeList
         DefaultListModel model = new DefaultListModel();
 
         List_Individuals.setModel(model);
+        List_Individuals.getSelectionModel().setSelectionMode(DefaultListSelectionModel.SINGLE_SELECTION);
     }
 
     private void initVarInfoTable() {
@@ -499,10 +498,9 @@ public class MainWindow extends javax.swing.JFrame implements PropertyChangeList
         ComboBox_GeometrySelection.addItem("Convex Hull");
     }
 
-    private void initViewer() {
-        GLJPanel panel = new GLJPanel(new GLCapabilities(GLProfile.get(GLProfile.GL3)));
+    private void initViewerPanel() {
+        GLJPanel panel = new ViewerPanel(Panel_GLContainer.getSize(), sceneController);
 
-        panel.setSize(Panel_GLContainer.getSize());
         Panel_GLContainer.add(panel);
         Panel_GLContainer.addComponentListener(new ComponentAdapter() {
 
@@ -514,10 +512,6 @@ public class MainWindow extends javax.swing.JFrame implements PropertyChangeList
         });
 
         panel.setVisible(true);
-
-        viewer = new Viewer(panel);
-
-        viewer.start();
     }
 
     private void initCommandTextField() {
@@ -529,7 +523,7 @@ public class MainWindow extends javax.swing.JFrame implements PropertyChangeList
         resetVarInfoTable();
         resetIndividualsList();
         initStatusBar();
-        viewer.reset();
+        sceneController.resetDisplayInformation();
 
         TextField_Command.setText("");
         TextField_Command.setEnabled(false);
@@ -545,6 +539,7 @@ public class MainWindow extends javax.swing.JFrame implements PropertyChangeList
         DefaultListModel listModel = (DefaultListModel) List_Individuals.getModel();
 
         listModel.clear();
+        sceneController.setDisplaySelection(-1);
     }
 
     private void resetGeometrySelectionComboBox() {
@@ -583,7 +578,7 @@ public class MainWindow extends javax.swing.JFrame implements PropertyChangeList
                 break;
 
             case "SemanticCloudChange":
-                viewer.load((SemanticCloud) evt.getNewValue());
+                sceneController.loadDisplayInformation((SemanticCloud) evt.getNewValue());
 
                 break;
         }
@@ -596,6 +591,7 @@ public class MainWindow extends javax.swing.JFrame implements PropertyChangeList
         Label_StatusLED.setForeground(Color.GREEN);
         Label_StatusText.setText("Active");
         TextField_Command.setEnabled(true);
+        sceneController.resetDisplayInformation();
 
         JOptionPane.showMessageDialog(this, "Load complete.", "Info",
                 JOptionPane.INFORMATION_MESSAGE);
@@ -608,7 +604,7 @@ public class MainWindow extends javax.swing.JFrame implements PropertyChangeList
         resetIndividualsList();
         resetVarInfoTable();
         resetGeometrySelectionComboBox();
-        viewer.reset();
+        sceneController.resetDisplayInformation();
     }
 
     /**
@@ -629,7 +625,6 @@ public class MainWindow extends javax.swing.JFrame implements PropertyChangeList
     }
 
     public void exit() {
-        viewer.stop();
         setVisible(false);
         dispose();
         System.exit(0);

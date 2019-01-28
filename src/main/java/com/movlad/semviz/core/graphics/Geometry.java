@@ -10,25 +10,35 @@ public abstract class Geometry {
     private final BufferLayout layout;
     protected FloatBuffer data;
 
+    /**
+     * @param data is a buffer containing the interleaved data for the geometry
+     * @param layout is the layout of the data
+     */
     protected Geometry(FloatBuffer data, BufferLayout layout) {
         this.data = data;
         this.layout = layout;
     }
 
-    public FloatBuffer getData() {
+    public FloatBuffer getBufferData() {
         return data;
-    }
-
-    public int getDataSize() {
-        return data.capacity() * Float.BYTES;
-    }
-
-    public int getVertexCount() {
-        return data.capacity() / layout.rowLength();
     }
 
     public BufferLayout getLayout() {
         return layout;
+    }
+
+    /**
+     * @return the size of the buffer data in bytes
+     */
+    public int sizeOfBufferData() {
+        return data.capacity() * Float.BYTES;
+    }
+
+    /**
+     * @return the number of vertices of the geometry
+     */
+    public int vertexCount() {
+        return data.capacity() / layout.rowLength();
     }
 
     /**

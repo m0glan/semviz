@@ -6,7 +6,7 @@ import java.util.List;
 /**
  * Controller used for navigating through the command history.
  */
-public class CommandNavigationController extends Controller {
+public final class CommandNavigationController extends Controller {
 
     private final List<String> commands;
     private int selectedIndex;

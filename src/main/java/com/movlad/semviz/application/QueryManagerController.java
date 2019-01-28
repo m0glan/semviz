@@ -11,7 +11,7 @@ import java.util.List;
  * Controller that creates a bridge between the view and the query manager
  * model; SPARQL queries can be executed through this controller.
  */
-public class QueryManagerController extends Controller {
+public final class QueryManagerController extends Controller {
 
     private QueryManager queryManager;
     private List<QueryResult> queryResults;

@@ -29,10 +29,19 @@ class BufferLayout implements Iterable<BufferAttribute> {
         return attributes.get(i);
     }
 
-    public int size() {
-        return attributes.size();
+    /**
+     * Adds an attribute to the layout and increases the stride.
+     *
+     * @param attribute is the attribute to be added
+     */
+    public void add(BufferAttribute attribute) {
+        attributes.add(attribute);
+        stride += attribute.sizeInBytes();
     }
 
+    /**
+     * @return the sum of all attribute sizes
+     */
     public int rowLength() {
         int length = 0;
 
@@ -43,9 +52,8 @@ class BufferLayout implements Iterable<BufferAttribute> {
         return length;
     }
 
-    public void add(BufferAttribute attribute) {
-        attributes.add(attribute);
-        stride += attribute.sizeInBytes();
+    public int size() {
+        return attributes.size();
     }
 
     @Override

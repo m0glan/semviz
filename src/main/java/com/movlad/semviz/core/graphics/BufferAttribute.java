@@ -3,8 +3,8 @@ package com.movlad.semviz.core.graphics;
 import com.jogamp.opengl.util.GLBuffers;
 
 /**
- * Class representing one attribute of a buffer layout, such as position, color,
- * texture coordinates etc. .
+ * Class representing one attribute of a buffer layout, such as position, color
+ * or texture coordinates.
  */
 class BufferAttribute {
 
@@ -45,12 +45,10 @@ class BufferAttribute {
     }
 
     /**
-     * @return the total size of the layout element in bytes
-     * ({@code count * sizeof(type)})
+     * @return the size of the attribute in bytes
      */
     public int sizeInBytes() {
-        //return size * GLBuffers.sizeOfGLType(type);
-        return size * GLBuffers.SIZEOF_FLOAT;
+        return size * GLBuffers.sizeOfGLType(type);
     }
 
 }
