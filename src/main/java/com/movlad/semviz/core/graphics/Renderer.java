@@ -21,7 +21,6 @@ public abstract class Renderer implements GLEventListener {
 
     private ShaderProgram program;
 
-    private IntBuffer vbos;
     private IntBuffer vaos;
 
     public Renderer(Scene scene, Camera camera) {
@@ -59,24 +58,21 @@ public abstract class Renderer implements GLEventListener {
     public final void display(GLAutoDrawable drawable) {
         GL3 gl = (GL3) drawable.getGL();
 
+        generateVertexArrays(gl);
+
         program.use(gl);
 
         gl.glClearColor(0.027f, 0.184f, 0.372f, 1.0f);
         gl.glClear(GL3.GL_COLOR_BUFFER_BIT | GL3.GL_DEPTH_BUFFER_BIT);
 
-        generateVertexArrays(gl);
-
         for (int i = 0; i < scene.size(); i++) {
-            SceneObject object = scene.get(i);
-            int vao = vaos.get(i);
-
-            gl.glBindVertexArray(vao);
-
-            draw(gl, object);
+            draw(gl, scene.get(i), vaos.get(i));
         }
     }
 
-    private void draw(GL3 gl, SceneObject object) {
+    private void draw(GL3 gl, SceneObject object, int vao) {
+        gl.glBindVertexArray(vao);
+
         Geometry geometry = object.getGeometry();
 
         setObjectMatrixUniforms(gl, object);
@@ -85,21 +81,21 @@ public abstract class Renderer implements GLEventListener {
 
     private void generateVertexArrays(GL3 gl) {
         if (scene.size() > 0) {
-            vbos = IntBuffer.allocate(scene.size());
+            IntBuffer vbos = BufferUtils.createIntBuffer(scene.size());
 
             gl.glGenBuffers(scene.size(), vbos);
 
-            vaos = IntBuffer.allocate(scene.size());
+            vaos = BufferUtils.createIntBuffer(scene.size());
 
             gl.glGenVertexArrays(scene.size(), vaos);
 
             for (int i = 0; i < scene.size(); i++) {
                 Geometry geometry = scene.get(i).getGeometry();
 
+                gl.glBindVertexArray(vaos.get(i));
                 gl.glBindBuffer(GL3.GL_ARRAY_BUFFER, vbos.get(i));
                 gl.glBufferData(GL3.GL_ARRAY_BUFFER, geometry.getDataSize(), geometry.getData(),
                         GL3.GL_STATIC_DRAW);
-                gl.glBindVertexArray(vaos.get(i));
 
                 BufferLayout layout = geometry.getLayout();
                 int offset = 0;
@@ -108,10 +104,10 @@ public abstract class Renderer implements GLEventListener {
                     BufferAttribute attribute = layout.get(j);
 
                     gl.glEnableVertexAttribArray(j);
-                    gl.glVertexAttribPointer(j, attribute.getSize(), GL3.GL_FLOAT,
+                    gl.glVertexAttribPointer(j, attribute.getSize(), attribute.getType(),
                             attribute.getNormalized(), layout.getStride(), offset);
 
-                    offset += layout.getStride();
+                    offset += attribute.sizeInBytes();
                 }
             }
         }
@@ -141,23 +137,14 @@ public abstract class Renderer implements GLEventListener {
     }
 
     private void clear(GL3 gl) {
-        if (vaos.capacity() > 0) {
-            gl.glBindVertexArray(0);
-            gl.glDeleteVertexArrays(vaos.capacity(), vaos);
-        }
-
-        if (vbos.capacity() > 0) {
-            gl.glBindBuffer(GL3.GL_ARRAY_BUFFER, 0);
-            gl.glDeleteBuffers(vbos.capacity(), vbos);
-        }
+        gl.glDeleteVertexArrays(vaos.capacity(), vaos);
     }
 
     @Override
     public final void dispose(GLAutoDrawable drawable) {
         GL3 gl = (GL3) drawable.getGL();
 
-        gl.glBindVertexArray(0);
-        program.delete(gl);
+        clear(gl);
     }
 
 }

@@ -125,7 +125,7 @@ public class Viewer {
             PointCloud cloud = viewItems.get(i).getCloud();
             BoundingBox bbox = new BoundingBox(cloud);
             Geometry geometry = GeometryFactory.getInstance()
-                    .createBoundingBoxGeometry(bbox, (short) 255, (short) 255, (short) 0);
+                    .createBoundingBoxGeometry(bbox, 255.f, 255.f, 0.f);
 
             SceneObject box = new SceneObject(geometry);
 

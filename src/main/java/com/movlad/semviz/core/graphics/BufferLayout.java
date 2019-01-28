@@ -26,7 +26,7 @@ class BufferLayout implements Iterable<BufferAttribute> {
     }
 
     public BufferAttribute get(int i) {
-        return attributes.get(0);
+        return attributes.get(i);
     }
 
     public int size() {

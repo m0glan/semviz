@@ -11,8 +11,8 @@ public class BoundingBox {
     Point3d pointMax;
 
     public BoundingBox(PointCloud cloud) {
-        pointMin = new Point3d(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
-        pointMax = new Point3d(-Double.MAX_VALUE, -Double.MAX_VALUE, -Double.MAX_VALUE);
+        pointMin = new Point3d(Float.MAX_VALUE, Float.MAX_VALUE, Float.MAX_VALUE);
+        pointMax = new Point3d(-Float.MAX_VALUE, -Float.MAX_VALUE, -Float.MAX_VALUE);
 
         cloud.forEach(point -> {
             if (point.x < pointMin.x) {

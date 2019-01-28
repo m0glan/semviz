@@ -38,8 +38,8 @@ public class GeometryFactory {
 
         BufferLayout layout = new BufferLayout();
 
-        layout.add(new BufferAttribute("position", 3, true));
-        layout.add(new BufferAttribute("color", 3, false));
+        layout.add(new BufferAttribute("position", 3, GL3.GL_FLOAT, true));
+        layout.add(new BufferAttribute("color", 3, GL3.GL_UNSIGNED_BYTE, false));
 
         Geometry geometry = new Geometry(FloatBuffer.wrap(data), layout) {
             @Override
@@ -51,7 +51,7 @@ public class GeometryFactory {
         return geometry;
     }
 
-    public Geometry createBoundingBoxGeometry(BoundingBox bbox, short r, short g, short b) {
+    public Geometry createBoundingBoxGeometry(BoundingBox bbox, float r, float g, float b) {
         List<Point3d> vertices = new ArrayList<>();
 
         Point3d min = bbox.getMinBounds();
@@ -71,8 +71,8 @@ public class GeometryFactory {
 
         BufferLayout layout = new BufferLayout();
 
-        layout.add(new BufferAttribute("position", 3, true));
-        layout.add(new BufferAttribute("color", 3, true));
+        layout.add(new BufferAttribute("position", 3, GL3.GL_FLOAT, true));
+        layout.add(new BufferAttribute("color", 3, GL3.GL_UNSIGNED_BYTE, false));
 
         float[] data = new float[edges.length * 2 * layout.rowLength()];
 
@@ -81,8 +81,9 @@ public class GeometryFactory {
         for (int[] edge : edges) {
             for (int j = 0; j < edge.length; j++) {
                 Point3d v = vertices.get(edge[j]);
+                float[] rgb = GLUtils.normalizeColor(r, g, b);
                 float[] section = new float[]{(float) v.x, (float) v.y, (float) v.z,
-                    r, g, b};
+                    rgb[0], rgb[1], rgb[2]};
 
                 System.arraycopy(section, 0, data, offset, section.length);
 
@@ -103,16 +104,17 @@ public class GeometryFactory {
     public Geometry createHighResolutionCloudGeometry(PointCloud cloud) {
         BufferLayout layout = new BufferLayout();
 
-        layout.add(new BufferAttribute("position", 3, false));
-        layout.add(new BufferAttribute("color", 3, false));
+        layout.add(new BufferAttribute("position", 3, GL3.GL_FLOAT, true));
+        layout.add(new BufferAttribute("color", 3, GL3.GL_UNSIGNED_BYTE, true));
 
         float[] data = new float[cloud.size() * layout.rowLength()];
 
         int offset = 0;
 
         for (Point point : cloud) {
+            float[] rgb = GLUtils.normalizeColor((float) point.r, (float) point.g, (float) point.b);
             float[] section = new float[]{(float) point.x, (float) point.y, (float) point.z,
-                (float) point.r, (float) point.g, (float) point.b};
+                point.r, point.g, point.b};
 
             System.arraycopy(section, 0, data, offset, section.length);
 
@@ -132,8 +134,8 @@ public class GeometryFactory {
     public Geometry createNormalColoredCloudGeometry(PointCloud cloud) {
         BufferLayout layout = new BufferLayout();
 
-        layout.add(new BufferAttribute("position", 3, true));
-        layout.add(new BufferAttribute("color", 3, false));
+        layout.add(new BufferAttribute("position", 3, GL3.GL_FLOAT, true));
+        layout.add(new BufferAttribute("color", 3, GL3.GL_UNSIGNED_BYTE, false));
 
         float[] data = new float[cloud.size() * layout.rowLength()];
 
@@ -186,8 +188,8 @@ public class GeometryFactory {
 
         BufferLayout layout = new BufferLayout();
 
-        layout.add(new BufferAttribute("position", 3, true));
-        layout.add(new BufferAttribute("color", 3, false));
+        layout.add(new BufferAttribute("position", 3, GL3.GL_FLOAT, true));
+        layout.add(new BufferAttribute("color", 3, GL3.GL_UNSIGNED_BYTE, false));
 
         float[] data = new float[faces.length * faces[0].length * layout.rowLength()];
 
@@ -207,7 +209,7 @@ public class GeometryFactory {
         Geometry geometry = new Geometry(FloatBuffer.wrap(data), layout) {
             @Override
             public int getDrawingMode() {
-                return GL3.GL_POINTS;
+                return GL3.GL_TRIANGLES;
             }
         };
 
