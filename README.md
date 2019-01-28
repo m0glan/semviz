@@ -1,6 +1,6 @@
 # Semviz
 
-![Tag](https://img.shields.io/badge/tag-v2.1.0-blue.svg) [![Build Status](https://travis-ci.com/vmoglan/semviz.svg?branch=master)](https://travis-ci.org/vmoglan/semviz)
+![Tag](https://img.shields.io/badge/tag-v1.0.0-blue.svg) [![Build Status](https://travis-ci.com/vmoglan/semviz.svg?branch=master)](https://travis-ci.org/vmoglan/semviz)
 
 ## Main objective
 
@@ -24,7 +24,7 @@ The display of 3D objects must be done in three ways:
 
 ### Setup
 
-You can download the Semviz all-in-one `.jar` at this [link](https://github.com/vmoglan/semviz/releases/download/v2.1.0/semviz-2.1.0.jar). There is no installation process, just make sure you have Java 8 installed on your marchine and then you should be able to run the file.
+You can download the Semviz all-in-one `.jar` at this [link](https://github.com/vmoglan/semviz/releases/download/v1.0.0/semviz-1.0.0.jar). There is no installation process, just make sure you have Java 8 installed on your marchine and then you should be able to run the file.
 
 ### Initialization
 
