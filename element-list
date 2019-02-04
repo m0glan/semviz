@@ -3,5 +3,5 @@ com.movlad.semviz.core
 com.movlad.semviz.core.graphics
 com.movlad.semviz.core.io
 com.movlad.semviz.core.math.geometry
-com.movlad.semviz.core.semantic
+com.movlad.semviz.core.sqm
 com.movlad.semviz.view
