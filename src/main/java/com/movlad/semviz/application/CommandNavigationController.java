@@ -9,18 +9,14 @@ import java.util.List;
 public final class CommandNavigationController extends Controller {
 
     private final List<String> commands;
-    private int selectedIndex;
+    private int selectedCommandIndex;
 
     public CommandNavigationController() {
         commands = new ArrayList<>();
 
         commands.add("");
 
-        selectedIndex = commands.size() - 1;
-    }
-
-    public String getSelection() {
-        return commands.get(selectedIndex);
+        selectedCommandIndex = commands.size() - 1;
     }
 
     /**
@@ -30,18 +26,21 @@ public final class CommandNavigationController extends Controller {
      */
     public void enter(String command) {
         commands.add(commands.size() - 1, command);
+
+        changeSupport.firePropertyChange("CommandLaunch", null, command);
     }
 
     /**
      * Selects previous command.
      */
     public void up() {
-        if (selectedIndex - 1 >= 0) {
-            String prev = getSelection();
+        if (selectedCommandIndex - 1 >= 0) {
+            String prev = commands.get(selectedCommandIndex);
 
-            selectedIndex--;
+            selectedCommandIndex--;
 
-            changeSupport.firePropertyChange("CommandNavigationUp", prev, getSelection());
+            changeSupport.firePropertyChange("CommandNavigationUp", prev,
+                    commands.get(selectedCommandIndex));
         }
     }
 
@@ -49,12 +48,13 @@ public final class CommandNavigationController extends Controller {
      * Selects a more recent command.
      */
     public void down() {
-        if (selectedIndex + 1 < commands.size()) {
-            String prev = getSelection();
+        if (selectedCommandIndex + 1 < commands.size()) {
+            String prev = commands.get(selectedCommandIndex);
 
-            selectedIndex++;
+            selectedCommandIndex++;
 
-            changeSupport.firePropertyChange("CommandNavigationDown", prev, getSelection());
+            changeSupport.firePropertyChange("CommandNavigationDown", prev,
+                    commands.get(selectedCommandIndex));
         }
     }
 

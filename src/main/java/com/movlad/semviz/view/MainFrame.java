@@ -7,13 +7,10 @@ package com.movlad.semviz.view;
 
 import com.jogamp.opengl.awt.GLJPanel;
 import com.movlad.semviz.application.CommandNavigationController;
-import com.movlad.semviz.application.QueryManagerController;
+import com.movlad.semviz.application.SQMController;
 import com.movlad.semviz.application.SceneController;
-import com.movlad.semviz.application.SemanticCloudController;
-import com.movlad.semviz.core.semantic.QueryManager;
-import com.movlad.semviz.core.semantic.QueryResult;
-import com.movlad.semviz.core.semantic.SemanticCloud;
-import java.awt.Color;
+import com.movlad.semviz.core.sqm.SQM;
+import com.movlad.semviz.core.sqm.SemanticCloudDescription;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.KeyEvent;
@@ -21,28 +18,29 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.nio.file.Paths;
 import java.util.List;
 import javax.swing.DefaultListModel;
 import javax.swing.DefaultListSelectionModel;
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 import javax.swing.table.DefaultTableModel;
 
 public class MainFrame extends javax.swing.JFrame implements PropertyChangeListener {
 
-    private QueryManagerController queryManagerController;
-    private SemanticCloudController semanticCloudController;
-    private CommandNavigationController commandNavigationController;
+    private SQMController sqmController;
+    private CommandNavigationController navigationController;
     private SceneController sceneController;
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox<String> ComboBox_GeometrySelection;
     private javax.swing.JLabel Label_GeometrySelection;
     private java.awt.Label Label_Individuals;
-    private javax.swing.JLabel Label_StatusLED;
     private javax.swing.JLabel Label_StatusText;
     private javax.swing.JLabel Label_VarInfo;
     private javax.swing.JList<String> List_Individuals;
@@ -86,10 +84,12 @@ public class MainFrame extends javax.swing.JFrame implements PropertyChangeListe
          * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
          */
 
-        try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        if (System.getProperty("os.name").contains("Windows")) {
+            try {
+                UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            }
         }
         //</editor-fold>
 
@@ -122,7 +122,6 @@ public class MainFrame extends javax.swing.JFrame implements PropertyChangeListe
         TextField_Command = new javax.swing.JTextField();
         Panel_Control = new javax.swing.JPanel();
         Panel_Status = new javax.swing.JPanel();
-        Label_StatusLED = new javax.swing.JLabel();
         Label_StatusText = new javax.swing.JLabel();
         Panel_Individuals = new javax.swing.JPanel();
         Label_Individuals = new java.awt.Label();
@@ -152,17 +151,14 @@ public class MainFrame extends javax.swing.JFrame implements PropertyChangeListe
 
         Panel_Control.setBackground(new java.awt.Color(204, 204, 204));
 
-        Label_StatusLED.setFont(new java.awt.Font("Arial", 0, 20)); // NOI18N
-        Label_StatusLED.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        Label_StatusLED.setText("•");
-
-        Label_StatusText.setFont(new java.awt.Font("Arial", 0, 20)); // NOI18N
-        Label_StatusText.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        Label_StatusText.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        Label_StatusText.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         Label_StatusText.setText("Ontology Model Loaded");
+        Label_StatusText.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
 
         Panel_Individuals.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
 
-        Label_Individuals.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
+        Label_Individuals.setFont(new java.awt.Font("Arial", 1, 13)); // NOI18N
         Label_Individuals.setText("Cloud List");
 
         List_Individuals.setModel(new javax.swing.AbstractListModel<String>() {
@@ -201,7 +197,7 @@ public class MainFrame extends javax.swing.JFrame implements PropertyChangeListe
                 .addContainerGap())
         );
 
-        Label_VarInfo.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
+        Label_VarInfo.setFont(new java.awt.Font("Arial", 1, 13)); // NOI18N
         Label_VarInfo.setText("Queried Info");
 
         Table_VarInfo.setModel(new javax.swing.table.DefaultTableModel(
@@ -227,7 +223,7 @@ public class MainFrame extends javax.swing.JFrame implements PropertyChangeListe
                     .addComponent(Scroll_VarInfo, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                     .addGroup(Panel_VarInfoLayout.createSequentialGroup()
                         .addComponent(Label_VarInfo)
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                        .addGap(0, 178, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         Panel_VarInfoLayout.setVerticalGroup(
@@ -240,7 +236,7 @@ public class MainFrame extends javax.swing.JFrame implements PropertyChangeListe
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        Label_GeometrySelection.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
+        Label_GeometrySelection.setFont(new java.awt.Font("Arial", 1, 13)); // NOI18N
         Label_GeometrySelection.setText("View");
 
         ComboBox_GeometrySelection.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
@@ -257,9 +253,9 @@ public class MainFrame extends javax.swing.JFrame implements PropertyChangeListe
             .addGroup(Panel_GeometrySelectionLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(Panel_GeometrySelectionLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(ComboBox_GeometrySelection, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(ComboBox_GeometrySelection, 0, 252, Short.MAX_VALUE)
                     .addGroup(Panel_GeometrySelectionLayout.createSequentialGroup()
-                        .addComponent(Label_GeometrySelection)
+                        .addComponent(Label_GeometrySelection, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
@@ -277,23 +273,19 @@ public class MainFrame extends javax.swing.JFrame implements PropertyChangeListe
         Panel_Status.setLayout(Panel_StatusLayout);
         Panel_StatusLayout.setHorizontalGroup(
             Panel_StatusLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(Panel_StatusLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(Label_StatusLED, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(Label_StatusText, javax.swing.GroupLayout.PREFERRED_SIZE, 208, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(34, Short.MAX_VALUE))
             .addComponent(Panel_Individuals, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(Panel_VarInfo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(Panel_GeometrySelection, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, Panel_StatusLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(Label_StatusText, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
         );
         Panel_StatusLayout.setVerticalGroup(
             Panel_StatusLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, Panel_StatusLayout.createSequentialGroup()
                 .addGap(27, 27, 27)
-                .addGroup(Panel_StatusLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(Label_StatusLED, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(Label_StatusText, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(Label_StatusText, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(Panel_Individuals, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -320,7 +312,7 @@ public class MainFrame extends javax.swing.JFrame implements PropertyChangeListe
         Panel_GLContainer.setLayout(Panel_GLContainerLayout);
         Panel_GLContainerLayout.setHorizontalGroup(
             Panel_GLContainerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 698, Short.MAX_VALUE)
+            .addGap(0, 706, Short.MAX_VALUE)
         );
         Panel_GLContainerLayout.setVerticalGroup(
             Panel_GLContainerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -389,7 +381,7 @@ public class MainFrame extends javax.swing.JFrame implements PropertyChangeListe
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             String path = fc.getSelectedFile().getAbsolutePath();
 
-            queryManagerController.loadQueryManager(path);
+            sqmController.load(path);
         }
     }//GEN-LAST:event_menuItem_OpenActionPerformed
 
@@ -401,17 +393,15 @@ public class MainFrame extends javax.swing.JFrame implements PropertyChangeListe
         switch (evt.getKeyCode()) {
             case KeyEvent.VK_ENTER:
                 String queryString = TextField_Command.getText();
-
-                commandNavigationController.enter(queryString);
-                queryManagerController.executeQuery(queryString);
+                navigationController.enter(queryString);
 
                 break;
             case KeyEvent.VK_UP:
-                commandNavigationController.up();
+                navigationController.up();
 
                 break;
             case KeyEvent.VK_DOWN:
-                commandNavigationController.down();
+                navigationController.down();
 
                 break;
         }
@@ -429,49 +419,22 @@ public class MainFrame extends javax.swing.JFrame implements PropertyChangeListe
     private void List_IndividualsValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_List_IndividualsValueChanged
         int index = List_Individuals.getSelectedIndex();
 
-        resetVarInfoTable();
-
-        DefaultTableModel model = (DefaultTableModel) Table_VarInfo.getModel();
-
-        if (index != -1) {
-            // An individual is selected
-
-            /*
-            Filling in variable information table with the semantic attributes
-            decribing the selected individual.
-             */
-            List<QueryResult> queryResults = queryManagerController.getQueryResults();
-
-            queryResults.get(index).getKeys().forEach(key -> {
-                String[] row = new String[2];
-
-                row[0] = key;
-                row[1] = queryResults.get(index).getAttribute(key);
-
-                model.addRow(row);
-            });
-
-            sceneController.setDisplaySelection(index);
-            ComboBox_GeometrySelection.setEnabled(true);
-            ComboBox_GeometrySelection.setSelectedIndex(sceneController.getSelectedViewIndex(index));
-        }
+        sqmController.setSelectedDescriptionIndex(index);
     }//GEN-LAST:event_List_IndividualsValueChanged
 
     private void initControllers() {
-        queryManagerController = new QueryManagerController();
-        semanticCloudController = new SemanticCloudController();
-        commandNavigationController = new CommandNavigationController();
+        sqmController = SQMController.getInstance();
+        navigationController = new CommandNavigationController();
         sceneController = new SceneController();
 
-        queryManagerController.register(this);
-        semanticCloudController.register(this);
-        commandNavigationController.register(this);
+        sqmController.register(this);
+        navigationController.register(this);
         sceneController.register(this);
     }
 
     private void initStatusBar() {
-        Label_StatusLED.setForeground(Color.RED);
-        Label_StatusText.setText("Inactive");
+        Label_StatusText.setText("No directory loaded.");
+        Label_StatusText.setToolTipText("");
     }
 
     private void initIndividualsList() {
@@ -554,42 +517,84 @@ public class MainFrame extends javax.swing.JFrame implements PropertyChangeListe
                     JOptionPane.ERROR_MESSAGE);
         }
 
-        if (evt.getPropertyName().contains("CommandNavigation")) {
-            TextField_Command.setText((String) evt.getNewValue());
-        }
+        pollSQMEvents(evt);
+        pollNavigationEvents(evt);
+    }
 
-        if (evt.getPropertyName().contains("QueryManagerLoad")) {
+    /**
+     * Checks whether an event comes from the {@code SQMController} and takes
+     * action accordingly.
+     *
+     * @param evt is a property change event
+     */
+    private void pollSQMEvents(PropertyChangeEvent evt) {
+        if (evt.getPropertyName().contains("SQMLoad")) {
             resetInterface();
         }
 
-        if (evt.getPropertyName().contains("QueryExecution")) {
-            onQueryExecution(evt);
+        if (evt.getPropertyName().contains("SQMExecution")) {
+            onSQMExecution(evt);
         }
 
         switch (evt.getPropertyName()) {
-            case "QueryManagerLoadSuccess":
-                onQueryManagerLoadSuccess(evt);
+            case "SQMLoadSuccess":
+                onSQMLoadSuccess(evt);
 
                 break;
 
-            case "QueryExecutionSuccess":
-                onQueryExecutionSuccess(evt);
+            case "SQMExecutionSuccess":
+                onSQMExecutionSuccess(evt);
 
                 break;
 
-            case "SemanticCloudChange":
-                sceneController.loadDisplayInformation((SemanticCloud) evt.getNewValue());
+            case "SQMFailCountChanged":
+                onSQMFailCountChanged(evt);
+
+                break;
+
+            case "SQMDescriptionIndexChanged":
+                onSQMDescriptionIndexChanged(evt);
 
                 break;
         }
     }
 
     /**
-     * Called when the query manager is successfully loaded.
+     * Checks whether an event is related to command navigation and takes action
+     * accordingly.
+     *
+     * @param evt is a property change event
      */
-    private void onQueryManagerLoadSuccess(PropertyChangeEvent evt) {
-        Label_StatusLED.setForeground(Color.GREEN);
-        Label_StatusText.setText("Active");
+    private void pollNavigationEvents(PropertyChangeEvent evt) {
+        if (evt.getPropertyName().contains("CommandNavigation")) {
+            TextField_Command.setText((String) evt.getNewValue());
+        }
+
+        if (evt.getPropertyName().equals("CommandLaunch")) {
+            onCommandLaunch(evt);
+        }
+    }
+
+    /**
+     * Called whenever a exec is executed.
+     */
+    private void onSQMExecution(PropertyChangeEvent evt) {
+        resetIndividualsList();
+        resetVarInfoTable();
+        resetGeometrySelectionComboBox();
+        sceneController.resetDisplayInformation();
+    }
+
+    /**
+     * Called when the exec manager is successfully loaded.
+     */
+    private void onSQMLoadSuccess(PropertyChangeEvent evt) {
+        SQM sqm = (SQM) evt.getNewValue();
+        String activeDirectoryPath = sqm.getPath();
+
+        Label_StatusText.setText("Active directory: "
+                + Paths.get(activeDirectoryPath).getFileName().toString());
+        Label_StatusText.setToolTipText(activeDirectoryPath);
         TextField_Command.setEnabled(true);
         sceneController.resetDisplayInformation();
 
@@ -598,30 +603,99 @@ public class MainFrame extends javax.swing.JFrame implements PropertyChangeListe
     }
 
     /**
-     * Called whenever a query is executed.
+     * Called upon successful execution of a exec.
      */
-    private void onQueryExecution(PropertyChangeEvent evt) {
-        resetIndividualsList();
-        resetVarInfoTable();
-        resetGeometrySelectionComboBox();
-        sceneController.resetDisplayInformation();
+    private void onSQMExecutionSuccess(PropertyChangeEvent evt) {
+        List<SemanticCloudDescription> descriptions
+                = (List<SemanticCloudDescription>) evt.getNewValue();
+
+        sceneController.load(descriptions);
+
+        DefaultListModel listModel = (DefaultListModel) List_Individuals.getModel();
+
+        descriptions.forEach(description -> {
+            listModel.addElement(description.toString());
+        });
     }
 
     /**
-     * Called upon successful execution of a query.
+     * Called whenever the fail count of the Semviz Query Manager changes.
+     *
+     * @param evt is a property change event
      */
-    private void onQueryExecutionSuccess(PropertyChangeEvent evt) {
-        DefaultListModel listModel = (DefaultListModel) List_Individuals.getModel();
+    private void onSQMFailCountChanged(PropertyChangeEvent evt) {
+        int failCount = (int) evt.getNewValue();
 
-        List<QueryResult> queryResults = (List<QueryResult>) evt.getNewValue();
+        if (failCount > 0) {
+            JOptionPane.showMessageDialog(this, "A number of " + failCount + " cloud "
+                    + "individuals could not be retreived.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
 
-        queryResults.forEach(result -> {
-            listModel.addElement(result.getIndividual().getLocalName());
+    /**
+     * Called whenever the selected description index is changed within the
+     * Semviz Query Manager controller.
+     *
+     * @param evt is a property change event
+     */
+    private void onSQMDescriptionIndexChanged(PropertyChangeEvent evt) {
+        resetVarInfoTable();
+
+        int index = (int) evt.getNewValue();
+        DefaultTableModel model = (DefaultTableModel) Table_VarInfo.getModel();
+
+        if (index != -1) {
+            // An individual is selected
+
+            /*
+            Filling in variable information table with the semantic attributes
+            decribing the selected individual.
+             */
+            sqmController.getSelectedDescription().attributeKeySet().forEach(key -> {
+                String[] row = new String[2];
+
+                row[0] = key;
+                row[1] = sqmController.getSelectedDescription().getAttribute(key);
+
+                model.addRow(row);
+            });
+
+            sceneController.setDisplaySelection(index);
+            ComboBox_GeometrySelection.setEnabled(true);
+            ComboBox_GeometrySelection.setSelectedIndex(sceneController.getSelectedViewIndex(index));
+        }
+    }
+
+    /**
+     * Called whenever a SPARQL query is launched.
+     *
+     * @param evt is a property change event
+     */
+    private void onCommandLaunch(PropertyChangeEvent evt) {
+        String queryString = (String) evt.getNewValue();
+
+        SwingWorker<Void, Void> swingWorker = new SwingWorker<Void, Void>() {
+            @Override
+            protected Void doInBackground() throws Exception {
+                sqmController.exec(queryString);
+
+                return null;
+            }
+        };
+
+        final JDialog dialog = new LoadingDialog(this);
+
+        swingWorker.addPropertyChangeListener((PropertyChangeEvent evt1) -> {
+            if (evt1.getPropertyName().equals("state")) {
+                if (evt1.getNewValue() == SwingWorker.StateValue.DONE) {
+                    dialog.dispose();
+                }
+            }
         });
 
-        QueryManager queryManager = queryManagerController.getQueryManager();
+        swingWorker.execute();
 
-        semanticCloudController.loadSuperCloud(queryManager, queryResults);
+        dialog.setVisible(true);
     }
 
     public void exit() {

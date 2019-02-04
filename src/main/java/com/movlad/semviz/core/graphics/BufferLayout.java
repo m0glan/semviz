@@ -9,7 +9,7 @@ import java.util.List;
  * {@code VertexBufferObject}, such as position, color, texture coordinates etc.
  * .
  */
-class BufferLayout implements Iterable<BufferAttribute> {
+public class BufferLayout implements Iterable<BufferAttribute> {
 
     private final List<BufferAttribute> attributes;
     private int stride = 0;

@@ -11,33 +11,24 @@ import java.io.IOException;
  */
 public class CloudLoader {
 
+    private final int POINT_ATTR_COUNT = 9;
     private String path;
-    private boolean normalsIncluded;
-
-    private int numInvalidLines;
-
+    private int failCount;
     private PointCloud pointCloud;
 
     /**
      * @param path is the path of the cloud {@code .txt} file
-     * @param normalsIncluded is true if the file also contains the normal
-     * vectors in each point
      */
-    public CloudLoader(String path, boolean normalsIncluded) {
+    public CloudLoader(String path) {
         this.path = path;
-        this.normalsIncluded = normalsIncluded;
     }
 
     public void setPath(String path) {
         this.path = path;
     }
 
-    public void setNormalsIncluded(boolean normalsIncluded) {
-        this.normalsIncluded = normalsIncluded;
-    }
-
-    public int getNumInvalidLines() {
-        return numInvalidLines;
+    public int getFailCount() {
+        return failCount;
     }
 
     /**
@@ -54,15 +45,7 @@ public class CloudLoader {
      * @throws IOException if the cloud file is not found
      */
     public void load() throws IOException {
-        int numFields;
-
-        numInvalidLines = 0;
-
-        if (normalsIncluded) {
-            numFields = 9;
-        } else {
-            numFields = 6;
-        }
+        failCount = 0;
 
         try (BufferedReader reader = new BufferedReader(new FileReader(path))) {
             pointCloud = new PointCloud();
@@ -70,26 +53,28 @@ public class CloudLoader {
             for (String line; (line = reader.readLine()) != null;) {
                 String[] attributes = line.split("\\t");
 
-                if (attributes.length == numFields) {
-                    Point point = new Point();
+                if (attributes.length == POINT_ATTR_COUNT) {
+                    try {
+                        Point point = new Point();
 
-                    point.x = Float.parseFloat(attributes[0]);
-                    point.y = Float.parseFloat(attributes[1]);
-                    point.z = Float.parseFloat(attributes[2]);
+                        point.x = Float.parseFloat(attributes[0]);
+                        point.y = Float.parseFloat(attributes[1]);
+                        point.z = Float.parseFloat(attributes[2]);
 
-                    point.r = Short.parseShort(attributes[3]);
-                    point.g = Short.parseShort(attributes[4]);
-                    point.b = Short.parseShort(attributes[5]);
+                        point.r = Short.parseShort(attributes[3]);
+                        point.g = Short.parseShort(attributes[4]);
+                        point.b = Short.parseShort(attributes[5]);
 
-                    if (numFields == 9) {
                         point.normalX = Float.parseFloat(attributes[6]);
                         point.normalY = Float.parseFloat(attributes[7]);
                         point.normalZ = Float.parseFloat(attributes[8]);
-                    }
 
-                    pointCloud.add(point);
+                        pointCloud.add(point);
+                    } catch (NumberFormatException e) {
+                        failCount++;
+                    }
                 } else {
-                    numInvalidLines++;
+                    failCount++;
                 }
             }
         }

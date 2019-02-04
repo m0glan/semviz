@@ -1,14 +1,17 @@
 package com.movlad.semviz.application;
 
+import com.github.quickhull3d.Point3d;
+import com.github.quickhull3d.Vector3d;
 import com.movlad.semviz.core.graphics.Geometry;
 import com.movlad.semviz.core.graphics.GeometryFactory;
 import com.movlad.semviz.core.graphics.Scene;
 import com.movlad.semviz.core.graphics.SceneObject;
 import com.movlad.semviz.core.math.geometry.BoundingBox;
 import com.movlad.semviz.core.math.geometry.PointCloud;
-import com.movlad.semviz.core.semantic.SemanticCloud;
+import com.movlad.semviz.core.sqm.SemanticCloudDescription;
 import java.util.ArrayList;
 import java.util.List;
+import org.joml.Vector3f;
 
 /**
  * Controller for the modification of a {@code Scene} and view in general.
@@ -38,16 +41,18 @@ public final class SceneController extends Controller {
     /**
      * Loads the base geometry for each cloud in a semantic cloud
      *
-     * @param cloud is the cloud containing the clusters
+     * @param descriptions
      */
-    public void loadDisplayInformation(SemanticCloud cloud) {
+    public void load(List<SemanticCloudDescription> descriptions) {
         resetDisplayInformation();
+        center(descriptions);
+        rotate(descriptions);
 
-        views = new SceneObject[cloud.size()][3];
-        selectedViewIndices = new int[cloud.size()];
+        views = new SceneObject[descriptions.size()][3];
+        selectedViewIndices = new int[descriptions.size()];
 
-        for (int i = 0; i < cloud.size(); i++) {
-            clusters.add(cloud.get(i));
+        for (int i = 0; i < descriptions.size(); i++) {
+            clusters.add(descriptions.get(i).getCloud());
 
             SceneObject object = new SceneObject(GeometryFactory.getInstance()
                     .createHighResolutionCloudGeometry(clusters.get(i)));
@@ -87,8 +92,6 @@ public final class SceneController extends Controller {
      * @param view is the view selection for the cluster at index {@code i}
      */
     public void setSelectedViewIndex(int i, int view) {
-        int prev = selectedViewIndices[i];
-
         selectedViewIndices[i] = view;
 
         if (views[i][view] == null) {
@@ -117,7 +120,7 @@ public final class SceneController extends Controller {
 
         scene.replace(i, object);
 
-        changeSupport.firePropertyChange("SelectedViewIndexUpdate", prev, selectedViewIndices[i]);
+        changeSupport.firePropertyChange("SceneViewIndexUpdate", null, scene);
     }
 
     /**
@@ -135,7 +138,56 @@ public final class SceneController extends Controller {
             scene.add(new SceneObject("selection", geometry));
         }
 
-        changeSupport.firePropertyChange("SceneSelectionUpdate", null, i);
+        changeSupport.firePropertyChange("SceneSelectionUpdate", null, scene);
+    }
+
+    /**
+     * Centers the cluster contained within each semantic description according
+     * to a common centroid.
+     *
+     * @param descriptions is a list of semantic cloud descriptions, each
+     * containing a cluster.
+     */
+    private void center(List<SemanticCloudDescription> descriptions) {
+        Point3d centroid = new Point3d(0, 0, 0);
+        int size = 0;
+
+        for (SemanticCloudDescription description : descriptions) {
+            PointCloud cluster = description.getCloud();
+
+            size += cluster.size();
+
+            cluster.forEach(point -> {
+                centroid.add(new Vector3d(point.x, point.y, point.z));
+            });
+        }
+
+        centroid.set(centroid.x / size, centroid.y / size, centroid.z / size);
+
+        descriptions.stream().map((description) -> description.getCloud()).forEachOrdered((cluster) -> {
+            cluster.forEach(point -> {
+                point.sub(centroid);
+            });
+        });
+    }
+
+    /**
+     * Rotates the cluster of each semantic description so that the up vector of
+     * the whole corresponds to the world Z-axis.
+     *
+     * @param descriptions is a list of semantic cloud descriptions, each
+     * containing a cluster.
+     */
+    private void rotate(List<SemanticCloudDescription> descriptions) {
+        descriptions.stream().map((description) -> description.getCloud()).forEachOrdered((cluster) -> {
+            cluster.forEach(point -> {
+                Vector3f v = new Vector3f((float) point.x, (float) point.y, (float) point.z);
+
+                v.rotateAxis((float) (Math.PI / 2), 0.0f, 1.0f, 0.0f);
+
+                point.set(v.x, v.y, v.z);
+            });
+        });
     }
 
 }

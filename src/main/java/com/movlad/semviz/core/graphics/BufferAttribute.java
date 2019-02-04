@@ -6,7 +6,7 @@ import com.jogamp.opengl.util.GLBuffers;
  * Class representing one attribute of a buffer layout, such as position, color
  * or texture coordinates.
  */
-class BufferAttribute {
+public class BufferAttribute {
 
     private final String name;
     private final int size;

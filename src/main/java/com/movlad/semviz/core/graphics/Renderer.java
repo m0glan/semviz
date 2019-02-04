@@ -15,8 +15,8 @@ import org.lwjgl.BufferUtils;
  */
 public abstract class Renderer implements GLEventListener {
 
-    private final Scene scene;
-    private final Camera camera;
+    private volatile Scene scene;
+    private Camera camera;
 
     private ShaderProgram program;
 
@@ -24,10 +24,16 @@ public abstract class Renderer implements GLEventListener {
     private IntBuffer vaos;
     private IntBuffer vbos;
 
-    public Renderer(Scene scene, Camera camera) {
-        this.scene = scene;
-        this.camera = camera;
+    public Renderer() {
         this.VAO = IntBuffer.allocate(1);
+    }
+
+    public final void setScene(Scene scene) {
+        this.scene = scene;
+    }
+
+    public final void setCamera(Camera camera) {
+        this.camera = camera;
     }
 
     @Override

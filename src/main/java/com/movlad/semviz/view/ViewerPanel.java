@@ -5,18 +5,22 @@ import com.jogamp.opengl.GLCapabilities;
 import com.jogamp.opengl.GLProfile;
 import com.jogamp.opengl.awt.GLJPanel;
 import com.jogamp.opengl.util.Animator;
+import com.movlad.semviz.application.SQMController;
 import com.movlad.semviz.application.SceneController;
 import com.movlad.semviz.core.graphics.Controls;
 import com.movlad.semviz.core.graphics.OrbitControls;
 import com.movlad.semviz.core.graphics.OrthographicCamera;
 import com.movlad.semviz.core.graphics.Renderer;
+import com.movlad.semviz.core.graphics.Scene;
 import java.awt.Dimension;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import org.joml.Vector3f;
 
 /**
  * Interface component on which a scene is drawn.
  */
-public final class ViewerPanel extends GLJPanel {
+public final class ViewerPanel extends GLJPanel implements PropertyChangeListener {
 
     private final OrthographicCamera camera;
     private final Controls controls;
@@ -34,6 +38,11 @@ public final class ViewerPanel extends GLJPanel {
         super(new GLCapabilities(GLProfile.get(GLProfile.GL3)));
         setSize(d);
 
+        sceneController.register(this);
+        SQMController.getInstance().register(this);
+
+        Scene scene = new Scene();
+
         camera = new OrthographicCamera(-getWidth() / 2, getWidth() / 2, -getHeight() / 2, getHeight() / 2,
                 0.1f, 1000.0f);
 
@@ -49,7 +58,7 @@ public final class ViewerPanel extends GLJPanel {
         addMouseMotionListener(controls);
         addMouseWheelListener(controls);
 
-        renderer = new Renderer(sceneController.getScene(), camera) {
+        renderer = new Renderer() {
 
             @Override
             public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
@@ -60,11 +69,25 @@ public final class ViewerPanel extends GLJPanel {
 
         };
 
+        renderer.setCamera(camera);
+        renderer.setScene(scene);
         addGLEventListener(renderer);
 
         animator = new Animator(this);
 
         animator.start();
+    }
+
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+        if (evt.getPropertyName().equals("SQMExecutionStarted")) {
+            animator.stop();
+        }
+
+        if (evt.getPropertyName().contains("Scene")) {
+            renderer.setScene((Scene) evt.getNewValue());
+            animator.start();
+        }
     }
 
 }
