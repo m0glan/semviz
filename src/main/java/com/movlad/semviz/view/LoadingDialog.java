@@ -1,13 +1,13 @@
 package com.movlad.semviz.view;
 
-import javax.swing.JFrame;
+import java.awt.Window;
 
 public final class LoadingDialog extends javax.swing.JDialog {
 
     /**
      * @param parent is the parent frame
      */
-    public LoadingDialog(JFrame parent) {
+    public LoadingDialog(Window parent) {
         super(parent);
 
         this.initComponents();

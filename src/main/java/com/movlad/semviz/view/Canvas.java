@@ -20,7 +20,7 @@ import org.joml.Vector3f;
 /**
  * Interface component on which a scene is drawn.
  */
-public final class ViewerPanel extends GLJPanel implements PropertyChangeListener {
+public final class Canvas extends GLJPanel implements PropertyChangeListener {
 
     private final OrthographicCamera camera;
     private final Controls controls;
@@ -34,7 +34,7 @@ public final class ViewerPanel extends GLJPanel implements PropertyChangeListene
      * @param sceneController is the controller containing the scene to be
      * observed
      */
-    public ViewerPanel(Dimension d, SceneController sceneController) {
+    public Canvas(Dimension d, SceneController sceneController) {
         super(new GLCapabilities(GLProfile.get(GLProfile.GL3)));
         setSize(d);
 
