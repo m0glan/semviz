@@ -1,4 +1,4 @@
-package com.movlad.semviz.patterns.mediator;
+package com.movlad.semviz.mvp;
 
 public interface IParticipant {
 

@@ -1,16 +1,14 @@
 package com.movlad.semviz.data;
 
 import java.util.Map;
-import org.apache.jena.ontology.Individual;
 
-public class SemanticObjectAnnotation<T> {
+public class SemanticAnnotation<T> {
 
     private String uri;
     private Map<String, String> annotations;
     private T annotatedObject;
 
-    public SemanticObjectAnnotation(String uri, Individual individual, Map<String, String> annotations,
-            T object) {
+    public SemanticAnnotation(String uri, Map<String, String> annotations, T object) {
         this.uri = uri;
         this.annotations = annotations;
         this.annotatedObject = object;

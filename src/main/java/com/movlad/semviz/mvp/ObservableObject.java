@@ -1,13 +1,13 @@
-package com.movlad.semviz.presentation;
+package com.movlad.semviz.mvp;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 
-public class PresenterBase {
+public class ObservableObject {
 
     private final PropertyChangeSupport changeSupport;
 
-    public PresenterBase() {
+    public ObservableObject() {
         changeSupport = new PropertyChangeSupport(this);
     }
 

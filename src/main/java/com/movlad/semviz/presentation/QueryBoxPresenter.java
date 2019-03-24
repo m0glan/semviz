@@ -1,13 +1,14 @@
 package com.movlad.semviz.presentation;
 
+import com.movlad.semviz.mvp.ObservableObject;
 import com.movlad.semviz.core.sqm.SQM;
-import com.movlad.semviz.patterns.mediator.IParticipant;
-import com.movlad.semviz.patterns.mediator.Mediator;
+import com.movlad.semviz.mvp.IParticipant;
+import com.movlad.semviz.mvp.Mediator;
 import com.movlad.semviz.service.navigation.ILoadingDialogService;
 import java.util.ArrayList;
 import java.util.List;
 
-public class QueryBoxPresenter extends PresenterBase
+public class QueryBoxPresenter extends ObservableObject
         implements IParticipant {
 
     private boolean isEnabled;
