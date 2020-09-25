@@ -1,6 +1,6 @@
 # Semviz
 
-![Tag](https://img.shields.io/badge/tag-v1.0.1-blue.svg) [![Build Status](https://travis-ci.com/vmoglan/semviz.svg?branch=master)](https://travis-ci.org/vmoglan/semviz)
+![Tag](https://img.shields.io/badge/tag-1.0.1-blue.svg) [![Build Status](https://travis-ci.com/vmoglan/semviz.svg?branch=master)](https://travis-ci.org/vmoglan/semviz)
 
 ## Main objective
 
